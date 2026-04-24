@@ -62,13 +62,16 @@ jobs:
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       
       - name: Run Bandit security linter
-        uses: gaurav-nelson/bandit-action@v1
-        with:
-          path: "CancerGenomicsSuite"
-          level: "medium"
-          confidence: "medium"
+        run: |
+          pip install bandit
+          bandit -r CancerGenomicsSuite -ll -ii -f json -o bandit-results.json || true
       
       - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1

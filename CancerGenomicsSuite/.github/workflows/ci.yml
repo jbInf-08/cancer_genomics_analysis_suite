@@ -269,8 +269,9 @@ jobs:
     - name: Notify deployment
       uses: 8398a7/action-slack@v3
       if: always()
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       with:
         status: ${{ job.status }}
         channel: '#deployments'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
         fields: repo,message,commit,author,action,eventName,ref,workflow
