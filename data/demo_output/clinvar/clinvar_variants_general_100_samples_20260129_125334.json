@@ -1,0 +1,2512 @@
+[
+  {
+    "variation_id": "4686570",
+    "title": "NM_000546.6(TP53):c.1168_1171dup (p.Asp391delinsAlaTer)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004686570",
+    "trait_names": "",
+    "molecular_consequence": [
+      "nonsense",
+      "3 prime UTR variant",
+      "non-coding transcript variant",
+      "frameshift variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007127652"
+    ]
+  },
+  {
+    "variation_id": "4553149",
+    "title": "NM_000546.6(TP53):c.153_159dup (p.Phe54fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553149",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "F54fs, F15fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007152014"
+    ]
+  },
+  {
+    "variation_id": "4553134",
+    "title": "NM_000546.6(TP53):c.142_151del (p.Asp48fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553134",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "D9fs, D48fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007151998"
+    ]
+  },
+  {
+    "variation_id": "4553123",
+    "title": "NM_000546.6(TP53):c.1164A>C (p.Glu388Asp)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553123",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "E256D, E229D, E388D, E349D",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007151987"
+    ]
+  },
+  {
+    "variation_id": "4553112",
+    "title": "NM_000546.6(TP53):c.791_808delinsACTGGGACGGAACAGC (p.Leu264fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553112",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "L132fs, L264fs, L225fs, L105fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007151976"
+    ]
+  },
+  {
+    "variation_id": "4553088",
+    "title": "NM_000546.6(TP53):c.322_329delinsATTCTGGGCTACAT (p.Gly108_Arg110delinsIleLeuGlyTyrIle)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553088",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_indel",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007151948"
+    ]
+  },
+  {
+    "variation_id": "4553078",
+    "title": "NM_000546.6(TP53):c.360G>A (p.Lys120=)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553078",
+    "trait_names": "",
+    "molecular_consequence": [
+      "synonymous variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007151938"
+    ]
+  },
+  {
+    "variation_id": "4553048",
+    "title": "NM_000546.6(TP53):c.265_272del (p.Pro89fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553048",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "P50fs, P89fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007151905"
+    ]
+  },
+  {
+    "variation_id": "4553021",
+    "title": "NM_000546.6(TP53):c.981T>C (p.Tyr327=)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553021",
+    "trait_names": "",
+    "molecular_consequence": [
+      "synonymous variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007151876"
+    ]
+  },
+  {
+    "variation_id": "4553010",
+    "title": "NM_000546.6(TP53):c.503del (p.His168fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553010",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "H129fs, H168fs, H9fs, H36fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154387"
+    ]
+  },
+  {
+    "variation_id": "4553001",
+    "title": "NM_000546.6(TP53):c.673-96_673del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004553001",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154378"
+    ]
+  },
+  {
+    "variation_id": "4552983",
+    "title": "NM_000546.6(TP53):c.1087A>T (p.Arg363Trp)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552983",
+    "trait_names": "",
+    "molecular_consequence": [
+      "3 prime UTR variant",
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "R324W, R231W, R363W, R204W",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154359"
+    ]
+  },
+  {
+    "variation_id": "4552972",
+    "title": "NM_000546.6(TP53):c.220G>A (p.Ala74Thr)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552972",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "A35T, A74T",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154348"
+    ]
+  },
+  {
+    "variation_id": "4552962",
+    "title": "NM_000546.6(TP53):c.648_666delinsTTCC (p.Val217_Pro222delinsSer)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552962",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_indel"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154338"
+    ]
+  },
+  {
+    "variation_id": "4552953",
+    "title": "NM_000546.6(TP53):c.898_906dup (p.Gly302_Ser303insProProGly)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552953",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_insertion",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154329"
+    ]
+  },
+  {
+    "variation_id": "4552934",
+    "title": "NM_000546.6(TP53):c.336C>T (p.Gly112=)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552934",
+    "trait_names": "",
+    "molecular_consequence": [
+      "synonymous variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154309"
+    ]
+  },
+  {
+    "variation_id": "4552901",
+    "title": "NM_000546.6(TP53):c.690C>A (p.Thr230=)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552901",
+    "trait_names": "",
+    "molecular_consequence": [
+      "non-coding transcript variant",
+      "synonymous variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154273"
+    ]
+  },
+  {
+    "variation_id": "4552891",
+    "title": "NM_000546.6(TP53):c.676_708dup (p.Tyr236_Met237insGlySerAspCysThrThrIleHisTyrAsnTyr)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552891",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_insertion",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154263"
+    ]
+  },
+  {
+    "variation_id": "4552487",
+    "title": "NM_000546.6(TP53):c.502C>T (p.His168Tyr)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004552487",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "H129Y, H168Y, H9Y, H36Y",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007154691"
+    ]
+  },
+  {
+    "variation_id": "4539756",
+    "title": "NM_000546.6(TP53):c.75-1G>C",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539756",
+    "trait_names": "",
+    "molecular_consequence": [
+      "5 prime UTR variant",
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129919"
+    ]
+  },
+  {
+    "variation_id": "4539755",
+    "title": "NM_000546.6(TP53):c.241_244dup (p.Pro82fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539755",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "P43fs, P82fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129914"
+    ]
+  },
+  {
+    "variation_id": "4539754",
+    "title": "NM_000546.6(TP53):c.392_397del (p.Asn131_Lys132del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539754",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_deletion",
+      "initiator_codon_variant",
+      "5 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "M1del",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129904"
+    ]
+  },
+  {
+    "variation_id": "4539753",
+    "title": "NM_000546.6(TP53):c.414dup (p.Lys139fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539753",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant",
+      "5 prime UTR variant"
+    ],
+    "protein_change": "K100fs, K139fs, K7fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129900"
+    ]
+  },
+  {
+    "variation_id": "4539752",
+    "title": "NM_000546.6(TP53):c.414_420del (p.Lys139fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539752",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant",
+      "5 prime UTR variant"
+    ],
+    "protein_change": "K100fs, K139fs, K7fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129898"
+    ]
+  },
+  {
+    "variation_id": "4539751",
+    "title": "NM_000546.6(TP53):c.421_424del (p.Cys141fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539751",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "5 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "C102fs, C141fs, C9fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129897"
+    ]
+  },
+  {
+    "variation_id": "4539750",
+    "title": "NM_000546.6(TP53):c.463_466del (p.Thr155fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539750",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant",
+      "5 prime UTR variant"
+    ],
+    "protein_change": "T116fs, T155fs, T23fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129892"
+    ]
+  },
+  {
+    "variation_id": "4539749",
+    "title": "NM_000546.6(TP53):c.489_490del (p.Tyr163_Lys164delinsTer)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539749",
+    "trait_names": "",
+    "molecular_consequence": [
+      "nonsense",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129886"
+    ]
+  },
+  {
+    "variation_id": "4539748",
+    "title": "NM_000546.6(TP53):c.504_513dup (p.Val172fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539748",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "V133fs, V13fs, V172fs, V40fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129883"
+    ]
+  },
+  {
+    "variation_id": "4539746",
+    "title": "NM_000546.6(TP53):c.559+35_560-8del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539746",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129875"
+    ]
+  },
+  {
+    "variation_id": "4539744",
+    "title": "NM_000546.6(TP53):c.638del (p.Arg213fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539744",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant"
+    ],
+    "protein_change": "R174fs, R213fs, R54fs, R81fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129865"
+    ]
+  },
+  {
+    "variation_id": "4539743",
+    "title": "NM_000546.6(TP53):c.688A>C (p.Thr230Pro)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539743",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "T191P, T230P, T71P, T98P",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129859"
+    ]
+  },
+  {
+    "variation_id": "4539742",
+    "title": "NM_000546.6(TP53):c.751_758del (p.Ile251fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539742",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "I119fs, I212fs, I251fs, I92fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129842"
+    ]
+  },
+  {
+    "variation_id": "4539741",
+    "title": "NM_000546.6(TP53):c.759_769del (p.Ile254fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539741",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "I122fs, I215fs, I254fs, I95fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129841"
+    ]
+  },
+  {
+    "variation_id": "4539740",
+    "title": "NM_000546.6(TP53):c.815dup (p.Arg273fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539740",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "R114fs, R141fs, R234fs, R273fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129831"
+    ]
+  },
+  {
+    "variation_id": "4539739",
+    "title": "NM_000546.6(TP53):c.814_837del (p.Val272_Gly279del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539739",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_deletion",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129826"
+    ]
+  },
+  {
+    "variation_id": "4539738",
+    "title": "NM_000546.6(TP53):c.871A>T (p.Lys291Ter)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539738",
+    "trait_names": "",
+    "molecular_consequence": [
+      "nonsense",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "K132*, K159*, K252*, K291*",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129824"
+    ]
+  },
+  {
+    "variation_id": "4539737",
+    "title": "NM_000546.6(TP53):c.885_900del (p.His296fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539737",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "H137fs, H164fs, H257fs, H296fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129822"
+    ]
+  },
+  {
+    "variation_id": "4539736",
+    "title": "NM_000546.6(TP53):c.1176_1177insAA (p.Asp393fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539736",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "D234fs, D261fs, D354fs, D393fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129813"
+    ]
+  },
+  {
+    "variation_id": "4539572",
+    "title": "NM_000546.6(TP53):c.-29+2T>C",
+    "gene_symbols": "LOC126862483; TP53; WRAP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004539572",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice donor variant",
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007129519"
+    ]
+  },
+  {
+    "variation_id": "4533295",
+    "title": "NM_000546.6(TP53):c.322_332delinsATTCA (p.Gly108_Leu111delinsIleGln)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004533295",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_indel",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007113938"
+    ]
+  },
+  {
+    "variation_id": "4532981",
+    "title": "NM_000546.6(TP53):c.330_331insAAACCGT (p.Leu111fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004532981",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "L111fs, L72fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007111134"
+    ]
+  },
+  {
+    "variation_id": "4530512",
+    "title": "NM_000546.6(TP53):c.1020dup (p.Phe341fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530512",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "F182fs, F209fs, F302fs, F341fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105426"
+    ]
+  },
+  {
+    "variation_id": "4530510",
+    "title": "NM_000546.6(TP53):c.461_469del (p.Gly154_Arg156del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530510",
+    "trait_names": "",
+    "molecular_consequence": [
+      "5 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105392"
+    ]
+  },
+  {
+    "variation_id": "4530422",
+    "title": "NM_000546.6(TP53):c.639_640inv (p.His214Tyr)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530422",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant"
+    ],
+    "protein_change": "H175Y, H214Y, H55Y, H82Y",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007104886"
+    ]
+  },
+  {
+    "variation_id": "4530246",
+    "title": "NM_000546.6(TP53):c.1051_1058del (p.Lys351fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530246",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "K192fs, K219fs, K312fs, K351fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105639"
+    ]
+  },
+  {
+    "variation_id": "4530245",
+    "title": "NM_000546.6(TP53):c.1015_1023del (p.Glu339_Phe341del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530245",
+    "trait_names": "",
+    "molecular_consequence": [
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105638"
+    ]
+  },
+  {
+    "variation_id": "4530244",
+    "title": "NM_000546.6(TP53):c.993+216del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530244",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "intron variant"
+    ],
+    "protein_change": "E180fs, E207fs, E300fs, E339fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105633"
+    ]
+  },
+  {
+    "variation_id": "4530243",
+    "title": "NM_000546.6(TP53):c.835G>T (p.Gly279Trp)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530243",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "G120W, G147W, G240W, G279W",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105628"
+    ]
+  },
+  {
+    "variation_id": "4530242",
+    "title": "NM_000546.6(TP53):c.1045del (p.Glu349fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530242",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "E190fs, E217fs, E310fs, E349fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105625",
+      "SCV007129814"
+    ]
+  },
+  {
+    "variation_id": "4530239",
+    "title": "NM_000546.6(TP53):c.458_472del (p.Pro153_Val157del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530239",
+    "trait_names": "",
+    "molecular_consequence": [
+      "5 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105607"
+    ]
+  },
+  {
+    "variation_id": "4530238",
+    "title": "NM_000546.6(TP53):c.1017_1018del (p.Glu339fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530238",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "E180fs, E207fs, E300fs, E339fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105601"
+    ]
+  },
+  {
+    "variation_id": "4530237",
+    "title": "NM_000546.6(TP53):c.818del (p.Arg273fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530237",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "R114fs, R141fs, R234fs, R273fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105576"
+    ]
+  },
+  {
+    "variation_id": "4530236",
+    "title": "NM_000546.6(TP53):c.816_817delinsAA (p.Arg273Ser)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530236",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "R114S, R141S, R234S, R273S",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105566"
+    ]
+  },
+  {
+    "variation_id": "4530235",
+    "title": "NM_000546.6(TP53):c.761_781del (p.Ile254_Ser260del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004530235",
+    "trait_names": "",
+    "molecular_consequence": [
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV007105558"
+    ]
+  },
+  {
+    "variation_id": "4427958",
+    "title": "NM_000546.6(TP53):c.74+4A>G",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427958",
+    "trait_names": "",
+    "molecular_consequence": [
+      "5 prime UTR variant",
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902902"
+    ]
+  },
+  {
+    "variation_id": "4427957",
+    "title": "NM_000546.6(TP53):c.75-2A>C",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427957",
+    "trait_names": "",
+    "molecular_consequence": [
+      "5 prime UTR variant",
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902901"
+    ]
+  },
+  {
+    "variation_id": "4427954",
+    "title": "NM_000546.6(TP53):c.96+31A>T",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427954",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902890",
+      "SCV006902889",
+      "SCV006902881",
+      "SCV006902882",
+      "SCV006902883",
+      "SCV006902880",
+      "SCV006902879",
+      "SCV006902887",
+      "SCV006902886",
+      "SCV006902885",
+      "SCV006902884",
+      "SCV006902891"
+    ]
+  },
+  {
+    "variation_id": "4427952",
+    "title": "NM_000546.6(TP53):c.97-2A>T",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427952",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902875"
+    ]
+  },
+  {
+    "variation_id": "4427951",
+    "title": "NM_000546.6(TP53):c.97-1G>C",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427951",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902867",
+      "SCV006902868",
+      "SCV006902869"
+    ]
+  },
+  {
+    "variation_id": "4427947",
+    "title": "NM_000546.6(TP53):c.362C>A (p.Ser121Tyr)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427947",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "S82Y, S121Y",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902858"
+    ]
+  },
+  {
+    "variation_id": "4427946",
+    "title": "NM_000546.6(TP53):c.363T>A (p.Ser121=)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427946",
+    "trait_names": "",
+    "molecular_consequence": [
+      "non-coding transcript variant",
+      "synonymous variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902857"
+    ]
+  },
+  {
+    "variation_id": "4427945",
+    "title": "NM_000546.6(TP53):c.373A>T (p.Thr125Ser)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427945",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "T125S, T86S",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006902856"
+    ]
+  },
+  {
+    "variation_id": "4427938",
+    "title": "NM_000546.6(TP53):c.559+2T>G",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427938",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice donor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006900371",
+      "SCV006900372"
+    ]
+  },
+  {
+    "variation_id": "4427937",
+    "title": "NM_000546.6(TP53):c.586C>A (p.Arg196=)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427937",
+    "trait_names": "",
+    "molecular_consequence": [
+      "synonymous variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006900354"
+    ]
+  },
+  {
+    "variation_id": "4427936",
+    "title": "NM_000546.6(TP53):c.673-7C>G",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427936",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006900284"
+    ]
+  },
+  {
+    "variation_id": "4427935",
+    "title": "NM_000546.6(TP53):c.782G>A (p.Ser261Asn)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427935",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "S129N, S261N, S102N, S222N",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006897759"
+    ]
+  },
+  {
+    "variation_id": "4427933",
+    "title": "NM_000546.6(TP53):c.783-10T>A",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427933",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006897742"
+    ]
+  },
+  {
+    "variation_id": "4427932",
+    "title": "NM_000546.6(TP53):c.783-6G>T",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427932",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006897741"
+    ]
+  },
+  {
+    "variation_id": "4427925",
+    "title": "NM_000546.6(TP53):c.997C>G (p.Arg333Gly)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004427925",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "R174G, R201G, R294G, R333G",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006897637"
+    ]
+  },
+  {
+    "variation_id": "4294233",
+    "title": "NM_000546.6(TP53):c.940_952del (p.Ser314fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004294233",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "S155fs, S182fs, S275fs, S314fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006586505"
+    ]
+  },
+  {
+    "variation_id": "4285561",
+    "title": "NM_000546.6(TP53):c.96+1_96+6del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285561",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice donor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562897"
+    ]
+  },
+  {
+    "variation_id": "4285559",
+    "title": "NM_000546.6(TP53):c.97-44_97-21del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285559",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562895"
+    ]
+  },
+  {
+    "variation_id": "4285558",
+    "title": "NM_000546.6(TP53):c.97-37_97-22del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285558",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562894"
+    ]
+  },
+  {
+    "variation_id": "4285557",
+    "title": "NM_000546.6(TP53):c.97-9_97-2del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285557",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562892"
+    ]
+  },
+  {
+    "variation_id": "4285556",
+    "title": "NM_000546.6(TP53):c.97-8_106del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285556",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562891"
+    ]
+  },
+  {
+    "variation_id": "4285555",
+    "title": "NM_000546.6(TP53):c.346_375+25del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285555",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice donor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562888"
+    ]
+  },
+  {
+    "variation_id": "4285554",
+    "title": "NM_000546.6(TP53):c.376-2_376-1del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285554",
+    "trait_names": "",
+    "molecular_consequence": [
+      "5 prime UTR variant",
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562887"
+    ]
+  },
+  {
+    "variation_id": "4285552",
+    "title": "NM_000546.6(TP53):c.610del (p.Glu204fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285552",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant"
+    ],
+    "protein_change": "E165fs, E204fs, E45fs, E72fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562884"
+    ]
+  },
+  {
+    "variation_id": "4285551",
+    "title": "NM_000546.6(TP53):c.752_782+121del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285551",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice donor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562883"
+    ]
+  },
+  {
+    "variation_id": "4285550",
+    "title": "NM_000546.6(TP53):c.783-3_786del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285550",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562882"
+    ]
+  },
+  {
+    "variation_id": "4285549",
+    "title": "NM_000546.6(TP53):c.920-26_920-6del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285549",
+    "trait_names": "",
+    "molecular_consequence": [
+      "intron variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562881"
+    ]
+  },
+  {
+    "variation_id": "4285548",
+    "title": "NM_000546.6(TP53):c.920-11_920del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285548",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice acceptor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562879"
+    ]
+  },
+  {
+    "variation_id": "4285546",
+    "title": "NM_000546.6(TP53):c.949_978del (p.Gln317_Glu326del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285546",
+    "trait_names": "",
+    "molecular_consequence": [
+      "inframe_deletion",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562877"
+    ]
+  },
+  {
+    "variation_id": "4285545",
+    "title": "NM_000546.6(TP53):c.993+2_993+13del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004285545",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice donor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006562876"
+    ]
+  },
+  {
+    "variation_id": "4279056",
+    "title": "NM_000546.6(TP53):c.391A>C (p.Asn131His)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004279056",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "5 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "N131H, N92H",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006554497"
+    ]
+  },
+  {
+    "variation_id": "4189278",
+    "title": "NM_000546.6(TP53):c.470dup (p.Arg158fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189278",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant",
+      "5 prime UTR variant"
+    ],
+    "protein_change": "R119fs, R158fs, R26fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451546"
+    ]
+  },
+  {
+    "variation_id": "4189277",
+    "title": "NM_000546.6(TP53):c.1182A>C (p.Ter394Cys)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189277",
+    "trait_names": "",
+    "molecular_consequence": [
+      "stop lost",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451545"
+    ]
+  },
+  {
+    "variation_id": "4189276",
+    "title": "NM_000546.6(TP53):c.476_480delinsGGT (p.Ala159fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189276",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "initiator_codon_variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "A120fs, A159fs, M1fs, A27fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451544"
+    ]
+  },
+  {
+    "variation_id": "4189275",
+    "title": "NM_000546.6(TP53):c.858A>G (p.Glu286=)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189275",
+    "trait_names": "",
+    "molecular_consequence": [
+      "synonymous variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451543"
+    ]
+  },
+  {
+    "variation_id": "4189274",
+    "title": "NM_000546.6(TP53):c.299A>C (p.Gln100Pro)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189274",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "Q100P, Q61P",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451542"
+    ]
+  },
+  {
+    "variation_id": "4189273",
+    "title": "NM_000546.6(TP53):c.535_543del (p.His179_Arg181del)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189273",
+    "trait_names": "",
+    "molecular_consequence": [
+      "non-coding transcript variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451541"
+    ]
+  },
+  {
+    "variation_id": "4189272",
+    "title": "NM_000546.6(TP53):c.864dup (p.Leu289fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189272",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "L250fs, L157fs, L289fs, L130fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451540"
+    ]
+  },
+  {
+    "variation_id": "4189271",
+    "title": "NM_000546.6(TP53):c.236C>T (p.Ala79Val)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189271",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "A79V, A40V",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451538"
+    ]
+  },
+  {
+    "variation_id": "4189270",
+    "title": "NM_000546.6(TP53):c.455_459del (p.Pro152fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189270",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "5 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "P113fs, P152fs, P20fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451537"
+    ]
+  },
+  {
+    "variation_id": "4189268",
+    "title": "NM_000546.6(TP53):c.563T>C (p.Leu188Pro)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189268",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant"
+    ],
+    "protein_change": "L149P, L29P, L56P, L188P",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451535"
+    ]
+  },
+  {
+    "variation_id": "4189267",
+    "title": "NM_000546.6(TP53):c.672_672+6del",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189267",
+    "trait_names": "",
+    "molecular_consequence": [
+      "splice donor variant"
+    ],
+    "protein_change": "",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451534"
+    ]
+  },
+  {
+    "variation_id": "4189266",
+    "title": "NM_000546.6(TP53):c.869del (p.Arg290fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189266",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "R158fs, R131fs, R251fs, R290fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451531"
+    ]
+  },
+  {
+    "variation_id": "4189265",
+    "title": "NM_000546.6(TP53):c.1150dup (p.Met384fs)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189265",
+    "trait_names": "",
+    "molecular_consequence": [
+      "frameshift variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "M252fs, M345fs, M225fs, M384fs",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451529"
+    ]
+  },
+  {
+    "variation_id": "4189264",
+    "title": "NM_000546.6(TP53):c.523C>A (p.Arg175Ser)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189264",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "R175S, R43S, R136S, R16S",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451527",
+      "SCV007099946"
+    ]
+  },
+  {
+    "variation_id": "4189263",
+    "title": "NM_000546.6(TP53):c.994A>C (p.Ile332Leu)",
+    "gene_symbols": "TP53",
+    "clinical_significance": "Not provided",
+    "review_status": "",
+    "variation_type": "",
+    "chromosome": "",
+    "start": "",
+    "stop": "",
+    "ref_allele": "",
+    "alt_allele": "",
+    "assembly": "",
+    "accession": "VCV004189263",
+    "trait_names": "",
+    "molecular_consequence": [
+      "missense variant",
+      "3 prime UTR variant",
+      "non-coding transcript variant"
+    ],
+    "protein_change": "I200L, I293L, I173L, I332L",
+    "last_evaluated": "",
+    "submission_count": [
+      "SCV006451526"
+    ]
+  }
+]

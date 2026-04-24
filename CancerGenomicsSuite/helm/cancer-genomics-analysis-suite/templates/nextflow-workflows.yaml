@@ -1,0 +1,540 @@
+{{- if .Values.nextflowWorkflows.enabled }}
+# Nextflow Workflow Controller
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-controller
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: nextflow-controller
+spec:
+  replicas: {{ .Values.nextflowWorkflows.controller.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: nextflow-controller
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: nextflow-controller
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: nextflow-controller
+          image: "{{ .Values.nextflowWorkflows.image.registry }}/{{ .Values.nextflowWorkflows.image.repository }}:{{ .Values.nextflowWorkflows.image.tag }}"
+          imagePullPolicy: {{ .Values.nextflowWorkflows.image.pullPolicy }}
+          command: ["python", "-m", "nextflow_workflows.controller"]
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_TOPIC_WORKFLOW_REQUESTS
+              value: "{{ .Values.nextflowWorkflows.topics.workflowRequests }}"
+            - name: KAFKA_TOPIC_WORKFLOW_STATUS
+              value: "{{ .Values.nextflowWorkflows.topics.workflowStatus }}"
+            - name: REDIS_URL
+              value: "redis://{{ include "cancer-genomics-analysis-suite.fullname" . }}-redis-master:6379/0"
+            - name: POSTGRES_URL
+              value: "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql:5432/{{ .Values.postgresql.auth.database }}"
+            - name: WORKFLOW_STORAGE_PATH
+              value: "/workflows"
+            - name: WORKFLOW_OUTPUT_PATH
+              value: "/outputs"
+            - name: NEXFLOW_EXECUTOR
+              value: "k8s"
+            - name: KUBERNETES_NAMESPACE
+              value: "{{ .Release.Namespace }}"
+            - name: NEXFLOW_WORK_DIR
+              value: "/workflows/work"
+            - name: NEXFLOW_TEMP_DIR
+              value: "/workflows/tmp"
+            {{- with .Values.nextflowWorkflows.controller.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.nextflowWorkflows.controller.resources | nindent 12 }}
+          volumeMounts:
+            - name: workflow-storage
+              mountPath: /workflows
+            - name: workflow-outputs
+              mountPath: /outputs
+            - name: nextflow-config
+              mountPath: /config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      volumes:
+        - name: workflow-storage
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-workflows
+        - name: workflow-outputs
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-outputs
+        - name: nextflow-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-config
+      {{- with .Values.nextflowWorkflows.controller.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nextflowWorkflows.controller.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nextflowWorkflows.controller.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+# Nextflow Workflow Executor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-executor
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: nextflow-executor
+spec:
+  replicas: {{ .Values.nextflowWorkflows.executor.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: nextflow-executor
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: nextflow-executor
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: nextflow-executor
+          image: "{{ .Values.nextflowWorkflows.image.registry }}/{{ .Values.nextflowWorkflows.image.repository }}:{{ .Values.nextflowWorkflows.image.tag }}"
+          imagePullPolicy: {{ .Values.nextflowWorkflows.image.pullPolicy }}
+          command: ["python", "-m", "nextflow_workflows.executor"]
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_TOPIC_WORKFLOW_TASKS
+              value: "{{ .Values.nextflowWorkflows.topics.workflowTasks }}"
+            - name: KAFKA_TOPIC_TASK_STATUS
+              value: "{{ .Values.nextflowWorkflows.topics.taskStatus }}"
+            - name: REDIS_URL
+              value: "redis://{{ include "cancer-genomics-analysis-suite.fullname" . }}-redis-master:6379/0"
+            - name: WORKFLOW_STORAGE_PATH
+              value: "/workflows"
+            - name: WORKFLOW_OUTPUT_PATH
+              value: "/outputs"
+            - name: NEXFLOW_EXECUTOR
+              value: "k8s"
+            - name: KUBERNETES_NAMESPACE
+              value: "{{ .Release.Namespace }}"
+            - name: NEXFLOW_WORK_DIR
+              value: "/workflows/work"
+            - name: NEXFLOW_TEMP_DIR
+              value: "/workflows/tmp"
+            - name: MAX_CONCURRENT_JOBS
+              value: "{{ .Values.nextflowWorkflows.executor.maxConcurrentJobs }}"
+            {{- with .Values.nextflowWorkflows.executor.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.nextflowWorkflows.executor.resources | nindent 12 }}
+          volumeMounts:
+            - name: workflow-storage
+              mountPath: /workflows
+            - name: workflow-outputs
+              mountPath: /outputs
+            - name: nextflow-config
+              mountPath: /config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      volumes:
+        - name: workflow-storage
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-workflows
+        - name: workflow-outputs
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-outputs
+        - name: nextflow-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-config
+      {{- with .Values.nextflowWorkflows.executor.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nextflowWorkflows.executor.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nextflowWorkflows.executor.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+# Nextflow Storage PVCs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-workflows
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: nextflow
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.nextflowWorkflows.storage.workflowsSize }}
+  {{- if .Values.nextflowWorkflows.storage.storageClass }}
+  storageClassName: {{ .Values.nextflowWorkflows.storage.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-outputs
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: nextflow
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.nextflowWorkflows.storage.outputsSize }}
+  {{- if .Values.nextflowWorkflows.storage.storageClass }}
+  storageClassName: {{ .Values.nextflowWorkflows.storage.storageClass }}
+  {{- end }}
+---
+# Nextflow Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: nextflow
+data:
+  nextflow.config: |
+    // Nextflow configuration for Cancer Genomics Analysis
+    process {
+        executor = 'k8s'
+        queue = 'default'
+        
+        // Resource limits
+        cpus = {{ .Values.nextflowWorkflows.defaultResources.cpu }}
+        memory = '{{ .Values.nextflowWorkflows.defaultResources.memory }}'
+        disk = '{{ .Values.nextflowWorkflows.defaultResources.disk }}'
+        
+        // Error handling
+        errorStrategy = 'retry'
+        maxRetries = {{ .Values.nextflowWorkflows.retry.maxAttempts }}
+        
+        // Container settings
+        container = '{{ .Values.nextflowWorkflows.image.registry }}/{{ .Values.nextflowWorkflows.image.repository }}:{{ .Values.nextflowWorkflows.image.tag }}'
+        
+        // Storage
+        scratch = false
+        stageInMode = 'copy'
+        stageOutMode = 'copy'
+    }
+    
+    // Kubernetes configuration
+    k8s {
+        namespace = '{{ .Release.Namespace }}'
+        serviceAccount = '{{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}'
+        storageClaimName = '{{ include "cancer-genomics-analysis-suite.fullname" . }}-nextflow-workflows'
+        storageMountPath = '/workflows'
+        storageSubPath = 'work'
+        tempMountPath = '/tmp'
+        tempSubPath = 'tmp'
+        
+        // Resource limits
+        cpu = {{ .Values.nextflowWorkflows.defaultResources.cpu }}
+        memory = '{{ .Values.nextflowWorkflows.defaultResources.memory }}'
+        
+        // Image pull policy
+        imagePullPolicy = '{{ .Values.nextflowWorkflows.image.pullPolicy }}'
+    }
+    
+    // Workflow settings
+    workflow {
+        name = 'Cancer Genomics Analysis'
+        version = '1.0.0'
+        
+        // Execution settings
+        maxForks = {{ .Values.nextflowWorkflows.executor.maxConcurrentJobs }}
+        resume = true
+        cache = true
+        
+        // Error handling
+        errorStrategy = 'terminate'
+        maxErrors = 3
+        
+        // Logging
+        logLevel = '{{ .Values.nextflowWorkflows.logging.level }}'
+        logFile = '/workflows/logs/nextflow.log'
+        
+        // Cleanup
+        cleanup = true
+        cleanupMode = 'on_success'
+    }
+    
+    // Reporting
+    report {
+        enabled = true
+        file = '/outputs/reports/execution_report.html'
+        format = 'html'
+    }
+    
+    timeline {
+        enabled = true
+        file = '/outputs/reports/execution_timeline.html'
+    }
+    
+    trace {
+        enabled = true
+        file = '/outputs/reports/execution_trace.txt'
+        fields = 'task_id,hash,native_id,process,tag,name,status,exit,module,container,cpus,time,disk,memory,attempt,submit,start,complete,duration,realtime,queue,%cpu,%mem,rss,vmem,peak_rss,peak_vmem,rchar,wchar,syscr,syscw,read_bytes,write_bytes,vol_ctxt,inv_ctxt,env'
+    }
+    
+    // Docker configuration
+    docker {
+        enabled = true
+        userEmulation = true
+        temp = 'auto'
+    }
+    
+    // Singularity configuration
+    singularity {
+        enabled = false
+        autoMounts = true
+        cacheDir = '/workflows/singularity'
+    }
+    
+    // Conda configuration
+    conda {
+        enabled = false
+        cacheDir = '/workflows/conda'
+    }
+    
+    // Environment variables
+    env {
+        NXF_VER = '23.04.3'
+        NXF_ANSI_LOG = false
+        NXF_OPTS = '-Xms1g -Xmx4g'
+    }
+  
+  main.nf: |
+    #!/usr/bin/env nextflow
+    
+    /*
+     * Cancer Genomics Analysis Pipeline
+     * 
+     * This pipeline performs comprehensive cancer genomics analysis including:
+     * - Quality control and preprocessing
+     * - Variant calling and annotation
+     * - Expression analysis
+     * - Pathway analysis
+     * - Clinical correlation
+     */
+    
+    nextflow.enable.dsl = 2
+    
+    // Include subworkflows
+    include { QUALITY_CONTROL } from './workflows/quality_control'
+    include { VARIANT_CALLING } from './workflows/variant_calling'
+    include { EXPRESSION_ANALYSIS } from './workflows/expression_analysis'
+    include { PATHWAY_ANALYSIS } from './workflows/pathway_analysis'
+    include { CLINICAL_CORRELATION } from './workflows/clinical_correlation'
+    
+    // Workflow parameters
+    params {
+        // Input parameters
+        input_dir = '/workflows/input'
+        samples_file = '/workflows/input/samples.csv'
+        
+        // Reference data
+        reference_genome = '/workflows/reference/hg38.fa'
+        annotation_gtf = '/workflows/reference/hg38.gtf'
+        dbsnp = '/workflows/reference/dbsnp.vcf'
+        cosmic = '/workflows/reference/cosmic.vcf'
+        
+        // Output directory
+        output_dir = '/outputs'
+        
+        // Analysis parameters
+        variant_caller = 'gatk'
+        expression_method = 'salmon'
+        pathway_database = 'kegg'
+        
+        // Resource parameters
+        max_cpus = {{ .Values.nextflowWorkflows.defaultResources.cpu }}
+        max_memory = '{{ .Values.nextflowWorkflows.defaultResources.memory }}'
+        max_time = '24.h'
+        
+        // Help
+        help = false
+    }
+    
+    // Print help information
+    if (params.help) {
+        log.info """
+        Cancer Genomics Analysis Pipeline
+        =================================
+        
+        Usage:
+            nextflow run main.nf --input_dir /path/to/input --output_dir /path/to/output
+        
+        Parameters:
+            --input_dir          Input directory containing FASTQ files
+            --samples_file       CSV file with sample information
+            --reference_genome   Reference genome FASTA file
+            --annotation_gtf     Gene annotation GTF file
+            --output_dir         Output directory for results
+            --variant_caller     Variant caller to use (gatk, freebayes, mutect2)
+            --expression_method  Expression quantification method (salmon, kallisto, star)
+            --pathway_database   Pathway database (kegg, reactome, go)
+            --max_cpus           Maximum number of CPUs to use
+            --max_memory         Maximum memory to use
+            --max_time           Maximum time per process
+            --help               Show this help message
+        """
+        exit 0
+    }
+    
+    // Validate input parameters
+    if (!params.input_dir) {
+        error "Input directory must be specified with --input_dir"
+    }
+    
+    if (!params.samples_file) {
+        error "Samples file must be specified with --samples_file"
+    }
+    
+    if (!params.reference_genome) {
+        error "Reference genome must be specified with --reference_genome"
+    }
+    
+    if (!params.annotation_gtf) {
+        error "Annotation GTF must be specified with --annotation_gtf"
+    }
+    
+    // Create output directory
+    output_dir = file(params.output_dir)
+    output_dir.mkdirs()
+    
+    // Read samples
+    Channel
+        .fromPath(params.samples_file)
+        .splitCsv(header: true, sep: ',')
+        .map { row -> [row.sample_id, row.fastq_1, row.fastq_2, row.condition] }
+        .set { samples_ch }
+    
+    // Main workflow
+    workflow {
+        // Quality control
+        QUALITY_CONTROL (
+            samples_ch,
+            params.reference_genome
+        )
+        
+        // Variant calling
+        VARIANT_CALLING (
+            QUALITY_CONTROL.out.bam,
+            params.reference_genome,
+            params.dbsnp,
+            params.cosmic
+        )
+        
+        // Expression analysis
+        EXPRESSION_ANALYSIS (
+            QUALITY_CONTROL.out.bam,
+            params.reference_genome,
+            params.annotation_gtf
+        )
+        
+        // Pathway analysis
+        PATHWAY_ANALYSIS (
+            EXPRESSION_ANALYSIS.out.counts,
+            params.pathway_database
+        )
+        
+        // Clinical correlation
+        CLINICAL_CORRELATION (
+            VARIANT_CALLING.out.vcf,
+            EXPRESSION_ANALYSIS.out.counts,
+            PATHWAY_ANALYSIS.out.pathways
+        )
+        
+        // Generate final report
+        generate_report (
+            VARIANT_CALLING.out.vcf,
+            EXPRESSION_ANALYSIS.out.counts,
+            PATHWAY_ANALYSIS.out.pathways,
+            CLINICAL_CORRELATION.out.correlations
+        )
+    }
+    
+    // Generate comprehensive analysis report
+    process generate_report {
+        publishDir "${params.output_dir}/reports", mode: 'copy'
+        
+        input:
+        path vcf_files
+        path count_files
+        path pathway_files
+        path correlation_files
+        
+        output:
+        path "analysis_report.html", emit: report
+        path "summary_statistics.json", emit: stats
+        
+        script:
+        """
+        python /workflows/scripts/generate_comprehensive_report.py \\
+            --variants ${vcf_files} \\
+            --expression ${count_files} \\
+            --pathways ${pathway_files} \\
+            --correlations ${correlation_files} \\
+            --output analysis_report.html \\
+            --stats summary_statistics.json
+        """
+    }
+{{- end }}

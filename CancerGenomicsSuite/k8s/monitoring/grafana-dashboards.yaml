@@ -1,0 +1,925 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  cancer-genomics-overview.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Cancer Genomics - Overview",
+        "tags": ["cancer-genomics", "overview"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Application Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"cancer-genomics-app\"}",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": 0
+                    },
+                    {
+                      "color": "green",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            },
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": 2,
+            "title": "Request Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_requests_total{job=\"cancer-genomics-app\"}[5m])",
+                "legendFormat": "{{method}} {{endpoint}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 0
+            }
+          },
+          {
+            "id": 3,
+            "title": "Response Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"cancer-genomics-app\"}[5m]))",
+                "legendFormat": "95th percentile"
+              },
+              {
+                "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=\"cancer-genomics-app\"}[5m]))",
+                "legendFormat": "50th percentile"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 8
+            }
+          },
+          {
+            "id": 4,
+            "title": "Error Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_requests_total{job=\"cancer-genomics-app\",status=~\"5..\"}[5m])",
+                "legendFormat": "5xx errors"
+              },
+              {
+                "expr": "rate(http_requests_total{job=\"cancer-genomics-app\",status=~\"4..\"}[5m])",
+                "legendFormat": "4xx errors"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 8
+            }
+          },
+          {
+            "id": 5,
+            "title": "Memory Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "process_resident_memory_bytes{job=\"cancer-genomics-app\"} / 1024 / 1024 / 1024",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 16
+            }
+          },
+          {
+            "id": 6,
+            "title": "CPU Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(process_cpu_seconds_total{job=\"cancer-genomics-app\"}[5m]) * 100",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 16
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }
+  
+  cancer-genomics-pipelines.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Cancer Genomics - Pipelines",
+        "tags": ["cancer-genomics", "pipelines"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Pipeline Executions",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "cancer_genomics_pipeline_executions_total",
+                "legendFormat": "Total Executions"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": 2,
+            "title": "Pipeline Success Rate",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "rate(cancer_genomics_pipeline_executions_total{status=\"completed\"}[5m]) / rate(cancer_genomics_pipeline_executions_total[5m]) * 100",
+                "legendFormat": "Success Rate %"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 6,
+              "y": 0
+            }
+          },
+          {
+            "id": 3,
+            "title": "Pipeline Execution Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, rate(cancer_genomics_pipeline_execution_duration_seconds_bucket[5m]))",
+                "legendFormat": "95th percentile"
+              },
+              {
+                "expr": "histogram_quantile(0.50, rate(cancer_genomics_pipeline_execution_duration_seconds_bucket[5m]))",
+                "legendFormat": "50th percentile"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 0
+            }
+          },
+          {
+            "id": 4,
+            "title": "Pipeline Status Distribution",
+            "type": "piechart",
+            "targets": [
+              {
+                "expr": "cancer_genomics_pipeline_executions_total",
+                "legendFormat": "{{status}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 8
+            }
+          },
+          {
+            "id": 5,
+            "title": "Pipeline Types",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(cancer_genomics_pipeline_executions_total[5m])",
+                "legendFormat": "{{pipeline_type}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 8
+            }
+          },
+          {
+            "id": 6,
+            "title": "Resource Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "cancer_genomics_pipeline_cpu_usage_seconds_total",
+                "legendFormat": "CPU Usage"
+              },
+              {
+                "expr": "cancer_genomics_pipeline_memory_usage_bytes / 1024 / 1024 / 1024",
+                "legendFormat": "Memory Usage (GB)"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 24,
+              "x": 0,
+              "y": 16
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }
+  
+  cancer-genomics-workflows.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Cancer Genomics - Workflows",
+        "tags": ["cancer-genomics", "workflows"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Argo Workflows Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"argo-workflows\"}",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": 2,
+            "title": "Active Workflows",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "argo_workflows_active",
+                "legendFormat": "Active"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 6,
+              "y": 0
+            }
+          },
+          {
+            "id": 3,
+            "title": "Workflow Success Rate",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "rate(argo_workflows_completed_total{status=\"Succeeded\"}[5m]) / rate(argo_workflows_completed_total[5m]) * 100",
+                "legendFormat": "Success Rate %"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 12,
+              "y": 0
+            }
+          },
+          {
+            "id": 4,
+            "title": "Workflow Duration",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "argo_workflows_duration_seconds",
+                "legendFormat": "{{workflow_name}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 18,
+              "y": 0
+            }
+          },
+          {
+            "id": 5,
+            "title": "Workflow Executions Over Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(argo_workflows_started_total[5m])",
+                "legendFormat": "Started"
+              },
+              {
+                "expr": "rate(argo_workflows_completed_total[5m])",
+                "legendFormat": "Completed"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 8
+            }
+          },
+          {
+            "id": 6,
+            "title": "Workflow Status Distribution",
+            "type": "piechart",
+            "targets": [
+              {
+                "expr": "argo_workflows_completed_total",
+                "legendFormat": "{{status}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 8
+            }
+          },
+          {
+            "id": 7,
+            "title": "Workflow Resource Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "argo_workflows_cpu_usage_seconds_total",
+                "legendFormat": "CPU Usage"
+              },
+              {
+                "expr": "argo_workflows_memory_usage_bytes / 1024 / 1024 / 1024",
+                "legendFormat": "Memory Usage (GB)"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 24,
+              "x": 0,
+              "y": 16
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }
+  
+  cancer-genomics-databases.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Cancer Genomics - Databases",
+        "tags": ["cancer-genomics", "databases"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "PostgreSQL Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"postgresql\"}",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": 2,
+            "title": "Redis Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"redis\"}",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 6,
+              "y": 0
+            }
+          },
+          {
+            "id": 3,
+            "title": "Neo4j Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"neo4j\"}",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 12,
+              "y": 0
+            }
+          },
+          {
+            "id": 4,
+            "title": "Database Connections",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "pg_stat_database_numbackends",
+                "legendFormat": "PostgreSQL"
+              },
+              {
+                "expr": "redis_connected_clients",
+                "legendFormat": "Redis"
+              },
+              {
+                "expr": "neo4j_connections_active",
+                "legendFormat": "Neo4j"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 18,
+              "y": 0
+            }
+          },
+          {
+            "id": 5,
+            "title": "Database Query Performance",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "pg_stat_database_tup_returned",
+                "legendFormat": "PostgreSQL - Tuples Returned"
+              },
+              {
+                "expr": "redis_commands_processed_total",
+                "legendFormat": "Redis - Commands Processed"
+              },
+              {
+                "expr": "neo4j_queries_executed_total",
+                "legendFormat": "Neo4j - Queries Executed"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 8
+            }
+          },
+          {
+            "id": 6,
+            "title": "Database Storage Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "pg_database_size_bytes / 1024 / 1024 / 1024",
+                "legendFormat": "PostgreSQL (GB)"
+              },
+              {
+                "expr": "redis_memory_used_bytes / 1024 / 1024 / 1024",
+                "legendFormat": "Redis (GB)"
+              },
+              {
+                "expr": "neo4j_store_size_bytes / 1024 / 1024 / 1024",
+                "legendFormat": "Neo4j (GB)"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 8
+            }
+          },
+          {
+            "id": 7,
+            "title": "Database Error Rates",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(pg_stat_database_deadlocks[5m])",
+                "legendFormat": "PostgreSQL - Deadlocks"
+              },
+              {
+                "expr": "rate(redis_rejected_connections_total[5m])",
+                "legendFormat": "Redis - Rejected Connections"
+              },
+              {
+                "expr": "rate(neo4j_queries_failed_total[5m])",
+                "legendFormat": "Neo4j - Failed Queries"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 24,
+              "x": 0,
+              "y": 16
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }
+  
+  cancer-genomics-streaming.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Cancer Genomics - Streaming",
+        "tags": ["cancer-genomics", "streaming"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Kafka Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"kafka\"}",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": 2,
+            "title": "Active Topics",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "kafka_topic_partitions",
+                "legendFormat": "{{topic}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 6,
+              "y": 0
+            }
+          },
+          {
+            "id": 3,
+            "title": "Message Rate",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "rate(kafka_topic_partition_current_offset[5m])",
+                "legendFormat": "{{topic}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 12,
+              "y": 0
+            }
+          },
+          {
+            "id": 4,
+            "title": "Consumer Lag",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "kafka_consumer_lag_sum",
+                "legendFormat": "{{topic}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 18,
+              "y": 0
+            }
+          },
+          {
+            "id": 5,
+            "title": "Message Throughput",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(kafka_topic_partition_current_offset[5m])",
+                "legendFormat": "{{topic}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 8
+            }
+          },
+          {
+            "id": 6,
+            "title": "Consumer Lag Over Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "kafka_consumer_lag_sum",
+                "legendFormat": "{{topic}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 8
+            }
+          },
+          {
+            "id": 7,
+            "title": "Stream Processing Metrics",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(cancer_genomics_stream_events_processed_total[5m])",
+                "legendFormat": "Events Processed"
+              },
+              {
+                "expr": "rate(cancer_genomics_stream_events_failed_total[5m])",
+                "legendFormat": "Events Failed"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 16
+            }
+          },
+          {
+            "id": 8,
+            "title": "Stream Processing Latency",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.95, rate(cancer_genomics_stream_processing_duration_seconds_bucket[5m]))",
+                "legendFormat": "95th percentile"
+              },
+              {
+                "expr": "histogram_quantile(0.50, rate(cancer_genomics_stream_processing_duration_seconds_bucket[5m]))",
+                "legendFormat": "50th percentile"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 16
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }
+  
+  cancer-genomics-infrastructure.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Cancer Genomics - Infrastructure",
+        "tags": ["cancer-genomics", "infrastructure"],
+        "style": "dark",
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Node Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"kubernetes-nodes\"}",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "id": 2,
+            "title": "Pod Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "kube_pod_status_phase{namespace=\"cancer-genomics\"}",
+                "legendFormat": "{{phase}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 6,
+              "y": 0
+            }
+          },
+          {
+            "id": 3,
+            "title": "CPU Usage",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 12,
+              "y": 0
+            }
+          },
+          {
+            "id": 4,
+            "title": "Memory Usage",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+                "legendFormat": "{{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 6,
+              "x": 18,
+              "y": 0
+            }
+          },
+          {
+            "id": 5,
+            "title": "Node Resource Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+                "legendFormat": "CPU Usage - {{instance}}"
+              },
+              {
+                "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+                "legendFormat": "Memory Usage - {{instance}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 8
+            }
+          },
+          {
+            "id": 6,
+            "title": "Pod Resource Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(container_cpu_usage_seconds_total{namespace=\"cancer-genomics\"}[5m]) * 100",
+                "legendFormat": "CPU - {{pod}}"
+              },
+              {
+                "expr": "container_memory_usage_bytes{namespace=\"cancer-genomics\"} / 1024 / 1024 / 1024",
+                "legendFormat": "Memory (GB) - {{pod}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 8
+            }
+          },
+          {
+            "id": 7,
+            "title": "Network Traffic",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(node_network_receive_bytes_total[5m])",
+                "legendFormat": "Receive - {{device}}"
+              },
+              {
+                "expr": "rate(node_network_transmit_bytes_total[5m])",
+                "legendFormat": "Transmit - {{device}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 0,
+              "y": 16
+            }
+          },
+          {
+            "id": 8,
+            "title": "Disk Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100",
+                "legendFormat": "{{instance}} - {{mountpoint}}"
+              }
+            ],
+            "gridPos": {
+              "h": 8,
+              "w": 12,
+              "x": 12,
+              "y": 16
+            }
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }

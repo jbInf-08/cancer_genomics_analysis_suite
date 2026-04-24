@@ -1,0 +1,415 @@
+{{- if .Values.kafkaStreamProcessors.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-stream-processor-mutation-alert
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: mutation-alert
+spec:
+  replicas: {{ .Values.kafkaStreamProcessors.mutationAlert.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: stream-processor
+      processor-type: mutation-alert
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: stream-processor
+        processor-type: mutation-alert
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: mutation-alert-processor
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.kafkaStreamProcessors.image.registry }}/{{ .Values.kafkaStreamProcessors.image.repository }}:{{ .Values.kafkaStreamProcessors.image.tag }}"
+          imagePullPolicy: {{ .Values.kafkaStreamProcessors.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_TOPIC_MUTATIONS
+              value: "{{ .Values.kafkaStreamProcessors.topics.mutations }}"
+            - name: KAFKA_TOPIC_ALERTS
+              value: "{{ .Values.kafkaStreamProcessors.topics.alerts }}"
+            - name: NEO4J_URI
+              value: "bolt://{{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j:7687"
+            - name: NEO4J_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-secrets
+                  key: username
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-secrets
+                  key: password
+            - name: WEBHOOK_URL
+              value: "{{ .Values.kafkaStreamProcessors.mutationAlert.webhookUrl }}"
+            - name: SMTP_HOST
+              value: "{{ .Values.kafkaStreamProcessors.mutationAlert.email.smtpHost }}"
+            - name: SMTP_PORT
+              value: "{{ .Values.kafkaStreamProcessors.mutationAlert.email.smtpPort }}"
+            - name: SMTP_FROM
+              value: "{{ .Values.kafkaStreamProcessors.mutationAlert.email.from }}"
+            - name: SMTP_TO
+              value: "{{ .Values.kafkaStreamProcessors.mutationAlert.email.to }}"
+            {{- with .Values.kafkaStreamProcessors.mutationAlert.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          command: ["python", "-m", "modules.real_time_processing.kafka_stream_processor"]
+          resources:
+            {{- toYaml .Values.kafkaStreamProcessors.mutationAlert.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: logs
+          emptyDir: {}
+      {{- with .Values.kafkaStreamProcessors.mutationAlert.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafkaStreamProcessors.mutationAlert.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafkaStreamProcessors.mutationAlert.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-stream-processor-mutation-alert
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: mutation-alert
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: mutation-alert
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-stream-processor-clinical-feed
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: clinical-feed
+spec:
+  replicas: {{ .Values.kafkaStreamProcessors.clinicalFeed.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: stream-processor
+      processor-type: clinical-feed
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: stream-processor
+        processor-type: clinical-feed
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: clinical-feed-processor
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.kafkaStreamProcessors.image.registry }}/{{ .Values.kafkaStreamProcessors.image.repository }}:{{ .Values.kafkaStreamProcessors.image.tag }}"
+          imagePullPolicy: {{ .Values.kafkaStreamProcessors.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_TOPIC_CLINICAL_FEEDS
+              value: "{{ .Values.kafkaStreamProcessors.topics.clinicalFeeds }}"
+            - name: KAFKA_TOPIC_PATIENT_DATA
+              value: "{{ .Values.kafkaStreamProcessors.topics.patientData }}"
+            - name: POSTGRES_HOST
+              value: "{{ include "cancer-genomics-analysis-suite.postgresql.fullname" . }}"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: "{{ .Values.config.database.name }}"
+            - name: POSTGRES_USER
+              value: "{{ .Values.config.database.user }}"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.postgresql.secretName" . }}
+                  key: postgres-password
+            - name: DATA_SOURCES
+              value: "{{ join "," .Values.kafkaStreamProcessors.clinicalFeed.dataSources }}"
+            - name: VALIDATION_ENABLED
+              value: "{{ .Values.kafkaStreamProcessors.clinicalFeed.validation.enabled }}"
+            - name: ANONYMIZATION_ENABLED
+              value: "{{ .Values.kafkaStreamProcessors.clinicalFeed.anonymization.enabled }}"
+            {{- with .Values.kafkaStreamProcessors.clinicalFeed.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          command: ["python", "-m", "modules.real_time_processing.clinical_feed_processor"]
+          resources:
+            {{- toYaml .Values.kafkaStreamProcessors.clinicalFeed.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: logs
+          emptyDir: {}
+      {{- with .Values.kafkaStreamProcessors.clinicalFeed.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafkaStreamProcessors.clinicalFeed.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafkaStreamProcessors.clinicalFeed.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-stream-processor-clinical-feed
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: clinical-feed
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: clinical-feed
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-stream-processor-analytics
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: analytics
+spec:
+  replicas: {{ .Values.kafkaStreamProcessors.analytics.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: stream-processor
+      processor-type: analytics
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: stream-processor
+        processor-type: analytics
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: analytics-processor
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.kafkaStreamProcessors.image.registry }}/{{ .Values.kafkaStreamProcessors.image.repository }}:{{ .Values.kafkaStreamProcessors.image.tag }}"
+          imagePullPolicy: {{ .Values.kafkaStreamProcessors.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_TOPIC_ANALYTICS
+              value: "{{ .Values.kafkaStreamProcessors.topics.analytics }}"
+            - name: KAFKA_TOPIC_METRICS
+              value: "{{ .Values.kafkaStreamProcessors.topics.metrics }}"
+            - name: PROMETHEUS_PUSHGATEWAY
+              value: "{{ .Values.kafkaStreamProcessors.analytics.prometheusPushgateway }}"
+            - name: WINDOW_SIZE
+              value: "{{ .Values.kafkaStreamProcessors.analytics.windowSize }}"
+            - name: AGGREGATION_INTERVAL
+              value: "{{ .Values.kafkaStreamProcessors.analytics.aggregationInterval }}"
+            {{- with .Values.kafkaStreamProcessors.analytics.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          command: ["python", "-m", "modules.real_time_processing.analytics_processor"]
+          resources:
+            {{- toYaml .Values.kafkaStreamProcessors.analytics.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: logs
+          emptyDir: {}
+      {{- with .Values.kafkaStreamProcessors.analytics.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafkaStreamProcessors.analytics.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafkaStreamProcessors.analytics.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-stream-processor-analytics
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: analytics
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: stream-processor
+    processor-type: analytics
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-stream-processors
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: stream-processor
+spec:
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: stream-processor
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+{{- end }}

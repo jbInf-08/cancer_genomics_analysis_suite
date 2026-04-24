@@ -1,0 +1,4 @@
+dataset_id,title,size,last_updated,download_count,vote_count,usability_rating,tags,dataset_type
+cancer-dataset-1,Breast Cancer Wisconsin Dataset,123KB,2023-01-01,1500,45,0.8,"cancer, breast, classification",cancer
+genomics-dataset-1,Gene Expression Cancer Dataset,2.1MB,2023-02-15,800,32,0.9,"genomics, gene-expression, cancer",cancer
+biomarker-dataset-1,Cancer Biomarker Discovery Dataset,5.3MB,2023-03-10,1200,28,0.7,"biomarkers, cancer, proteomics",cancer

@@ -1,0 +1,1062 @@
+{
+  "global": {
+    "output_dir": "data/external_sources",
+    "max_workers": 4,
+    "timeout": 300,
+    "retry_attempts": 3,
+    "retry_delay": 5,
+    "rate_limit_delay": 1.0,
+    "log_level": "INFO"
+  },
+  "tcga": {
+    "base_url": "https://api.gdc.cancer.gov",
+    "sample_limit": 100,
+    "cancer_types": ["BRCA", "LUAD", "COAD", "PRAD", "STAD", "LIHC", "THCA", "HNSC"],
+    "data_types": ["gene_expression", "mutation", "clinical", "copy_number", "methylation"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "geo": {
+    "base_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+    "max_datasets": 5,
+    "search_terms": ["breast cancer", "lung cancer", "prostate cancer", "colorectal cancer"],
+    "data_types": ["expression", "methylation", "chip_seq", "rna_seq"],
+    "file_formats": ["csv", "tsv"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "cosmic": {
+    "base_url": "https://cancer.sanger.ac.uk/cosmic",
+    "gene_list": ["TP53", "BRCA1", "BRCA2", "EGFR", "KRAS", "PIK3CA", "APC", "MYC", "PTEN", "RB1"],
+    "cancer_types": ["breast", "lung", "prostate", "colorectal", "liver", "thyroid"],
+    "data_types": ["mutations", "cancer_gene_census", "gene_fusions", "copy_number"],
+    "file_formats": ["csv", "tsv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "icgc": {
+    "base_url": "https://dcc.icgc.org/api/v1",
+    "sample_limit": 50,
+    "cancer_types": ["BRCA", "LUAD", "COAD", "PRAD"],
+    "data_types": ["mutations", "expression", "clinical"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "ega": {
+    "base_url": "https://ega-archive.org",
+    "sample_limit": 25,
+    "data_types": ["genomics", "phenomics"],
+    "file_formats": ["json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "tcia": {
+    "base_url": "https://www.cancerimagingarchive.net",
+    "sample_limit": 20,
+    "cancer_types": ["breast", "lung", "brain", "prostate"],
+    "data_types": ["imaging", "radiology", "pathology"],
+    "file_formats": ["dicom", "nifti"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "gdc": {
+    "base_url": "https://api.gdc.cancer.gov",
+    "sample_limit": 100,
+    "cancer_types": ["BRCA", "LUAD", "COAD", "PRAD"],
+    "data_types": ["genomics", "clinical", "imaging"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "cdc": {
+    "base_url": "https://data.cdc.gov",
+    "sample_limit": 50,
+    "data_types": ["cancer_statistics", "mortality", "incidence"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "nih": {
+    "base_url": "https://api.nih.gov",
+    "sample_limit": 30,
+    "data_types": ["clinical_trials", "grants", "publications"],
+    "file_formats": ["json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "nci": {
+    "base_url": "https://api.cancer.gov",
+    "sample_limit": 50,
+    "cancer_types": ["breast", "lung", "prostate", "colorectal"],
+    "data_types": ["clinical_trials", "drugs", "statistics"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "kaggle": {
+    "base_url": "https://www.kaggle.com/api/v1",
+    "sample_limit": 10,
+    "datasets": ["cancer", "genomics", "biomarkers"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "pubmed": {
+    "base_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+    "sample_limit": 100,
+    "search_terms": ["cancer biomarkers", "genomics", "precision medicine"],
+    "data_types": ["publications", "abstracts", "mesh_terms"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "ncbi": {
+    "base_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+    "sample_limit": 50,
+    "databases": ["gene", "protein", "nucleotide", "genome"],
+    "data_types": ["sequences", "annotations", "variants"],
+    "file_formats": ["fasta", "gb", "json"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "miccai": {
+    "base_url": "https://miccai.org",
+    "sample_limit": 15,
+    "challenges": ["brain_tumor", "prostate", "lung", "breast"],
+    "data_types": ["imaging", "segmentation", "classification"],
+    "file_formats": ["nifti", "dicom", "png"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "nih_clinical": {
+    "base_url": "https://clinicaltrials.gov/api",
+    "sample_limit": 30,
+    "conditions": ["cancer", "oncology", "tumor"],
+    "data_types": ["clinical_trials", "protocols", "results"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "prostate_x": {
+    "base_url": "https://prostatex.grand-challenge.org",
+    "sample_limit": 10,
+    "data_types": ["mri", "biopsy", "pathology"],
+    "file_formats": ["dicom", "nifti"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "pathlaion": {
+    "base_url": "https://pathology.vision",
+    "sample_limit": 20,
+    "data_types": ["histopathology", "immunohistochemistry"],
+    "file_formats": ["png", "tiff", "svs"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "camelyon": {
+    "base_url": "https://camelyon17.grand-challenge.org",
+    "sample_limit": 15,
+    "data_types": ["histopathology", "lymph_node", "metastasis"],
+    "file_formats": ["tiff", "svs"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "pancancer_atlas": {
+    "base_url": "https://pancanatlas.xenahubs.net",
+    "sample_limit": 50,
+    "cancer_types": ["all"],
+    "data_types": ["genomics", "proteomics", "pathology"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "seer": {
+    "base_url": "https://seer.cancer.gov",
+    "sample_limit": 100,
+    "cancer_types": ["all"],
+    "data_types": ["incidence", "mortality", "survival"],
+    "file_formats": ["csv", "txt"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "ncdb": {
+    "base_url": "https://www.facs.org",
+    "sample_limit": 50,
+    "cancer_types": ["all"],
+    "data_types": ["clinical", "outcomes", "quality"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "mimic": {
+    "base_url": "https://mimic.mit.edu",
+    "sample_limit": 25,
+    "data_types": ["clinical_notes", "vitals", "lab_results"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "wisconsin_breast_cancer": {
+    "base_url": "https://archive.ics.uci.edu",
+    "sample_limit": 100,
+    "data_types": ["clinical_features", "diagnosis"],
+    "file_formats": ["csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "ddsm": {
+    "base_url": "https://www.mammoimage.org",
+    "sample_limit": 20,
+    "data_types": ["mammography", "annotations"],
+    "file_formats": ["dicom", "png"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "inbreast": {
+    "base_url": "https://www.breastcancerdatabase.org",
+    "sample_limit": 15,
+    "data_types": ["mammography", "annotations"],
+    "file_formats": ["dicom", "png"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "lidc_idri": {
+    "base_url": "https://www.cancerimagingarchive.net",
+    "sample_limit": 20,
+    "data_types": ["ct_scans", "annotations"],
+    "file_formats": ["dicom", "xml"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "nsclc_radiogenomics": {
+    "base_url": "https://www.cancerimagingarchive.net",
+    "sample_limit": 15,
+    "data_types": ["ct_scans", "genomics", "clinical"],
+    "file_formats": ["dicom", "tsv"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "luna16": {
+    "base_url": "https://luna16.grand-challenge.org",
+    "sample_limit": 20,
+    "data_types": ["ct_scans", "annotations"],
+    "file_formats": ["dicom", "mhd"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "isic": {
+    "base_url": "https://www.isic-archive.com",
+    "sample_limit": 25,
+    "data_types": ["dermoscopy", "annotations"],
+    "file_formats": ["jpg", "png", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "ham10000": {
+    "base_url": "https://www.nature.com",
+    "sample_limit": 30,
+    "data_types": ["dermoscopy", "annotations"],
+    "file_formats": ["jpg", "png", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "brats": {
+    "base_url": "https://www.med.upenn.edu",
+    "sample_limit": 20,
+    "data_types": ["mri", "segmentation"],
+    "file_formats": ["nifti", "dicom"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "rembrandt": {
+    "base_url": "https://www.cancerimagingarchive.net",
+    "sample_limit": 15,
+    "data_types": ["mri", "genomics", "clinical"],
+    "file_formats": ["dicom", "tsv"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "tcia_glioblastoma": {
+    "base_url": "https://www.cancerimagingarchive.net",
+    "sample_limit": 20,
+    "data_types": ["mri", "pathology", "clinical"],
+    "file_formats": ["dicom", "svs", "tsv"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "clinvar": {
+    "base_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils",
+    "sample_limit": 100,
+    "genes": ["TP53", "BRCA1", "BRCA2", "EGFR", "KRAS"],
+    "data_types": ["variants", "clinical_significance"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "oncokb": {
+    "base_url": "https://www.oncokb.org/api/v1",
+    "sample_limit": 50,
+    "genes": ["TP53", "BRCA1", "BRCA2", "EGFR", "KRAS"],
+    "data_types": ["mutations", "drugs", "evidence"],
+    "file_formats": ["json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "cbioportal": {
+    "base_url": "https://www.cbioportal.org/api",
+    "sample_limit": 50,
+    "studies": ["tcga_brca", "tcga_luad", "tcga_coad"],
+    "data_types": ["mutations", "expression", "clinical"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "firecloud_terra": {
+    "base_url": "https://api.firecloud.org",
+    "sample_limit": 25,
+    "workspaces": ["cancer_genomics", "biomarker_discovery"],
+    "data_types": ["genomics", "clinical", "analysis"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "google_cloud_healthcare": {
+    "base_url": "https://healthcare.googleapis.com",
+    "sample_limit": 20,
+    "datasets": ["cancer", "genomics"],
+    "data_types": ["dicom", "fhir", "genomics"],
+    "file_formats": ["json", "dicom"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "ccle": {
+    "base_url": "https://portals.broadinstitute.org",
+    "sample_limit": 50,
+    "data_types": ["expression", "mutations", "drug_response"],
+    "file_formats": ["tsv", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "gdsc": {
+    "base_url": "https://www.cancerrxgene.org",
+    "sample_limit": 50,
+    "data_types": ["drug_response", "genomics", "cell_lines"],
+    "file_formats": ["csv", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "nci_60": {
+    "base_url": "https://dtp.cancer.gov",
+    "sample_limit": 30,
+    "data_types": ["drug_response", "cell_lines"],
+    "file_formats": ["csv", "txt"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "cptac": {
+    "base_url": "https://proteomics.cancer.gov",
+    "sample_limit": 50,
+    "cancer_types": ["BRCA", "LUAD", "COAD", "OV", "GBM", "CCRCC"],
+    "data_types": ["proteomics", "phosphoproteomics", "acetylomics", "clinical"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "ucsc_xena": {
+    "base_url": "https://xenabrowser.net",
+    "sample_limit": 100,
+    "cancer_types": ["all"],
+    "data_types": ["expression", "mutations", "clinical", "survival"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "clinicaltrials_gov": {
+    "base_url": "https://clinicaltrials.gov/api",
+    "sample_limit": 100,
+    "conditions": ["cancer", "oncology", "tumor", "neoplasm"],
+    "data_types": ["clinical_trials", "protocols", "results"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "euctr": {
+    "base_url": "https://www.clinicaltrialsregister.eu",
+    "sample_limit": 50,
+    "conditions": ["cancer", "oncology"],
+    "data_types": ["clinical_trials", "protocols"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "human_protein_atlas": {
+    "base_url": "https://www.proteinatlas.org",
+    "sample_limit": 50,
+    "cancer_types": ["all"],
+    "data_types": ["protein_expression", "tissue_expression", "cell_expression"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "canprovar": {
+    "base_url": "https://canprovar2.zhanglab.net",
+    "sample_limit": 30,
+    "cancer_types": ["all"],
+    "data_types": ["proteome_variations", "amino_acid_alterations"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "cancer_genome_interpreter": {
+    "base_url": "https://www.cancergenomeinterpreter.org",
+    "sample_limit": 50,
+    "cancer_types": ["all"],
+    "data_types": ["actionable_alterations", "biomarkers", "drug_targets"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "gtex": {
+    "base_url": "https://gtexportal.org",
+    "sample_limit": 100,
+    "tissues": ["all"],
+    "data_types": ["gene_expression", "eQTL", "tissue_expression"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "encode": {
+    "base_url": "https://www.encodeproject.org",
+    "sample_limit": 50,
+    "cell_types": ["all"],
+    "data_types": ["chip_seq", "rna_seq", "atac_seq", "histone_marks"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "depmap": {
+    "base_url": "https://depmap.org",
+    "sample_limit": 50,
+    "data_types": ["gene_expression", "mutations", "drug_response", "copy_number"],
+    "file_formats": ["csv", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "pharmacodb": {
+    "base_url": "https://pharmacodb.pmgenomics.ca",
+    "sample_limit": 30,
+    "data_types": ["drug_response", "pharmacogenomics", "cell_lines"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "cancer_target_discovery": {
+    "base_url": "https://www.cancertargetdiscovery.org",
+    "sample_limit": 25,
+    "cancer_types": ["all"],
+    "data_types": ["target_genes", "pathways", "drug_targets"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "cancer_immunome": {
+    "base_url": "https://cancerimmunome.org",
+    "sample_limit": 40,
+    "cancer_types": ["all"],
+    "data_types": ["immunogenomics", "t_cell_receptors", "immune_signatures"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "metabolomics_workbench": {
+    "base_url": "https://www.metabolomicsworkbench.org",
+    "sample_limit": 30,
+    "cancer_types": ["all"],
+    "data_types": ["metabolomics", "metabolic_pathways", "biomarkers"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "hmdb": {
+    "base_url": "https://hmdb.ca",
+    "sample_limit": 50,
+    "data_types": ["metabolites", "metabolic_pathways", "disease_associations"],
+    "file_formats": ["xml", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "kegg": {
+    "base_url": "https://www.genome.jp/kegg",
+    "sample_limit": 100,
+    "data_types": ["pathways", "genes", "compounds", "diseases"],
+    "file_formats": ["kgml", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "reactome": {
+    "base_url": "https://reactome.org",
+    "sample_limit": 50,
+    "data_types": ["pathways", "reactions", "proteins", "diseases"],
+    "file_formats": ["sbml", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "pathway_commons": {
+    "base_url": "https://www.pathwaycommons.org",
+    "sample_limit": 50,
+    "data_types": ["pathways", "interactions", "proteins"],
+    "file_formats": ["sif", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "string_db": {
+    "base_url": "https://string-db.org",
+    "sample_limit": 100,
+    "data_types": ["protein_interactions", "functional_annotations", "pathways"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "biogrid": {
+    "base_url": "https://thebiogrid.org",
+    "sample_limit": 50,
+    "data_types": ["protein_interactions", "genetic_interactions"],
+    "file_formats": ["tab2", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "intact": {
+    "base_url": "https://www.ebi.ac.uk/intact",
+    "sample_limit": 30,
+    "data_types": ["protein_interactions", "molecular_interactions"],
+    "file_formats": ["xml", "json"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "disgenet": {
+    "base_url": "https://www.disgenet.org",
+    "sample_limit": 50,
+    "data_types": ["gene_disease_associations", "variant_disease_associations"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "opentargets": {
+    "base_url": "https://api.platform.opentargets.org",
+    "sample_limit": 50,
+    "data_types": ["target_disease_associations", "drug_targets", "evidence"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drugbank": {
+    "base_url": "https://go.drugbank.com",
+    "sample_limit": 30,
+    "data_types": ["drugs", "targets", "interactions", "pharmacology"],
+    "file_formats": ["xml", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "chembl": {
+    "base_url": "https://www.ebi.ac.uk/chembl",
+    "sample_limit": 50,
+    "data_types": ["compounds", "bioactivities", "targets", "mechanisms"],
+    "file_formats": ["sdf", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "pubchem": {
+    "base_url": "https://pubchem.ncbi.nlm.nih.gov",
+    "sample_limit": 100,
+    "data_types": ["compounds", "bioactivities", "assays"],
+    "file_formats": ["sdf", "json"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "uniprot": {
+    "base_url": "https://www.uniprot.org",
+    "sample_limit": 100,
+    "data_types": ["proteins", "sequences", "annotations", "variants"],
+    "file_formats": ["fasta", "xml", "json"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "ensembl": {
+    "base_url": "https://rest.ensembl.org",
+    "sample_limit": 100,
+    "data_types": ["genes", "transcripts", "variants", "regulatory_features"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "gencode": {
+    "base_url": "https://www.gencodegenes.org",
+    "sample_limit": 50,
+    "data_types": ["genes", "transcripts", "annotations"],
+    "file_formats": ["gtf", "gff3", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "refseq": {
+    "base_url": "https://www.ncbi.nlm.nih.gov/refseq",
+    "sample_limit": 100,
+    "data_types": ["sequences", "annotations", "genomes"],
+    "file_formats": ["fasta", "gb", "json"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "genbank": {
+    "base_url": "https://www.ncbi.nlm.nih.gov/genbank",
+    "sample_limit": 100,
+    "data_types": ["sequences", "annotations", "genomes"],
+    "file_formats": ["fasta", "gb", "json"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "dbnsfp": {
+    "base_url": "https://sites.google.com/site/jpopgen/dbNSFP",
+    "sample_limit": 50,
+    "data_types": ["variant_annotations", "functional_predictions"],
+    "file_formats": ["vcf", "tsv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "exac": {
+    "base_url": "https://exac.broadinstitute.org",
+    "sample_limit": 50,
+    "data_types": ["variant_frequencies", "constraint_scores"],
+    "file_formats": ["vcf", "tsv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "gnomad": {
+    "base_url": "https://gnomad.broadinstitute.org",
+    "sample_limit": 50,
+    "data_types": ["variant_frequencies", "constraint_scores", "annotations"],
+    "file_formats": ["vcf", "tsv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "topmed": {
+    "base_url": "https://www.nhlbiwgs.org",
+    "sample_limit": 30,
+    "data_types": ["variants", "genotypes", "phenotypes"],
+    "file_formats": ["vcf", "tsv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "uk_biobank": {
+    "base_url": "https://www.ukbiobank.ac.uk",
+    "sample_limit": 25,
+    "data_types": ["genotypes", "phenotypes", "imaging", "biomarkers"],
+    "file_formats": ["bgen", "tsv"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "finnish_biobank": {
+    "base_url": "https://www.finngen.fi",
+    "sample_limit": 20,
+    "data_types": ["genotypes", "phenotypes", "health_records"],
+    "file_formats": ["vcf", "tsv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "estonian_biobank": {
+    "base_url": "https://genomics.ut.ee",
+    "sample_limit": 15,
+    "data_types": ["genotypes", "phenotypes", "health_records"],
+    "file_formats": ["vcf", "tsv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "icgc_argo": {
+    "base_url": "https://argo.icgc.org",
+    "sample_limit": 30,
+    "cancer_types": ["all"],
+    "data_types": ["genomics", "clinical", "imaging", "pathology"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "cptac_proteomics": {
+    "base_url": "https://proteomics.cancer.gov/programs/cptac",
+    "sample_limit": 40,
+    "cancer_types": ["BRCA", "LUAD", "COAD", "OV", "GBM", "CCRCC"],
+    "data_types": ["proteomics", "phosphoproteomics", "acetylomics"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "proteomicsdb": {
+    "base_url": "https://www.proteomicsdb.org",
+    "sample_limit": 30,
+    "data_types": ["protein_expression", "tissue_expression", "cell_expression"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "massive": {
+    "base_url": "https://massive.ucsd.edu",
+    "sample_limit": 25,
+    "data_types": ["proteomics", "metabolomics", "spectra"],
+    "file_formats": ["mzml", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "pride": {
+    "base_url": "https://www.ebi.ac.uk/pride",
+    "sample_limit": 30,
+    "data_types": ["proteomics", "mass_spectrometry", "peptides"],
+    "file_formats": ["mzml", "json"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "metabolights": {
+    "base_url": "https://www.ebi.ac.uk/metabolights",
+    "sample_limit": 25,
+    "data_types": ["metabolomics", "metabolic_profiling"],
+    "file_formats": ["mzml", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "gnps": {
+    "base_url": "https://gnps.ucsd.edu",
+    "sample_limit": 20,
+    "data_types": ["metabolomics", "molecular_networks", "spectra"],
+    "file_formats": ["mzml", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "nci_biomarker_database": {
+    "base_url": "https://www.cancer.gov/biomarkers",
+    "sample_limit": 100,
+    "cancer_types": ["all"],
+    "data_types": ["validated_biomarkers", "clinical_biomarkers", "prognostic_biomarkers", "predictive_biomarkers"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "fda_biomarker_qualification": {
+    "base_url": "https://www.fda.gov/drugs/biomarker-qualification-program",
+    "sample_limit": 50,
+    "data_types": ["qualified_biomarkers", "context_of_use", "regulatory_approvals"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "ebi_biomarker_database": {
+    "base_url": "https://www.ebi.ac.uk/biomarkers",
+    "sample_limit": 75,
+    "data_types": ["molecular_biomarkers", "clinical_biomarkers", "disease_biomarkers"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "biomarkers_consortium": {
+    "base_url": "https://www.biomarkersconsortium.org",
+    "sample_limit": 60,
+    "data_types": ["consortium_biomarkers", "validation_studies", "clinical_trials"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "precision_medicine_biomarkers": {
+    "base_url": "https://precisionmedicine.nih.gov",
+    "sample_limit": 80,
+    "data_types": ["precision_biomarkers", "pharmacogenomics", "companion_diagnostics"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "cancer_biomarker_atlas": {
+    "base_url": "https://cancerbiomarkeratlas.org",
+    "sample_limit": 70,
+    "cancer_types": ["all"],
+    "data_types": ["biomarker_expression", "clinical_correlations", "survival_biomarkers"],
+    "file_formats": ["tsv", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "biomarker_validation_database": {
+    "base_url": "https://biomarkervalidation.org",
+    "sample_limit": 40,
+    "data_types": ["validation_studies", "performance_metrics", "clinical_evidence"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "liquid_biopsy_biomarkers": {
+    "base_url": "https://liquidbiopsy.org",
+    "sample_limit": 50,
+    "data_types": ["circulating_biomarkers", "ctdna", "exosomes", "liquid_biopsy_panels"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "immunotherapy_biomarkers": {
+    "base_url": "https://immunotherapybiomarkers.org",
+    "sample_limit": 45,
+    "data_types": ["immune_biomarkers", "tmb", "pd_l1", "immune_signatures"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "pharmacogenomics_database": {
+    "base_url": "https://www.pharmgkb.org",
+    "sample_limit": 100,
+    "data_types": ["pharmacogenomics", "drug_metabolism", "genetic_variants", "clinical_guidelines"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "who_atc_ddd": {
+    "base_url": "https://www.who.int/tools/atc-ddd-toolkit",
+    "sample_limit": 200,
+    "data_types": ["drug_classification", "defined_daily_doses", "drug_utilization"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "nsduh": {
+    "base_url": "https://www.samhsa.gov/data/data-we-collect/nsduh",
+    "sample_limit": 50,
+    "data_types": ["drug_use_surveys", "substance_abuse", "prescription_drugs"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "iqvia_npa": {
+    "base_url": "https://www.iqvia.com/solutions/commercialization/real-world-evidence",
+    "sample_limit": 30,
+    "data_types": ["prescription_audit", "drug_utilization", "market_analysis"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 3.0,
+    "max_retries": 2
+  },
+  "rxnorm": {
+    "base_url": "https://www.nlm.nih.gov/research/umls/rxnorm",
+    "sample_limit": 100,
+    "data_types": ["drug_names", "drug_vocabularies", "normalized_names"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "dailymed": {
+    "base_url": "https://dailymed.nlm.nih.gov",
+    "sample_limit": 75,
+    "data_types": ["drug_labels", "package_inserts", "fda_approvals"],
+    "file_formats": ["xml", "json"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "faers": {
+    "base_url": "https://www.fda.gov/drugs/questions-and-answers-fdas-adverse-event-reporting-system-faers",
+    "sample_limit": 100,
+    "data_types": ["adverse_events", "drug_safety", "medication_errors"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "medicare_part_d": {
+    "base_url": "https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Information-on-Prescription-Drugs",
+    "sample_limit": 50,
+    "data_types": ["prescription_data", "medicare_claims", "drug_spending"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_interaction_database": {
+    "base_url": "https://www.drugs.com/drug_interactions.html",
+    "sample_limit": 80,
+    "data_types": ["drug_interactions", "contraindications", "side_effects"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "clinical_trials_drugs": {
+    "base_url": "https://clinicaltrials.gov/api",
+    "sample_limit": 100,
+    "data_types": ["drug_trials", "intervention_studies", "drug_development"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_approval_database": {
+    "base_url": "https://www.fda.gov/drugs/development-approval-process/drug-approvals-and-databases",
+    "sample_limit": 60,
+    "data_types": ["fda_approvals", "drug_development", "regulatory_data"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "orphan_drug_database": {
+    "base_url": "https://www.fda.gov/industry/designating-orphan-product-drugs-and-biological-products",
+    "sample_limit": 40,
+    "data_types": ["orphan_drugs", "rare_diseases", "orphan_designations"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_shortage_database": {
+    "base_url": "https://www.fda.gov/drugs/drug-shortages",
+    "sample_limit": 30,
+    "data_types": ["drug_shortages", "supply_chain", "availability_data"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_recall_database": {
+    "base_url": "https://www.fda.gov/drugs/drug-safety-and-availability/drug-recalls",
+    "sample_limit": 50,
+    "data_types": ["drug_recalls", "safety_alerts", "withdrawals"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_pricing_database": {
+    "base_url": "https://www.cms.gov/Research-Statistics-Data-and-Systems/Statistics-Trends-and-Reports/Information-on-Prescription-Drugs",
+    "sample_limit": 40,
+    "data_types": ["drug_prices", "cost_analysis", "pricing_trends"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_effectiveness_database": {
+    "base_url": "https://www.effectivehealthcare.ahrq.gov",
+    "sample_limit": 35,
+    "data_types": ["effectiveness_studies", "comparative_effectiveness", "outcomes_data"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "drug_metabolism_database": {
+    "base_url": "https://www.cypalleles.ki.se",
+    "sample_limit": 50,
+    "data_types": ["cyp_enzymes", "drug_metabolism", "pharmacokinetics"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_transport_database": {
+    "base_url": "https://www.pharmgkb.org",
+    "sample_limit": 45,
+    "data_types": ["drug_transporters", "absorption", "distribution"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_target_database": {
+    "base_url": "https://www.guidetopharmacology.org",
+    "sample_limit": 100,
+    "data_types": ["drug_targets", "receptors", "enzymes", "ion_channels"],
+    "file_formats": ["json", "tsv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_mechanism_database": {
+    "base_url": "https://www.drugbank.ca",
+    "sample_limit": 80,
+    "data_types": ["mechanisms_of_action", "pharmacodynamics", "drug_pathways"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_formulation_database": {
+    "base_url": "https://www.fda.gov/drugs/development-approval-process/drug-approvals-and-databases",
+    "sample_limit": 60,
+    "data_types": ["drug_formulations", "dosage_forms", "administration_routes"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "drug_stability_database": {
+    "base_url": "https://www.fda.gov/drugs/development-approval-process/drug-approvals-and-databases",
+    "sample_limit": 40,
+    "data_types": ["stability_data", "storage_conditions", "shelf_life"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_manufacturing_database": {
+    "base_url": "https://www.fda.gov/drugs/development-approval-process/drug-approvals-and-databases",
+    "sample_limit": 35,
+    "data_types": ["manufacturing_data", "quality_control", "production_info"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_regulatory_database": {
+    "base_url": "https://www.fda.gov/drugs/development-approval-process/drug-approvals-and-databases",
+    "sample_limit": 70,
+    "data_types": ["regulatory_data", "approval_history", "labeling_changes"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 1.5,
+    "max_retries": 3
+  },
+  "drug_patent_database": {
+    "base_url": "https://www.uspto.gov/patents-application-process/search-patents",
+    "sample_limit": 50,
+    "data_types": ["drug_patents", "intellectual_property", "patent_expiry"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_market_database": {
+    "base_url": "https://www.iqvia.com/solutions/commercialization/real-world-evidence",
+    "sample_limit": 45,
+    "data_types": ["market_data", "sales_data", "market_share"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_competitor_database": {
+    "base_url": "https://www.iqvia.com/solutions/commercialization/real-world-evidence",
+    "sample_limit": 40,
+    "data_types": ["competitor_analysis", "market_competition", "generic_drugs"],
+    "file_formats": ["csv", "json"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_development_pipeline": {
+    "base_url": "https://www.pharmaprojects.com",
+    "sample_limit": 100,
+    "data_types": ["development_pipeline", "clinical_trials", "drug_candidates"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  },
+  "drug_investment_database": {
+    "base_url": "https://www.biopharmadive.com",
+    "sample_limit": 30,
+    "data_types": ["investment_data", "funding_rounds", "mergers_acquisitions"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_licensing_database": {
+    "base_url": "https://www.biopharmadive.com",
+    "sample_limit": 35,
+    "data_types": ["licensing_deals", "partnerships", "collaborations"],
+    "file_formats": ["json", "csv"],
+    "min_request_interval": 2.0,
+    "max_retries": 3
+  },
+  "drug_publication_database": {
+    "base_url": "https://pubmed.ncbi.nlm.nih.gov",
+    "sample_limit": 100,
+    "data_types": ["drug_publications", "research_articles", "clinical_studies"],
+    "file_formats": ["json", "xml"],
+    "min_request_interval": 0.5,
+    "max_retries": 3
+  },
+  "drug_news_database": {
+    "base_url": "https://www.biopharmadive.com",
+    "sample_limit": 50,
+    "data_types": ["drug_news", "industry_updates", "regulatory_news"],
+    "file_formats": ["json", "rss"],
+    "min_request_interval": 1.0,
+    "max_retries": 3
+  }
+}

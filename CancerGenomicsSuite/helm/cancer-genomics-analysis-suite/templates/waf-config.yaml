@@ -1,0 +1,379 @@
+{{- if .Values.security.waf.enabled }}
+# WAF Configuration ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: waf
+data:
+  modsecurity.conf: |
+    # ModSecurity Configuration
+    SecRuleEngine On
+    SecRequestBodyAccess On
+    SecResponseBodyAccess On
+    SecResponseBodyMimeType text/plain text/html text/xml application/json
+    SecResponseBodyLimit 524288
+    SecRequestBodyLimit 134217728
+    SecRequestBodyNoFilesLimit 131072
+    SecRequestBodyLimitAction Reject
+    SecRule REQUEST_HEADERS:Content-Type "text/xml" \
+      "id:200000,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+    SecRule REQUEST_HEADERS:Content-Type "application/xml" \
+      "id:200001,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+    SecRule REQUEST_HEADERS:Content-Type "application/soap+xml" \
+      "id:200002,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+    SecRule REQUEST_HEADERS:Content-Type "application/x-amf" \
+      "id:200003,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=AMF"
+    SecRule REQUEST_HEADERS:Content-Type "application/x-www-form-urlencoded" \
+      "id:200004,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=URLENCODED"
+    SecRule REQUEST_HEADERS:Content-Type "multipart/form-data" \
+      "id:200005,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=MULTIPART"
+    SecRule REQUEST_HEADERS:Content-Type "application/json" \
+      "id:200006,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+    
+    # Cancer Genomics specific rules
+    SecRule REQUEST_URI "@contains /api/v1/patients" \
+      "id:1001,phase:1,block,msg:'Patient data access blocked',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    SecRule REQUEST_URI "@contains /api/v1/genetic-data" \
+      "id:1002,phase:1,block,msg:'Genetic data access blocked',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    SecRule REQUEST_HEADERS:User-Agent "@contains bot" \
+      "id:1003,phase:1,block,msg:'Bot detected',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    SecRule REQUEST_HEADERS:User-Agent "@contains crawler" \
+      "id:1004,phase:1,block,msg:'Crawler detected',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    SecRule REQUEST_HEADERS:User-Agent "@contains scanner" \
+      "id:1005,phase:1,block,msg:'Scanner detected',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    SecRule REQUEST_URI "@contains /admin" \
+      "id:1006,phase:1,block,msg:'Admin access blocked',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    SecRule REQUEST_URI "@contains /debug" \
+      "id:1007,phase:1,block,msg:'Debug access blocked',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    SecRule REQUEST_URI "@contains /test" \
+      "id:1008,phase:1,block,msg:'Test endpoint blocked',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # SQL Injection protection
+    SecRule ARGS "@detectSQLi" \
+      "id:2001,phase:2,block,msg:'SQL Injection Attack Detected',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # XSS protection
+    SecRule ARGS "@detectXSS" \
+      "id:2002,phase:2,block,msg:'XSS Attack Detected',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Command Injection protection
+    SecRule ARGS "@detectCmdInjection" \
+      "id:2003,phase:2,block,msg:'Command Injection Attack Detected',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # File Upload protection
+    SecRule FILES_NAMES "@rx \\.(php|phtml|php3|php4|php5|pht|phtm|shtml|shtm|js|jsp|asp|aspx|exe|bat|cmd|com|scr|vbs|vbe|ws|wsc|wsh|ps1|psm1|psd1|ps1xml|psc1|psc2|msh|msh1|msh2|mshxml|msh1xml|msh2xml|scf|lnk|inf|reg|doc|docx|xls|xlsx|ppt|pptx|pdf|zip|rar|7z|tar|gz|bz2)$" \
+      "id:2004,phase:2,block,msg:'Dangerous file upload detected',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Rate limiting
+    SecRule IP:REQUEST_COUNT "@gt 100" \
+      "id:3001,phase:1,block,msg:'Rate limit exceeded',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Request size limits
+    SecRule REQUEST_HEADERS:Content-Length "@gt 10485760" \
+      "id:3002,phase:1,block,msg:'Request too large',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Request method restrictions
+    SecRule REQUEST_METHOD "!@within GET POST PUT DELETE OPTIONS" \
+      "id:3003,phase:1,block,msg:'Method not allowed',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Header validation
+    SecRule REQUEST_HEADERS:Host "!@rx ^[a-zA-Z0-9.-]+$" \
+      "id:3004,phase:1,block,msg:'Invalid host header',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Referer validation
+    SecRule REQUEST_HEADERS:Referer "!@rx ^https?://[a-zA-Z0-9.-]+/" \
+      "id:3005,phase:1,block,msg:'Invalid referer header',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # User-Agent validation
+    SecRule REQUEST_HEADERS:User-Agent "@rx ^$" \
+      "id:3006,phase:1,block,msg:'Empty user agent',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Accept header validation
+    SecRule REQUEST_HEADERS:Accept "!@rx ^[a-zA-Z0-9*/,;= -]+$" \
+      "id:3007,phase:1,block,msg:'Invalid accept header',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Content-Type validation
+    SecRule REQUEST_HEADERS:Content-Type "!@rx ^[a-zA-Z0-9*/,;= -]+$" \
+      "id:3008,phase:1,block,msg:'Invalid content type header',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Authorization header validation
+    SecRule REQUEST_HEADERS:Authorization "!@rx ^Bearer [a-zA-Z0-9._-]+$" \
+      "id:3009,phase:1,block,msg:'Invalid authorization header',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Custom error page
+    SecRule REQUEST_URI "@contains /error" \
+      "id:4001,phase:1,pass,msg:'Error page access allowed',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Health check endpoint
+    SecRule REQUEST_URI "@contains /health" \
+      "id:4002,phase:1,pass,msg:'Health check endpoint allowed',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Metrics endpoint
+    SecRule REQUEST_URI "@contains /metrics" \
+      "id:4003,phase:1,pass,msg:'Metrics endpoint allowed',logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}'"
+    
+    # Logging configuration
+    SecAuditEngine RelevantOnly
+    SecAuditLogRelevantStatus "^(?:5|4(?!04))"
+    SecAuditLogParts ABIJDEFHZ
+    SecAuditLogType Serial
+    SecAuditLog /var/log/modsecurity/audit.log
+    SecAuditLogStorageDir /var/log/modsecurity/audit/
+    
+    # Error logging
+    SecDebugLog /var/log/modsecurity/debug.log
+    SecDebugLogLevel 3
+    
+    # Data directory
+    SecDataDir /tmp/
+    
+    # Unicode mapping
+    SecUnicodeMapFile unicode.mapping 20127
+    
+    # Collection timeout
+    SecCollectionTimeout 600
+    
+    # Rule engine
+    SecRuleEngine On
+    
+    # Request body processing
+    SecRequestBodyAccess On
+    SecRequestBodyLimit 134217728
+    SecRequestBodyNoFilesLimit 131072
+    SecRequestBodyLimitAction Reject
+    
+    # Response body processing
+    SecResponseBodyAccess On
+    SecResponseBodyMimeType text/plain text/html text/xml application/json
+    SecResponseBodyLimit 524288
+    SecResponseBodyLimitAction ProcessPartial
+    
+    # XML processing
+    SecRule REQUEST_HEADERS:Content-Type "text/xml" \
+      "id:200000,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+    
+    # JSON processing
+    SecRule REQUEST_HEADERS:Content-Type "application/json" \
+      "id:200001,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=JSON"
+    
+    # URL encoded processing
+    SecRule REQUEST_HEADERS:Content-Type "application/x-www-form-urlencoded" \
+      "id:200002,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=URLENCODED"
+    
+    # Multipart processing
+    SecRule REQUEST_HEADERS:Content-Type "multipart/form-data" \
+      "id:200003,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=MULTIPART"
+  
+  nginx.conf: |
+    # Nginx configuration with WAF
+    user nginx;
+    worker_processes auto;
+    error_log /var/log/nginx/error.log warn;
+    pid /var/run/nginx.pid;
+    
+    events {
+        worker_connections 1024;
+        use epoll;
+        multi_accept on;
+    }
+    
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        # Logging format
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+        
+        access_log /var/log/nginx/access.log main;
+        
+        # Basic settings
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        server_tokens off;
+        
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_comp_level 6;
+        gzip_types
+            text/plain
+            text/css
+            text/xml
+            text/javascript
+            application/json
+            application/javascript
+            application/xml+rss
+            application/atom+xml
+            image/svg+xml;
+        
+        # Rate limiting
+        limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+        limit_req_zone $binary_remote_addr zone=web:10m rate=100r/s;
+        limit_req_zone $binary_remote_addr zone=admin:10m rate=1r/s;
+        
+        # Connection limiting
+        limit_conn_zone $binary_remote_addr zone=conn_limit_per_ip:10m;
+        
+        # ModSecurity configuration
+        modsecurity on;
+        modsecurity_rules_file /etc/nginx/modsecurity/modsecurity.conf;
+        
+        # Include server configurations
+        include /etc/nginx/conf.d/*.conf;
+    }
+---
+# WAF Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: waf
+spec:
+  replicas: {{ .Values.security.waf.replicas | default 2 }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: waf
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: waf
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        fsGroup: 101
+      containers:
+      - name: waf
+        image: {{ .Values.security.waf.image | default "nginx:1.25-alpine" }}
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+        env:
+        - name: WAF_MODE
+          value: {{ .Values.security.waf.mode | default "blocking" | quote }}
+        - name: WAF_LOG_LEVEL
+          value: {{ .Values.security.waf.logLevel | default "info" | quote }}
+        volumeMounts:
+        - name: waf-config
+          mountPath: /etc/nginx/modsecurity
+        - name: waf-logs
+          mountPath: /var/log/modsecurity
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: waf-config
+        configMap:
+          name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf-config
+      - name: waf-logs
+        emptyDir: {}
+      - name: nginx-config
+        configMap:
+          name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf-config
+---
+# WAF Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: waf
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  - port: 443
+    targetPort: 443
+    protocol: TCP
+    name: https
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: waf
+---
+# WAF Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: waf
+---
+# WAF RBAC
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: waf
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: waf
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+subjects:
+- kind: ServiceAccount
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-waf
+  namespace: {{ .Release.Namespace }}
+{{- end }}

@@ -1,0 +1,376 @@
+{{- if .Values.snakemakeWorkflows.enabled }}
+# Snakemake Workflow Controller
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-controller
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: snakemake-controller
+spec:
+  replicas: {{ .Values.snakemakeWorkflows.controller.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: snakemake-controller
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: snakemake-controller
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: snakemake-controller
+          image: "{{ .Values.snakemakeWorkflows.image.registry }}/{{ .Values.snakemakeWorkflows.image.repository }}:{{ .Values.snakemakeWorkflows.image.tag }}"
+          imagePullPolicy: {{ .Values.snakemakeWorkflows.image.pullPolicy }}
+          command: ["python", "-m", "snakemake_workflows.controller"]
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_TOPIC_WORKFLOW_REQUESTS
+              value: "{{ .Values.snakemakeWorkflows.topics.workflowRequests }}"
+            - name: KAFKA_TOPIC_WORKFLOW_STATUS
+              value: "{{ .Values.snakemakeWorkflows.topics.workflowStatus }}"
+            - name: REDIS_URL
+              value: "redis://{{ include "cancer-genomics-analysis-suite.fullname" . }}-redis-master:6379/0"
+            - name: POSTGRES_URL
+              value: "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql:5432/{{ .Values.postgresql.auth.database }}"
+            - name: WORKFLOW_STORAGE_PATH
+              value: "/workflows"
+            - name: WORKFLOW_OUTPUT_PATH
+              value: "/outputs"
+            - name: SNAKEMAKE_PROFILE
+              value: "kubernetes"
+            - name: KUBERNETES_NAMESPACE
+              value: "{{ .Release.Namespace }}"
+            {{- with .Values.snakemakeWorkflows.controller.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.snakemakeWorkflows.controller.resources | nindent 12 }}
+          volumeMounts:
+            - name: workflow-storage
+              mountPath: /workflows
+            - name: workflow-outputs
+              mountPath: /outputs
+            - name: snakemake-config
+              mountPath: /config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      volumes:
+        - name: workflow-storage
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-workflows
+        - name: workflow-outputs
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-outputs
+        - name: snakemake-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-config
+      {{- with .Values.snakemakeWorkflows.controller.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.snakemakeWorkflows.controller.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.snakemakeWorkflows.controller.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+# Snakemake Workflow Executor
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-executor
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: snakemake-executor
+spec:
+  replicas: {{ .Values.snakemakeWorkflows.executor.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: snakemake-executor
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: snakemake-executor
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: snakemake-executor
+          image: "{{ .Values.snakemakeWorkflows.image.registry }}/{{ .Values.snakemakeWorkflows.image.repository }}:{{ .Values.snakemakeWorkflows.image.tag }}"
+          imagePullPolicy: {{ .Values.snakemakeWorkflows.image.pullPolicy }}
+          command: ["python", "-m", "snakemake_workflows.executor"]
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_TOPIC_WORKFLOW_TASKS
+              value: "{{ .Values.snakemakeWorkflows.topics.workflowTasks }}"
+            - name: KAFKA_TOPIC_TASK_STATUS
+              value: "{{ .Values.snakemakeWorkflows.topics.taskStatus }}"
+            - name: REDIS_URL
+              value: "redis://{{ include "cancer-genomics-analysis-suite.fullname" . }}-redis-master:6379/0"
+            - name: WORKFLOW_STORAGE_PATH
+              value: "/workflows"
+            - name: WORKFLOW_OUTPUT_PATH
+              value: "/outputs"
+            - name: SNAKEMAKE_PROFILE
+              value: "kubernetes"
+            - name: KUBERNETES_NAMESPACE
+              value: "{{ .Release.Namespace }}"
+            - name: MAX_CONCURRENT_JOBS
+              value: "{{ .Values.snakemakeWorkflows.executor.maxConcurrentJobs }}"
+            {{- with .Values.snakemakeWorkflows.executor.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.snakemakeWorkflows.executor.resources | nindent 12 }}
+          volumeMounts:
+            - name: workflow-storage
+              mountPath: /workflows
+            - name: workflow-outputs
+              mountPath: /outputs
+            - name: snakemake-config
+              mountPath: /config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      volumes:
+        - name: workflow-storage
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-workflows
+        - name: workflow-outputs
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-outputs
+        - name: snakemake-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-config
+      {{- with .Values.snakemakeWorkflows.executor.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.snakemakeWorkflows.executor.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.snakemakeWorkflows.executor.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+# Snakemake Storage PVCs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-workflows
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: snakemake
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.snakemakeWorkflows.storage.workflowsSize }}
+  {{- if .Values.snakemakeWorkflows.storage.storageClass }}
+  storageClassName: {{ .Values.snakemakeWorkflows.storage.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-outputs
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: snakemake
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.snakemakeWorkflows.storage.outputsSize }}
+  {{- if .Values.snakemakeWorkflows.storage.storageClass }}
+  storageClassName: {{ .Values.snakemakeWorkflows.storage.storageClass }}
+  {{- end }}
+---
+# Snakemake Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-snakemake-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: snakemake
+data:
+  config.yaml: |
+    # Snakemake configuration
+    kubernetes:
+      namespace: {{ .Release.Namespace }}
+      service_account: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      image_pull_secrets: []
+      storage_class: {{ .Values.snakemakeWorkflows.storage.storageClass | default "standard" }}
+      
+    # Workflow settings
+    workflow:
+      max_concurrent_jobs: {{ .Values.snakemakeWorkflows.executor.maxConcurrentJobs }}
+      default_resources:
+        cpu: {{ .Values.snakemakeWorkflows.defaultResources.cpu }}
+        memory: {{ .Values.snakemakeWorkflows.defaultResources.memory }}
+        disk: {{ .Values.snakemakeWorkflows.defaultResources.disk }}
+      
+    # Logging
+    logging:
+      level: {{ .Values.snakemakeWorkflows.logging.level }}
+      format: json
+      
+    # Retry settings
+    retry:
+      max_attempts: {{ .Values.snakemakeWorkflows.retry.maxAttempts }}
+      backoff_factor: {{ .Values.snakemakeWorkflows.retry.backoffFactor }}
+      
+  Snakefile: |
+    # Cancer Genomics Analysis Snakefile
+    import os
+    import pandas as pd
+    from snakemake.utils import min_version
+    
+    min_version("7.0")
+    
+    # Configuration
+    configfile: "config.yaml"
+    
+    # Input files
+    FASTQ_DIR = config["input"]["fastq_dir"]
+    REFERENCE_GENOME = config["reference"]["genome"]
+    ANNOTATION_GTF = config["reference"]["annotation"]
+    
+    # Output directory
+    OUTPUT_DIR = config["output"]["dir"]
+    
+    # Sample information
+    samples = pd.read_csv(config["input"]["samples"], sep="\t")
+    
+    # Rule: Quality control
+    rule fastqc:
+        input:
+            fq1 = FASTQ_DIR + "/{sample}_1.fastq.gz",
+            fq2 = FASTQ_DIR + "/{sample}_2.fastq.gz"
+        output:
+            html = OUTPUT_DIR + "/fastqc/{sample}_1_fastqc.html",
+            zip = OUTPUT_DIR + "/fastqc/{sample}_1_fastqc.zip"
+        threads: 4
+        resources:
+            mem_mb = 4000
+        shell:
+            "fastqc {input.fq1} -o {output.html} -t {threads}"
+    
+    # Rule: Trimming
+    rule trim_galore:
+        input:
+            fq1 = FASTQ_DIR + "/{sample}_1.fastq.gz",
+            fq2 = FASTQ_DIR + "/{sample}_2.fastq.gz"
+        output:
+            fq1 = OUTPUT_DIR + "/trimmed/{sample}_1_val_1.fq.gz",
+            fq2 = OUTPUT_DIR + "/trimmed/{sample}_2_val_2.fq.gz"
+        threads: 4
+        resources:
+            mem_mb = 4000
+        shell:
+            "trim_galore --paired --gzip {input.fq1} {input.fq2} -o {output.fq1}"
+    
+    # Rule: Alignment
+    rule star_align:
+        input:
+            fq1 = OUTPUT_DIR + "/trimmed/{sample}_1_val_1.fq.gz",
+            fq2 = OUTPUT_DIR + "/trimmed/{sample}_2_val_2.fq.gz",
+            genome = REFERENCE_GENOME,
+            gtf = ANNOTATION_GTF
+        output:
+            bam = OUTPUT_DIR + "/aligned/{sample}.bam",
+            log = OUTPUT_DIR + "/logs/{sample}_star.log"
+        threads: 8
+        resources:
+            mem_mb = 16000
+        shell:
+            "STAR --genomeDir {input.genome} --readFilesIn {input.fq1} {input.fq2} "
+            "--readFilesCommand zcat --outSAMtype BAM SortedByCoordinate "
+            "--outFileNamePrefix {output.bam} --runThreadN {threads}"
+    
+    # Rule: Variant calling
+    rule gatk_variant_calling:
+        input:
+            bam = OUTPUT_DIR + "/aligned/{sample}.bam",
+            reference = REFERENCE_GENOME + "/genome.fa"
+        output:
+            vcf = OUTPUT_DIR + "/variants/{sample}.vcf"
+        threads: 4
+        resources:
+            mem_mb = 8000
+        shell:
+            "gatk HaplotypeCaller -R {input.reference} -I {input.bam} "
+            "-O {output.vcf} --native-pair-hmm-threads {threads}"
+    
+    # Rule: Expression quantification
+    rule feature_counts:
+        input:
+            bam = OUTPUT_DIR + "/aligned/{sample}.bam",
+            gtf = ANNOTATION_GTF
+        output:
+            counts = OUTPUT_DIR + "/expression/{sample}_counts.txt"
+        threads: 4
+        resources:
+            mem_mb = 4000
+        shell:
+            "featureCounts -a {input.gtf} -o {output.counts} {input.bam} -T {threads}"
+    
+    # Rule: Generate summary report
+    rule generate_report:
+        input:
+            expand(OUTPUT_DIR + "/variants/{sample}.vcf", sample=samples.sample),
+            expand(OUTPUT_DIR + "/expression/{sample}_counts.txt", sample=samples.sample)
+        output:
+            report = OUTPUT_DIR + "/reports/analysis_summary.html"
+        shell:
+            "python scripts/generate_report.py {input} {output.report}"
+{{- end }}

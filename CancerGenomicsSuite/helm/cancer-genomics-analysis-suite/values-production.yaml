@@ -1,0 +1,683 @@
+# Production values for cancer-genomics-analysis-suite
+# This is a YAML-formatted file with enhanced security configurations
+
+# Global configuration
+global:
+  imageRegistry: "your-registry.com"
+  imagePullSecrets:
+    - name: registry-secret
+  storageClass: "fast-ssd"
+  
+  # Cloud provider configuration
+  cloudProvider: "aws"  # aws, gcp, azure
+  region: "us-west-2"
+  
+  # Domain configuration
+  domain: "cancer-genomics.yourdomain.com"
+  apiDomain: "api.cancer-genomics.yourdomain.com"
+  adminDomain: "admin.cancer-genomics.yourdomain.com"
+  
+  # AWS specific configuration
+  aws:
+    eksClusterName: "cancer-genomics-prod"
+    loadBalancerType: "nlb"
+    s3Bucket: "cancer-genomics-prod-data"
+    rdsInstance: "cancer-genomics-prod-db"
+    elasticacheCluster: "cancer-genomics-prod-cache"
+    secretsManager:
+      enabled: true
+      region: "us-west-2"
+      secrets:
+        - name: "cancer-genomics/database/password"
+          key: "POSTGRES_PASSWORD"
+        - name: "cancer-genomics/redis/password"
+          key: "REDIS_PASSWORD"
+        - name: "cancer-genomics/app/secret-key"
+          key: "SECRET_KEY"
+        - name: "cancer-genomics/app/jwt-secret"
+          key: "JWT_SECRET"
+
+# Image configuration
+image:
+  registry: "your-registry.com"
+  repository: "cancer-genomics-analysis-suite"
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - name: registry-secret
+
+# Service account
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/cancer-genomics-role"
+  name: "cancer-genomics-sa"
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+  supplementalGroups: [1000]
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# Web application configuration
+web:
+  replicaCount: 5
+  
+  image:
+    registry: "your-registry.com"
+    repository: "cancer-genomics-analysis-suite"
+    tag: "v1.0.0"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 8050
+    targetPort: 8050
+    annotations: {}
+  
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  
+  nodeSelector:
+    node-type: "compute-optimized"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "cancer-genomics"
+      effect: "NoSchedule"
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+              - cancer-genomics-analysis-suite
+            - key: component
+              operator: In
+              values:
+              - web
+          topologyKey: kubernetes.io/hostname
+  
+  # Environment variables
+  env:
+    - name: FLASK_ENV
+      value: "production"
+    - name: LOG_LEVEL
+      value: "INFO"
+    - name: ENABLE_MTLS
+      value: "true"
+    - name: ENABLE_SECURITY_HEADERS
+      value: "true"
+  
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8050
+      scheme: HTTPS
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8050
+      scheme: HTTPS
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Celery worker configuration
+celery:
+  worker:
+    replicaCount: 3
+    
+    image:
+      registry: "your-registry.com"
+      repository: "cancer-genomics-analysis-suite"
+      tag: "v1.0.0"
+      pullPolicy: IfNotPresent
+    
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    
+    nodeSelector:
+      node-type: "compute-optimized"
+    tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "cancer-genomics"
+        effect: "NoSchedule"
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - cancer-genomics-analysis-suite
+              - key: component
+                operator: In
+                values:
+                - celery
+            topologyKey: kubernetes.io/hostname
+    
+    # Environment variables
+    env:
+      - name: FLASK_ENV
+        value: "production"
+      - name: LOG_LEVEL
+        value: "INFO"
+      - name: ENABLE_MTLS
+        value: "true"
+  
+  beat:
+    replicaCount: 1
+    
+    image:
+      registry: "your-registry.com"
+      repository: "cancer-genomics-analysis-suite"
+      tag: "v1.0.0"
+      pullPolicy: IfNotPresent
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    
+    nodeSelector:
+      node-type: "compute-optimized"
+    tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "cancer-genomics"
+        effect: "NoSchedule"
+
+# Nginx configuration
+nginx:
+  enabled: true
+  replicaCount: 3
+  
+  image:
+    registry: "your-registry.com"
+    repository: "nginx"
+    tag: "1.25-alpine"
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 80
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-west-2:123456789012:certificate/your-cert-id"
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  
+  nodeSelector:
+    node-type: "compute-optimized"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "cancer-genomics"
+      effect: "NoSchedule"
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres-password"
+    username: "postgres"
+    password: "postgres-password"
+    database: "genomics_db"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 100Gi
+      storageClass: "fast-ssd"
+    
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    
+    nodeSelector:
+      node-type: "database-optimized"
+    tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "cancer-genomics-db"
+        effect: "NoSchedule"
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "redis-password"
+  
+  master:
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: "fast-ssd"
+    
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    
+    nodeSelector:
+      node-type: "cache-optimized"
+    tolerations:
+      - key: "dedicated"
+        operator: "Equal"
+        value: "cancer-genomics-cache"
+        effect: "NoSchedule"
+
+# Advanced Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    # Basic security
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';";
+      more_set_headers "Permissions-Policy: geolocation=(), microphone=(), camera=()";
+    
+    # Rate limiting
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+    # WAF integration
+    nginx.ingress.kubernetes.io/modsecurity: "on"
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecRuleEngine On
+      SecRule REQUEST_HEADERS:User-Agent "@contains bot" "id:1001,phase:1,block,msg:'Bot detected'"
+      SecRule REQUEST_URI "@contains /admin" "id:1002,phase:1,block,msg:'Admin access blocked'"
+    
+    # DDoS protection
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    
+    # CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://cancer-genomics.yourdomain.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+  
+  hosts:
+    - host: cancer-genomics.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: cancer-genomics-tls
+      hosts:
+        - cancer-genomics.yourdomain.com
+
+# API-specific ingress
+ingress:
+  api:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      
+      # API-specific security
+      nginx.ingress.kubernetes.io/rate-limit: "1000"
+      nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+      nginx.ingress.kubernetes.io/auth-type: "basic"
+      nginx.ingress.kubernetes.io/auth-secret: "api-basic-auth"
+      nginx.ingress.kubernetes.io/auth-realm: "API Access"
+      
+      # API versioning
+      nginx.ingress.kubernetes.io/rewrite-target: /api/v1/$1
+      
+      # API security headers
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        more_set_headers "X-API-Version: v1";
+        more_set_headers "X-Content-Type-Options: nosniff";
+        more_set_headers "X-Frame-Options: DENY";
+    
+    hosts:
+      - host: api.cancer-genomics.yourdomain.com
+        paths:
+          - path: /(.*)
+            pathType: Prefix
+    tls:
+      - secretName: api-cancer-genomics-tls
+        hosts:
+          - api.cancer-genomics.yourdomain.com
+
+# Admin-specific ingress
+ingress:
+  admin:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      
+      # Admin-specific security
+      nginx.ingress.kubernetes.io/rate-limit: "10"
+      nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+      nginx.ingress.kubernetes.io/auth-type: "basic"
+      nginx.ingress.kubernetes.io/auth-secret: "admin-basic-auth"
+      nginx.ingress.kubernetes.io/auth-realm: "Admin Access"
+      
+      # IP whitelist
+      nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+      
+      # Admin security headers
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        more_set_headers "X-Content-Type-Options: nosniff";
+        more_set_headers "X-Frame-Options: DENY";
+        more_set_headers "X-XSS-Protection: 1; mode=block";
+    
+    hosts:
+      - host: admin.cancer-genomics.yourdomain.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: admin-cancer-genomics-tls
+        hosts:
+          - admin.cancer-genomics.yourdomain.com
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels:
+      monitoring: "prometheus"
+  
+  prometheusRule:
+    enabled: true
+    labels:
+      monitoring: "prometheus"
+  
+  grafana:
+    enabled: true
+    dashboard:
+      enabled: true
+
+# Enhanced Security configuration
+security:
+  # Network policies
+  networkPolicy:
+    enabled: true
+  
+  # mTLS configuration
+  mtls:
+    enabled: true
+    certificateDuration: "8760h"  # 1 year
+    renewBefore: "720h"  # 30 days
+    
+    # CA configuration (should be provided via external secrets)
+    ca:
+      cert: ""  # Base64 encoded CA certificate
+      key: ""   # Base64 encoded CA private key
+    
+    # Component certificates (should be provided via external secrets)
+    web:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+    
+    celery:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+    
+    postgresql:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+    
+    redis:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+  
+  # Secrets management
+  secrets:
+    rotation:
+      enabled: true
+      schedule: "0 2 * * *"  # Daily at 2 AM
+      rotateDbPassword: true
+      rotateRedisPassword: true
+      rotateAppSecrets: true
+      restartPods: true
+      image: "bitnami/kubectl:latest"
+    
+    audit:
+      enabled: true
+      schedule: "0 */6 * * *"  # Every 6 hours
+      webhookUrl: "https://your-webhook-url.com/security-audit"
+      image: "bitnami/kubectl:latest"
+    
+    validation:
+      enabled: true
+      image: "gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0"
+      rules:
+        - name: "password-strength"
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$"
+        - name: "jwt-secret-length"
+          minLength: 64
+  
+  # Security monitoring
+  monitoring:
+    enabled: true
+    interval: "30s"
+    scrapeTimeout: "10s"
+  
+  # Compliance monitoring
+  compliance:
+    enabled: true
+    interval: "60s"
+    scrapeTimeout: "15s"
+  
+  # Incident response
+  incidentResponse:
+    enabled: true
+    interval: "30s"
+    scrapeTimeout: "10s"
+  
+  # Pod security policy
+  podSecurityPolicy:
+    enabled: true
+  
+  # RBAC
+  rbac:
+    create: true
+
+# Enhanced Secrets configuration
+secrets:
+  # Database secrets
+  database:
+    create: true
+    name: "postgres-secrets"
+    data:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres-password"
+      POSTGRES_DB: "genomics_db"
+  
+  # Application secrets
+  app:
+    create: true
+    name: "app-secrets"
+    data:
+      SECRET_KEY: "your-production-secret-key-change-this"
+      JWT_SECRET_KEY: "your-jwt-secret-key-change-this"
+  
+  # External API keys
+  apis:
+    create: true
+    name: "api-secrets"
+    data:
+      ENSEMBL_API_KEY: "your-ensembl-api-key"
+      UNIPROT_API_KEY: "your-uniprot-api-key"
+      CLINVAR_API_KEY: "your-clinvar-api-key"
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 1 * * *"  # Daily at 1 AM
+  retention: "30d"
+  storage:
+    enabled: true
+    size: 200Gi
+    storageClass: "fast-ssd"
+
+# Service mesh configuration
+serviceMesh:
+  enabled: true
+  istio:
+    enabled: true
+    virtualService:
+      enabled: true
+    destinationRule:
+      enabled: true
+    gateway:
+      enabled: true
+
+# Configuration management
+config:
+  # Application configuration
+  app:
+    name: "Cancer Genomics Analysis Suite"
+    version: "1.0.0"
+    environment: "production"
+    debug: false
+  
+  # Database configuration
+  database:
+    host: "postgresql"
+    port: 5432
+    name: "genomics_db"
+    user: "postgres"
+    sslmode: "require"
+  
+  # Redis configuration
+  redis:
+    host: "redis-master"
+    port: 6379
+    db: 0
+    password: "redis-password"
+  
+  # Celery configuration
+  celery:
+    broker_url: "redis://:redis-password@redis-master:6379/0"
+    result_backend: "redis://:redis-password@redis-master:6379/0"
+    task_serializer: "json"
+    result_serializer: "json"
+    accept_content: ["json"]
+    timezone: "UTC"
+    enable_utc: true
+  
+  # External APIs
+  apis:
+    ensembl:
+      base_url: "https://rest.ensembl.org"
+      timeout: 30
+    uniprot:
+      base_url: "https://www.uniprot.org/uniprot"
+      timeout: 30
+    clinvar:
+      base_url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+      timeout: 30
+  
+  # Feature flags
+  features:
+    auth_enabled: true
+    api_enabled: true
+    dashboard_enabled: true
+    reporting_enabled: true
+    ml_enabled: true
+    blast_enabled: true
+    annotation_enabled: true
+    mtls_enabled: true
+    security_headers_enabled: true
+    waf_enabled: true
+    ddos_protection_enabled: true

@@ -1,0 +1,4 @@
+dataset_id,dataset_title,sample_type,data_format,estimated_samples,features,target_variable
+cancer-dataset-1,Breast Cancer Wisconsin Dataset,cancer_data,cancer,100,"clinical_features,genomic_data",cancer_type
+genomics-dataset-1,Gene Expression Cancer Dataset,cancer_data,cancer,100,"clinical_features,genomic_data",cancer_type
+biomarker-dataset-1,Cancer Biomarker Discovery Dataset,cancer_data,cancer,100,"clinical_features,genomic_data",cancer_type

@@ -1,0 +1,263 @@
+{
+  "annotations": [
+    {
+      "variant_id": "17:7574003:G>A",
+      "gene_symbol": "TP53",
+      "transcript_id": "ENST00000269305",
+      "protein_change": "p.R175H",
+      "consequence_type": "missense_variant",
+      "clinical_significance": "Pathogenic",
+      "cosmic_id": "10662",
+      "allele_frequency": 0.45,
+      "read_depth": 120,
+      "variant_quality": 99.5,
+      "functional_predictions": {
+        "sift_score": 0.01,
+        "sift_prediction": "deleterious",
+        "polyphen2_score": 0.98,
+        "polyphen2_prediction": "probably_damaging",
+        "cadd_score": 25.3,
+        "cadd_prediction": "deleterious",
+        "revel_score": 0.89,
+        "revel_prediction": "pathogenic"
+      },
+      "pathway_annotations": [
+        "p53 pathway",
+        "DNA damage response",
+        "Cell cycle control",
+        "Apoptosis"
+      ],
+      "drug_responses": [
+        {
+          "drug_name": "Nutlin-3a",
+          "response_type": "sensitive",
+          "evidence_level": "preclinical"
+        },
+        {
+          "drug_name": "MDM2 inhibitor",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        }
+      ],
+      "population_frequencies": {
+        "gnomad_exomes": 0.0001,
+        "gnomad_genomes": 0.0002,
+        "exac": 0.0001,
+        "1000genomes": 0.0001
+      }
+    },
+    {
+      "variant_id": "17:43094695:G>C",
+      "gene_symbol": "BRCA1",
+      "transcript_id": "ENST00000357654",
+      "protein_change": "p.R1699W",
+      "consequence_type": "missense_variant",
+      "clinical_significance": "Pathogenic",
+      "cosmic_id": "10663",
+      "allele_frequency": 0.38,
+      "read_depth": 95,
+      "variant_quality": 98.2,
+      "functional_predictions": {
+        "sift_score": 0.02,
+        "sift_prediction": "deleterious",
+        "polyphen2_score": 0.95,
+        "polyphen2_prediction": "probably_damaging",
+        "cadd_score": 28.7,
+        "cadd_prediction": "deleterious",
+        "revel_score": 0.92,
+        "revel_prediction": "pathogenic"
+      },
+      "pathway_annotations": [
+        "BRCA1/BRCA2 pathway",
+        "Homologous recombination repair",
+        "DNA double-strand break repair",
+        "Fanconi anemia pathway"
+      ],
+      "drug_responses": [
+        {
+          "drug_name": "Olaparib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        },
+        {
+          "drug_name": "Rucaparib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        },
+        {
+          "drug_name": "Niraparib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        }
+      ],
+      "population_frequencies": {
+        "gnomad_exomes": 0.00005,
+        "gnomad_genomes": 0.00008,
+        "exac": 0.00006,
+        "1000genomes": 0.00004
+      }
+    },
+    {
+      "variant_id": "7:55241707:G>T",
+      "gene_symbol": "EGFR",
+      "transcript_id": "ENST00000275493",
+      "protein_change": "p.G719S",
+      "consequence_type": "missense_variant",
+      "clinical_significance": "Pathogenic",
+      "cosmic_id": "10664",
+      "allele_frequency": 0.52,
+      "read_depth": 110,
+      "variant_quality": 99.8,
+      "functional_predictions": {
+        "sift_score": 0.01,
+        "sift_prediction": "deleterious",
+        "polyphen2_score": 0.99,
+        "polyphen2_prediction": "probably_damaging",
+        "cadd_score": 32.1,
+        "cadd_prediction": "deleterious",
+        "revel_score": 0.94,
+        "revel_prediction": "pathogenic"
+      },
+      "pathway_annotations": [
+        "EGFR/ERBB signaling",
+        "PI3K/AKT/mTOR pathway",
+        "RAS/RAF/MEK/ERK pathway",
+        "Growth factor signaling"
+      ],
+      "drug_responses": [
+        {
+          "drug_name": "Gefitinib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        },
+        {
+          "drug_name": "Erlotinib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        },
+        {
+          "drug_name": "Afatinib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        }
+      ],
+      "population_frequencies": {
+        "gnomad_exomes": 0.0002,
+        "gnomad_genomes": 0.0003,
+        "exac": 0.0002,
+        "1000genomes": 0.0001
+      }
+    },
+    {
+      "variant_id": "8:128748315:G>A",
+      "gene_symbol": "MYC",
+      "transcript_id": "ENST00000259523",
+      "protein_change": "p.P44L",
+      "consequence_type": "missense_variant",
+      "clinical_significance": "Uncertain_significance",
+      "cosmic_id": "10665",
+      "allele_frequency": 0.25,
+      "read_depth": 85,
+      "variant_quality": 97.1,
+      "functional_predictions": {
+        "sift_score": 0.15,
+        "sift_prediction": "tolerated",
+        "polyphen2_score": 0.45,
+        "polyphen2_prediction": "possibly_damaging",
+        "cadd_score": 18.2,
+        "cadd_prediction": "deleterious",
+        "revel_score": 0.35,
+        "revel_prediction": "uncertain"
+      },
+      "pathway_annotations": [
+        "MYC pathway",
+        "Cell cycle control",
+        "Transcription regulation",
+        "Metabolism"
+      ],
+      "drug_responses": [
+        {
+          "drug_name": "MYC inhibitor",
+          "response_type": "unknown",
+          "evidence_level": "preclinical"
+        }
+      ],
+      "population_frequencies": {
+        "gnomad_exomes": 0.001,
+        "gnomad_genomes": 0.0012,
+        "exac": 0.0008,
+        "1000genomes": 0.0009
+      }
+    },
+    {
+      "variant_id": "12:25245350:G>A",
+      "gene_symbol": "KRAS",
+      "transcript_id": "ENST00000256078",
+      "protein_change": "p.G12D",
+      "consequence_type": "missense_variant",
+      "clinical_significance": "Pathogenic",
+      "cosmic_id": "10666",
+      "allele_frequency": 0.67,
+      "read_depth": 140,
+      "variant_quality": 99.9,
+      "functional_predictions": {
+        "sift_score": 0.00,
+        "sift_prediction": "deleterious",
+        "polyphen2_score": 1.00,
+        "polyphen2_prediction": "probably_damaging",
+        "cadd_score": 35.8,
+        "cadd_prediction": "deleterious",
+        "revel_score": 0.96,
+        "revel_prediction": "pathogenic"
+      },
+      "pathway_annotations": [
+        "RAS/RAF/MEK/ERK pathway",
+        "PI3K/AKT/mTOR pathway",
+        "Growth factor signaling",
+        "Cell proliferation"
+      ],
+      "drug_responses": [
+        {
+          "drug_name": "Sotorasib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        },
+        {
+          "drug_name": "Adagrasib",
+          "response_type": "sensitive",
+          "evidence_level": "clinical"
+        },
+        {
+          "drug_name": "Cetuximab",
+          "response_type": "resistant",
+          "evidence_level": "clinical"
+        }
+      ],
+      "population_frequencies": {
+        "gnomad_exomes": 0.0003,
+        "gnomad_genomes": 0.0004,
+        "exac": 0.0002,
+        "1000genomes": 0.0003
+      }
+    }
+  ],
+  "metadata": {
+    "annotation_date": "2024-01-15",
+    "annotation_version": "v1.0",
+    "annotation_tools": [
+      "VEP",
+      "ANNOVAR",
+      "SnpEff"
+    ],
+    "databases_used": [
+      "ClinVar",
+      "COSMIC",
+      "gnomAD",
+      "ExAC",
+      "1000 Genomes"
+    ],
+    "total_variants": 5,
+    "pathogenic_variants": 4,
+    "uncertain_significance": 1
+  }
+}

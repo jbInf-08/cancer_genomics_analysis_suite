@@ -1,0 +1,288 @@
+{{- if and .Values.global.cloudProvider (eq .Values.global.cloudProvider "gcp") }}
+---
+# GCP Load Balancer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-gcp-lb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+  annotations:
+    cloud.google.com/load-balancer-type: "{{ .Values.global.gcp.loadBalancerType }}"
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "cancer-genomics-backend-config"}'
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8050
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 8050
+    protocol: TCP
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+---
+# GCP Backend Config for Load Balancer
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: cancer-genomics-backend-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  healthCheck:
+    checkIntervalSec: 10
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+    type: HTTP
+    requestPath: /health
+    port: 8050
+  connectionDraining:
+    drainingTimeoutSec: 60
+  sessionAffinity:
+    affinityType: "CLIENT_IP"
+    affinityCookieTtlSec: 3600
+  timeoutSec: 30
+  connectionDrainingTimeoutSec: 60
+---
+# GCP Persistent Disk StorageClass
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gcp-pd-ssd
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+provisioner: pd.csi.storage.gke.io
+parameters:
+  type: pd-ssd
+  replication-type: regional-pd
+  zones: "{{ .Values.global.region }}-a,{{ .Values.global.region }}-b,{{ .Values.global.region }}-c"
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+---
+# GCP Filestore StorageClass
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gcp-filestore
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+provisioner: filestore.csi.storage.gke.io
+parameters:
+  instancePrefix: "cancer-genomics-fs"
+  tier: "STANDARD"
+  network: "default"
+  reserved-ipv4-cidr: "10.0.0.0/29"
+volumeBindingMode: Immediate
+allowVolumeExpansion: false
+reclaimPolicy: Retain
+---
+# GCP Workload Identity Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-gcp-sa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+  annotations:
+    iam.gke.io/gcp-service-account: "cancer-genomics-sa@{{ .Values.global.gcp.projectId }}.iam.gserviceaccount.com"
+automountServiceAccountToken: true
+---
+# GCP Cloud SQL connection secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gcp-cloudsql-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+type: Opaque
+data:
+  host: {{ .Values.global.gcp.cloudSqlInstance | b64enc }}
+  port: "NTQzMg=="  # 5432 in base64
+  username: "cancer_genomics_user"
+  password: ""  # Base64 encoded
+  database: "cancer_genomics_db"
+  instance-connection-name: "{{ .Values.global.gcp.projectId }}:{{ .Values.global.region }}:{{ .Values.global.gcp.cloudSqlInstance }}"
+---
+# GCP Memorystore connection secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gcp-memorystore-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+type: Opaque
+data:
+  host: {{ .Values.global.gcp.memorystoreInstance | b64enc }}
+  port: "NjM3OQ=="  # 6379 in base64
+  password: ""  # Base64 encoded
+---
+# GCP Cloud Storage bucket access secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gcp-gcs-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+type: Opaque
+data:
+  bucket-name: {{ .Values.global.gcp.gcsBucket | b64enc }}
+  project-id: {{ .Values.global.gcp.projectId | b64enc }}
+  service-account-key: ""  # Base64 encoded JSON key
+---
+# GCP Cloud Logging configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gcp-cloud-logging-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  fluent.conf: |
+    <source>
+      @type tail
+      @id in_tail_container_logs
+      path /var/log/containers/*cancer-genomics*.log
+      pos_file /var/log/fluentd-containers.log.pos
+      tag kubernetes.*
+      read_from_head true
+      <parse>
+        @type json
+        time_format %Y-%m-%dT%H:%M:%S.%NZ
+      </parse>
+    </source>
+
+    <filter kubernetes.**>
+      @type kubernetes_metadata
+      @id filter_kube_metadata
+      kubernetes_url "#{ENV['FLUENT_FILTER_KUBERNETES_URL'] || 'https://' + ENV['KUBERNETES_SERVICE_HOST'] + ':' + ENV['KUBERNETES_SERVICE_PORT'] + '/api'}"
+      verify_ssl "#{ENV['KUBERNETES_VERIFY_SSL'] || true}"
+      ca_file "#{ENV['KUBERNETES_CA_FILE']}"
+    </filter>
+
+    <match kubernetes.**>
+      @type google_cloud
+      @id out_gcp
+      project_id {{ .Values.global.gcp.projectId }}
+      zone "#{ENV['GCP_ZONE']}"
+      vm_id "#{ENV['GCP_VM_ID']}"
+      vm_name "#{ENV['GCP_VM_NAME']}"
+      # Use service account
+      use_metadata_service true
+      # Set buffer type
+      <buffer>
+        @type file
+        path /var/log/fluentd-buffers/kubernetes.system.buffer
+        flush_mode interval
+        retry_type exponential_backoff
+        flush_thread_count 2
+        flush_interval 5s
+        retry_forever
+        retry_max_interval 30
+        chunk_limit_size 2M
+        queue_limit_length 8
+        overflow_action block
+      </buffer>
+    </match>
+---
+# GCP Cloud Monitoring configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gcp-cloud-monitoring-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    rule_files:
+      - "cancer_genomics_rules.yml"
+
+    scrape_configs:
+      - job_name: 'cancer-genomics-app'
+        static_configs:
+          - targets: ['localhost:8050']
+        metrics_path: /metrics
+        scrape_interval: 30s
+
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+
+    remote_write:
+      - url: https://monitoring.googleapis.com/v1/projects/{{ .Values.global.gcp.projectId }}/location/global/prometheus/api/v1/write
+        write_relabel_configs:
+          - source_labels: [__name__]
+            regex: 'cancer_genomics_.*'
+            action: keep
+
+  cancer_genomics_rules.yml: |
+    groups:
+      - name: cancer_genomics_alerts
+        rules:
+          - alert: HighErrorRate
+            expr: rate(cancer_genomics_http_requests_total{status=~"5.."}[5m]) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High error rate detected"
+              description: "Error rate is {{ $value }} errors per second"
+
+          - alert: HighMemoryUsage
+            expr: (cancer_genomics_memory_usage_bytes / cancer_genomics_memory_limit_bytes) > 0.8
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High memory usage detected"
+              description: "Memory usage is {{ $value | humanizePercentage }}"
+---
+# GCP Cloud Trace configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gcp-cloud-trace-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  trace-config.yaml: |
+    sampling:
+      default_sampling_rate: 0.1
+      rules:
+        - service_name: "cancer-genomics-api"
+          sampling_rate: 0.5
+        - service_name: "cancer-genomics-worker"
+          sampling_rate: 0.2
+    buffer_size: 1000
+    flush_interval: 5s
+    max_attributes_per_span: 32
+    max_attributes_per_link: 32
+    max_events_per_span: 128
+    max_links_per_span: 128
+{{- end }}

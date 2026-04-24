@@ -1,0 +1,550 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: neo4j
+  labels:
+    name: neo4j
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: neo4j-config
+  namespace: neo4j
+data:
+  neo4j.conf: |
+    # Neo4j configuration for cancer genomics analysis
+    dbms.default_database=genomics
+    
+    # Memory settings
+    dbms.memory.heap.initial_size=2G
+    dbms.memory.heap.max_size=4G
+    dbms.memory.pagecache.size=2G
+    
+    # Network settings
+    dbms.default_listen_address=0.0.0.0
+    dbms.connector.bolt.listen_address=:7687
+    dbms.connector.http.listen_address=:7474
+    dbms.connector.https.listen_address=:7473
+    
+    # Security settings
+    dbms.security.auth_enabled=true
+    dbms.security.procedures.unrestricted=apoc.*,gds.*
+    dbms.security.procedures.allowlist=apoc.*,gds.*
+    
+    # APOC settings
+    apoc.export.file.enabled=true
+    apoc.import.file.enabled=true
+    apoc.import.file.use_neo4j_config=true
+    
+    # GDS settings
+    gds.enterprise.license_key=${GDS_LICENSE_KEY}
+    
+    # Logging
+    dbms.logs.http.enabled=true
+    dbms.logs.query.enabled=true
+    dbms.logs.query.threshold=1s
+    
+    # Performance
+    dbms.query_cache_size=1000
+    dbms.transaction.timeout=60s
+    dbms.lock.acquisition.timeout=60s
+    
+    # Backup
+    dbms.backup.enabled=true
+    dbms.backup.address=0.0.0.0:6362
+    
+    # Metrics
+    dbms.metrics.enabled=true
+    dbms.metrics.prometheus.enabled=true
+    dbms.metrics.prometheus.endpoint=0.0.0.0:2004
+    
+    # Clustering (for production)
+    dbms.mode=CORE
+    dbms.clustering.enabled=true
+    dbms.clustering.raft.enabled=true
+    dbms.clustering.raft.member_list_initial_discovery=neo4j-core-0.neo4j-headless:5000,neo4j-core-1.neo4j-headless:5000,neo4j-core-2.neo4j-headless:5000
+    dbms.clustering.raft.discovery_listen_address=:5000
+    dbms.clustering.raft.advertised_address=neo4j-core-0.neo4j-headless:5000
+    dbms.clustering.raft.listen_address=:7000
+    dbms.clustering.raft.advertised_listen_address=neo4j-core-0.neo4j-headless:7000
+    
+    # Read replicas
+    dbms.clustering.read_replica.enabled=true
+    dbms.clustering.read_replica.discovery_listen_address=:6000
+    dbms.clustering.read_replica.advertised_address=neo4j-read-replica-0.neo4j-headless:6000
+    dbms.clustering.read_replica.listen_address=:6001
+    dbms.clustering.read_replica.advertised_listen_address=neo4j-read-replica-0.neo4j-headless:6001
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: neo4j-secrets
+  namespace: neo4j
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual values
+  NEO4J_AUTH: bmVvNGo6cGFzc3dvcmQ=  # neo4j:password
+  GDS_LICENSE_KEY: ""  # Add your GDS license key here
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo4j-headless
+  namespace: neo4j
+  labels:
+    app: neo4j
+spec:
+  clusterIP: None
+  ports:
+    - port: 7687
+      name: bolt
+    - port: 7474
+      name: http
+    - port: 7473
+      name: https
+    - port: 5000
+      name: discovery
+    - port: 7000
+      name: raft
+    - port: 6000
+      name: read-replica-discovery
+    - port: 6001
+      name: read-replica
+    - port: 6362
+      name: backup
+    - port: 2004
+      name: metrics
+  selector:
+    app: neo4j
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo4j
+  namespace: neo4j
+  labels:
+    app: neo4j
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7687
+      name: bolt
+      targetPort: 7687
+    - port: 7474
+      name: http
+      targetPort: 7474
+    - port: 7473
+      name: https
+      targetPort: 7473
+  selector:
+    app: neo4j
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo4j-metrics
+  namespace: neo4j
+  labels:
+    app: neo4j
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2004
+      name: metrics
+      targetPort: 2004
+  selector:
+    app: neo4j
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: neo4j-core
+  namespace: neo4j
+  labels:
+    app: neo4j
+    component: core
+spec:
+  serviceName: neo4j-headless
+  replicas: 3
+  selector:
+    matchLabels:
+      app: neo4j
+      component: core
+  template:
+    metadata:
+      labels:
+        app: neo4j
+        component: core
+    spec:
+      containers:
+      - name: neo4j
+        image: neo4j:5.15-enterprise
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 7687
+          name: bolt
+        - containerPort: 7474
+          name: http
+        - containerPort: 7473
+          name: https
+        - containerPort: 5000
+          name: discovery
+        - containerPort: 7000
+          name: raft
+        - containerPort: 6362
+          name: backup
+        - containerPort: 2004
+          name: metrics
+        env:
+        - name: NEO4J_AUTH
+          valueFrom:
+            secretKeyRef:
+              name: neo4j-secrets
+              key: NEO4J_AUTH
+        - name: GDS_LICENSE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: neo4j-secrets
+              key: GDS_LICENSE_KEY
+        - name: NEO4J_dbms_memory_heap_initial__size
+          value: "2G"
+        - name: NEO4J_dbms_memory_heap_max__size
+          value: "4G"
+        - name: NEO4J_dbms_memory_pagecache_size
+          value: "2G"
+        - name: NEO4J_dbms_default__database
+          value: "genomics"
+        - name: NEO4J_dbms_mode
+          value: "CORE"
+        - name: NEO4J_dbms_clustering_enabled
+          value: "true"
+        - name: NEO4J_dbms_clustering_raft_enabled
+          value: "true"
+        - name: NEO4J_dbms_clustering_raft_member__list__initial__discovery
+          value: "neo4j-core-0.neo4j-headless:5000,neo4j-core-1.neo4j-headless:5000,neo4j-core-2.neo4j-headless:5000"
+        - name: NEO4J_dbms_clustering_raft_discovery__listen__address
+          value: ":5000"
+        - name: NEO4J_dbms_clustering_raft_advertised__address
+          value: "neo4j-core-$(POD_NAME).neo4j-headless:5000"
+        - name: NEO4J_dbms_clustering_raft_listen__address
+          value: ":7000"
+        - name: NEO4J_dbms_clustering_raft_advertised__listen__address
+          value: "neo4j-core-$(POD_NAME).neo4j-headless:7000"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: neo4j-data
+          mountPath: /data
+        - name: neo4j-logs
+          mountPath: /logs
+        - name: neo4j-import
+          mountPath: /var/lib/neo4j/import
+        - name: neo4j-plugins
+          mountPath: /plugins
+        - name: neo4j-config
+          mountPath: /var/lib/neo4j/conf/neo4j.conf
+          subPath: neo4j.conf
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        livenessProbe:
+          httpGet:
+            path: /db/genomics
+            port: 7474
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /db/genomics
+            port: 7474
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: neo4j-config
+        configMap:
+          name: neo4j-config
+      - name: neo4j-import
+        emptyDir: {}
+      - name: neo4j-plugins
+        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: neo4j-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 50Gi
+  - metadata:
+      name: neo4j-logs
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: neo4j-read-replica
+  namespace: neo4j
+  labels:
+    app: neo4j
+    component: read-replica
+spec:
+  serviceName: neo4j-headless
+  replicas: 2
+  selector:
+    matchLabels:
+      app: neo4j
+      component: read-replica
+  template:
+    metadata:
+      labels:
+        app: neo4j
+        component: read-replica
+    spec:
+      containers:
+      - name: neo4j
+        image: neo4j:5.15-enterprise
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 7687
+          name: bolt
+        - containerPort: 7474
+          name: http
+        - containerPort: 7473
+          name: https
+        - containerPort: 6000
+          name: read-replica-discovery
+        - containerPort: 6001
+          name: read-replica
+        - containerPort: 6362
+          name: backup
+        - containerPort: 2004
+          name: metrics
+        env:
+        - name: NEO4J_AUTH
+          valueFrom:
+            secretKeyRef:
+              name: neo4j-secrets
+              key: NEO4J_AUTH
+        - name: GDS_LICENSE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: neo4j-secrets
+              key: GDS_LICENSE_KEY
+        - name: NEO4J_dbms_memory_heap_initial__size
+          value: "2G"
+        - name: NEO4J_dbms_memory_heap_max__size
+          value: "4G"
+        - name: NEO4J_dbms_memory_pagecache_size
+          value: "2G"
+        - name: NEO4J_dbms_default__database
+          value: "genomics"
+        - name: NEO4J_dbms_mode
+          value: "READ_REPLICA"
+        - name: NEO4J_dbms_clustering_enabled
+          value: "true"
+        - name: NEO4J_dbms_clustering_read__replica_enabled
+          value: "true"
+        - name: NEO4J_dbms_clustering_read__replica_discovery__listen__address
+          value: ":6000"
+        - name: NEO4J_dbms_clustering_read__replica_advertised__address
+          value: "neo4j-read-replica-$(POD_NAME).neo4j-headless:6000"
+        - name: NEO4J_dbms_clustering_read__replica_listen__address
+          value: ":6001"
+        - name: NEO4J_dbms_clustering_read__replica_advertised__listen__address
+          value: "neo4j-read-replica-$(POD_NAME).neo4j-headless:6001"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: neo4j-data
+          mountPath: /data
+        - name: neo4j-logs
+          mountPath: /logs
+        - name: neo4j-import
+          mountPath: /var/lib/neo4j/import
+        - name: neo4j-plugins
+          mountPath: /plugins
+        - name: neo4j-config
+          mountPath: /var/lib/neo4j/conf/neo4j.conf
+          subPath: neo4j.conf
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        livenessProbe:
+          httpGet:
+            path: /db/genomics
+            port: 7474
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /db/genomics
+            port: 7474
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: neo4j-config
+        configMap:
+          name: neo4j-config
+      - name: neo4j-import
+        emptyDir: {}
+      - name: neo4j-plugins
+        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: neo4j-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 50Gi
+  - metadata:
+      name: neo4j-logs
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo4j-ingress
+  namespace: neo4j
+  labels:
+    app: neo4j
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 7474
+      name: http
+      targetPort: 7474
+    - port: 7687
+      name: bolt
+      targetPort: 7687
+  selector:
+    app: neo4j
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: neo4j-ingress
+  namespace: neo4j
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+    - hosts:
+        - neo4j.cancer-genomics.yourdomain.com
+      secretName: neo4j-tls
+  rules:
+    - host: neo4j.cancer-genomics.yourdomain.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: neo4j
+                port:
+                  number: 7474
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: neo4j-metrics
+  namespace: neo4j
+  labels:
+    app: neo4j
+spec:
+  selector:
+    matchLabels:
+      app: neo4j
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: neo4j-alerts
+  namespace: neo4j
+  labels:
+    app: neo4j
+spec:
+  groups:
+    - name: neo4j
+      rules:
+        - alert: Neo4jDown
+          expr: up{job="neo4j-metrics"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Neo4j instance is down"
+            description: "Neo4j instance {{ $labels.instance }} has been down for more than 1 minute."
+        
+        - alert: Neo4jHighMemoryUsage
+          expr: neo4j_memory_heap_used_bytes / neo4j_memory_heap_max_bytes > 0.8
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Neo4j high memory usage"
+            description: "Neo4j instance {{ $labels.instance }} has high memory usage ({{ $value | humanizePercentage }})."
+        
+        - alert: Neo4jHighPageCacheUsage
+          expr: neo4j_memory_pagecache_used_bytes / neo4j_memory_pagecache_max_bytes > 0.8
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Neo4j high page cache usage"
+            description: "Neo4j instance {{ $labels.instance }} has high page cache usage ({{ $value | humanizePercentage }})."
+        
+        - alert: Neo4jSlowQueries
+          expr: neo4j_query_duration_seconds > 10
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Neo4j slow queries"
+            description: "Neo4j instance {{ $labels.instance }} has slow queries ({{ $value }}s)."
+        
+        - alert: Neo4jConnectionPoolExhausted
+          expr: neo4j_connection_pool_active_connections / neo4j_connection_pool_max_connections > 0.9
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Neo4j connection pool exhausted"
+            description: "Neo4j instance {{ $labels.instance }} has high connection pool usage ({{ $value | humanizePercentage }})."

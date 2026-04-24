@@ -1,0 +1,51 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: cancer-genomics
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - postgres.yaml
+  - redis.yaml
+  - web-deployment.yaml
+  - celery-deployment.yaml
+  - nginx-deployment.yaml
+  - ingress.yaml
+  - monitoring.yaml
+
+commonLabels:
+  app: cancer-genomics-analysis-suite
+  version: v1.0.0
+
+images:
+  - name: cancer-genomics
+    newTag: latest
+
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: cancer-genomics-web
+      namespace: cancer-genomics
+    spec:
+      template:
+        spec:
+          containers:
+          - name: web
+            image: cancer-genomics:latest
+
+configMapGenerator:
+  - name: cancer-genomics-config
+    literals:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+
+secretGenerator:
+  - name: cancer-genomics-secrets
+    literals:
+      - SECRET_KEY=your-production-secret-key-change-this
+      - JWT_SECRET_KEY=your-jwt-secret-key-change-this
+    type: Opaque

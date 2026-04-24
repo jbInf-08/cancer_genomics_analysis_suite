@@ -1,0 +1,284 @@
+{{- if .Values.neo4j.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: neo4j
+spec:
+  replicas: {{ .Values.neo4j.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: neo4j
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: neo4j
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: neo4j
+          image: "{{ .Values.neo4j.image.registry }}/{{ .Values.neo4j.image.repository }}:{{ .Values.neo4j.image.tag }}"
+          imagePullPolicy: {{ .Values.neo4j.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 7474
+              protocol: TCP
+            - name: bolt
+              containerPort: 7687
+              protocol: TCP
+            - name: https
+              containerPort: 7473
+              protocol: TCP
+          env:
+            - name: NEO4J_AUTH
+              value: "{{ .Values.neo4j.auth.username }}/{{ .Values.neo4j.auth.password }}"
+            - name: NEO4J_dbms_security_procedures_unrestricted
+              value: "gds.*,apoc.*"
+            - name: NEO4J_dbms_security_procedures_allowlist
+              value: "gds.*,apoc.*"
+            - name: NEO4J_dbms_memory_heap_initial__size
+              value: "{{ .Values.neo4j.memory.heapInitial }}"
+            - name: NEO4J_dbms_memory_heap_max__size
+              value: "{{ .Values.neo4j.memory.heapMax }}"
+            - name: NEO4J_dbms_memory_pagecache_size
+              value: "{{ .Values.neo4j.memory.pageCache }}"
+            - name: NEO4J_dbms_default__database
+              value: "{{ .Values.neo4j.database.name }}"
+            - name: NEO4J_dbms_connector_bolt_listen__address
+              value: "0.0.0.0:7687"
+            - name: NEO4J_dbms_connector_http_listen__address
+              value: "0.0.0.0:7474"
+            - name: NEO4J_dbms_connector_https_listen__address
+              value: "0.0.0.0:7473"
+            - name: NEO4J_dbms_logs_debug_level
+              value: "{{ .Values.neo4j.logging.level }}"
+            - name: NEO4J_dbms_security_http__authorization__enabled
+              value: "true"
+            - name: NEO4J_dbms_security_http__authorization__realm
+              value: "Neo4j"
+            - name: NEO4J_dbms_security_http__authorization__enabled
+              value: "true"
+            - name: NEO4J_apoc_export_file_enabled
+              value: "true"
+            - name: NEO4J_apoc_import_file_enabled
+              value: "true"
+            - name: NEO4J_apoc_import_file_use__neo4j__config
+              value: "true"
+            - name: NEO4J_gds_license__key
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-secrets
+                  key: gds-license-key
+                  optional: true
+            {{- with .Values.neo4j.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.neo4j.resources | nindent 12 }}
+          volumeMounts:
+            - name: neo4j-data
+              mountPath: /data
+            - name: neo4j-logs
+              mountPath: /logs
+            - name: neo4j-import
+              mountPath: /var/lib/neo4j/import
+            - name: neo4j-plugins
+              mountPath: /plugins
+            - name: neo4j-config
+              mountPath: /var/lib/neo4j/conf
+          livenessProbe:
+            httpGet:
+              path: /db/{{ .Values.neo4j.database.name }}/cluster/available
+              port: 7474
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /db/{{ .Values.neo4j.database.name }}/cluster/available
+              port: 7474
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      volumes:
+        - name: neo4j-data
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-data
+        - name: neo4j-logs
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-logs
+        - name: neo4j-import
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-import
+        - name: neo4j-plugins
+          emptyDir: {}
+        - name: neo4j-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-config
+      {{- with .Values.neo4j.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.neo4j.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.neo4j.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: neo4j
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7474
+      targetPort: 7474
+      protocol: TCP
+      name: http
+    - port: 7687
+      targetPort: 7687
+      protocol: TCP
+      name: bolt
+    - port: 7473
+      targetPort: 7473
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: neo4j
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-data
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: neo4j
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.neo4j.persistence.dataSize }}
+  {{- if .Values.neo4j.persistence.storageClass }}
+  storageClassName: {{ .Values.neo4j.persistence.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-logs
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: neo4j
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.neo4j.persistence.logsSize }}
+  {{- if .Values.neo4j.persistence.storageClass }}
+  storageClassName: {{ .Values.neo4j.persistence.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-import
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: neo4j
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.neo4j.persistence.importSize }}
+  {{- if .Values.neo4j.persistence.storageClass }}
+  storageClassName: {{ .Values.neo4j.persistence.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: neo4j
+data:
+  neo4j.conf: |
+    # Neo4j configuration
+    dbms.default_database={{ .Values.neo4j.database.name }}
+    
+    # Memory settings
+    dbms.memory.heap.initial_size={{ .Values.neo4j.memory.heapInitial }}
+    dbms.memory.heap.max_size={{ .Values.neo4j.memory.heapMax }}
+    dbms.memory.pagecache.size={{ .Values.neo4j.memory.pageCache }}
+    
+    # Network settings
+    dbms.connector.bolt.listen_address=0.0.0.0:7687
+    dbms.connector.http.listen_address=0.0.0.0:7474
+    dbms.connector.https.listen_address=0.0.0.0:7473
+    
+    # Security settings
+    dbms.security.http_authorization_enabled=true
+    dbms.security.http_authorization_realm=Neo4j
+    
+    # APOC settings
+    apoc.export.file.enabled=true
+    apoc.import.file.enabled=true
+    apoc.import.file.use_neo4j_config=true
+    
+    # GDS settings
+    dbms.security.procedures.unrestricted=gds.*,apoc.*
+    dbms.security.procedures.allowlist=gds.*,apoc.*
+    
+    # Logging
+    dbms.logs.debug.level={{ .Values.neo4j.logging.level }}
+    
+    # Performance tuning
+    dbms.tx_log.rotation.retention_policy=1 days
+    dbms.checkpoint.interval.time=5m
+    dbms.checkpoint.interval.tx=100000
+    
+    # Query logging
+    dbms.logs.query.enabled=true
+    dbms.logs.query.threshold=1s
+    
+    # Transaction logging
+    dbms.tx_log.rotation.retention_policy=1 days
+    dbms.tx_log.rotation.size=250M
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-neo4j-secrets
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: neo4j
+type: Opaque
+data:
+  neo4j-password: {{ .Values.neo4j.auth.password | b64enc }}
+  {{- if .Values.neo4j.gds.licenseKey }}
+  gds-license-key: {{ .Values.neo4j.gds.licenseKey | b64enc }}
+  {{- end }}
+{{- end }}

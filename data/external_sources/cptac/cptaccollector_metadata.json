@@ -1,0 +1,11 @@
+{
+  "collector_name": "CPTACCollector",
+  "start_time": "2025-10-11T11:55:24.838159",
+  "end_time": null,
+  "samples_collected": 20,
+  "files_created": [
+    "data\\external_sources\\cptac\\cptac_proteomics_BRCA_20_samples_20251011_115525.csv"
+  ],
+  "errors": [],
+  "warnings": []
+}

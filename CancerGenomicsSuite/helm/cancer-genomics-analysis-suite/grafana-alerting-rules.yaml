@@ -1,0 +1,463 @@
+# Grafana Alerting Rules for Cancer Genomics Analysis Suite
+# Comprehensive monitoring and alerting for Vault, SealedSecrets, and secret management
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cancer-genomics-secrets-alerts
+  namespace: cancer-genomics
+  labels:
+    app: cancer-genomics
+    component: secrets-management
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: vault-health
+    rules:
+    - alert: VaultUnavailable
+      expr: vault_health_status != 1
+      for: 1m
+      labels:
+        severity: critical
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "Vault is unavailable or unhealthy"
+        description: "Vault health check failed for {{ $labels.instance }}. Status: {{ $value }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-unavailable"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+    
+    - alert: VaultSealed
+      expr: vault_sealed_status == 1
+      for: 0m
+      labels:
+        severity: critical
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "Vault is sealed"
+        description: "Vault instance {{ $labels.instance }} is sealed and cannot serve requests"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-sealed"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+    
+    - alert: VaultHighErrorRate
+      expr: rate(vault_http_requests_total{code=~"5.."}[5m]) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "High error rate in Vault requests"
+        description: "Vault {{ $labels.instance }} has high error rate: {{ $value }} errors/sec"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-high-error-rate"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+    
+    - alert: VaultHighLatency
+      expr: histogram_quantile(0.95, rate(vault_http_request_duration_seconds_bucket[5m])) > 1
+      for: 5m
+      labels:
+        severity: warning
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "High latency in Vault requests"
+        description: "95th percentile latency for Vault {{ $labels.instance }} is {{ $value }}s"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-high-latency"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+    
+    - alert: VaultTokenExpiringSoon
+      expr: vault_token_ttl_seconds < 3600
+      for: 0m
+      labels:
+        severity: warning
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "Vault token expiring soon"
+        description: "Vault token for {{ $labels.instance }} expires in {{ $value }} seconds"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-token-expiring"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+
+  - name: sealed-secrets-health
+    rules:
+    - alert: SealedSecretsControllerDown
+      expr: up{job="sealed-secrets-controller"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        component: sealed-secrets
+        service: secrets-management
+      annotations:
+        summary: "SealedSecrets controller is down"
+        description: "SealedSecrets controller {{ $labels.instance }} is not responding"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/sealed-secrets-controller-down"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/sealed-secrets-overview"
+    
+    - alert: SealedSecretsHighErrorRate
+      expr: rate(sealed_secrets_controller_errors_total[5m]) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+        component: sealed-secrets
+        service: secrets-management
+      annotations:
+        summary: "High error rate in SealedSecrets controller"
+        description: "SealedSecrets controller {{ $labels.instance }} has high error rate: {{ $value }} errors/sec"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/sealed-secrets-high-error-rate"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/sealed-secrets-overview"
+    
+    - alert: SealedSecretsUnsealFailed
+      expr: increase(sealed_secrets_controller_unseal_failed_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: sealed-secrets
+        service: secrets-management
+      annotations:
+        summary: "SealedSecrets unseal failed"
+        description: "Failed to unseal secret {{ $labels.secret_name }} in namespace {{ $labels.namespace }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/sealed-secrets-unseal-failed"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/sealed-secrets-overview"
+
+  - name: secret-rotation
+    rules:
+    - alert: SecretRotationFailed
+      expr: increase(secret_rotation_failed_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: secret-rotation
+        service: secrets-management
+      annotations:
+        summary: "Secret rotation failed"
+        description: "Failed to rotate secret {{ $labels.secret_name }} in namespace {{ $labels.namespace }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-rotation-failed"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-rotation-overview"
+    
+    - alert: SecretExpiringSoon
+      expr: secret_expires_in_hours < 24
+      for: 0m
+      labels:
+        severity: warning
+        component: secret-rotation
+        service: secrets-management
+      annotations:
+        summary: "Secret expiring soon"
+        description: "Secret {{ $labels.secret_name }} in namespace {{ $labels.namespace }} expires in {{ $value }} hours"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-expiring-soon"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-rotation-overview"
+    
+    - alert: SecretExpired
+      expr: secret_expires_in_hours < 0
+      for: 0m
+      labels:
+        severity: critical
+        component: secret-rotation
+        service: secrets-management
+      annotations:
+        summary: "Secret has expired"
+        description: "Secret {{ $labels.secret_name }} in namespace {{ $labels.namespace }} has expired {{ $value }} hours ago"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-expired"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-rotation-overview"
+    
+    - alert: SecretRotationScheduled
+      expr: secret_rotation_scheduled_hours < 1
+      for: 0m
+      labels:
+        severity: info
+        component: secret-rotation
+        service: secrets-management
+      annotations:
+        summary: "Secret rotation scheduled"
+        description: "Secret {{ $labels.secret_name }} in namespace {{ $labels.namespace }} is scheduled for rotation in {{ $value }} hours"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-rotation-scheduled"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-rotation-overview"
+
+  - name: secret-injection
+    rules:
+    - alert: SecretInjectionFailed
+      expr: increase(secret_injection_failed_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: secret-injection
+        service: secrets-management
+      annotations:
+        summary: "Secret injection failed"
+        description: "Failed to inject secret {{ $labels.secret_name }} into pod {{ $labels.pod_name }} in namespace {{ $labels.namespace }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-injection-failed"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-injection-overview"
+    
+    - alert: SecretInjectionHighLatency
+      expr: histogram_quantile(0.95, rate(secret_injection_duration_seconds_bucket[5m])) > 30
+      for: 5m
+      labels:
+        severity: warning
+        component: secret-injection
+        service: secrets-management
+      annotations:
+        summary: "High latency in secret injection"
+        description: "95th percentile latency for secret injection is {{ $value }}s"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-injection-high-latency"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-injection-overview"
+    
+    - alert: SecretInjectionRetryExhausted
+      expr: increase(secret_injection_retry_exhausted_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: secret-injection
+        service: secrets-management
+      annotations:
+        summary: "Secret injection retry exhausted"
+        description: "Secret injection retry exhausted for pod {{ $labels.pod_name }} in namespace {{ $labels.namespace }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-injection-retry-exhausted"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-injection-overview"
+
+  - name: cloud-secret-manager
+    rules:
+    - alert: CloudSecretManagerUnavailable
+      expr: up{job="cloud-secret-manager"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        component: cloud-secret-manager
+        service: secrets-management
+      annotations:
+        summary: "Cloud Secret Manager is unavailable"
+        description: "Cloud Secret Manager {{ $labels.provider }} is not responding"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/cloud-secret-manager-unavailable"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/cloud-secret-manager-overview"
+    
+    - alert: CloudSecretManagerHighErrorRate
+      expr: rate(cloud_secret_manager_errors_total[5m]) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+        component: cloud-secret-manager
+        service: secrets-management
+      annotations:
+        summary: "High error rate in Cloud Secret Manager"
+        description: "Cloud Secret Manager {{ $labels.provider }} has high error rate: {{ $value }} errors/sec"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/cloud-secret-manager-high-error-rate"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/cloud-secret-manager-overview"
+    
+    - alert: CloudSecretManagerQuotaExceeded
+      expr: cloud_secret_manager_quota_usage_percent > 90
+      for: 5m
+      labels:
+        severity: warning
+        component: cloud-secret-manager
+        service: secrets-management
+      annotations:
+        summary: "Cloud Secret Manager quota exceeded"
+        description: "Cloud Secret Manager {{ $labels.provider }} quota usage is {{ $value }}%"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/cloud-secret-manager-quota-exceeded"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/cloud-secret-manager-overview"
+
+  - name: secret-validation
+    rules:
+    - alert: SecretValidationFailed
+      expr: increase(secret_validation_failed_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        component: secret-validation
+        service: secrets-management
+      annotations:
+        summary: "Secret validation failed"
+        description: "Secret {{ $labels.secret_name }} in namespace {{ $labels.namespace }} failed validation: {{ $labels.reason }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-validation-failed"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-validation-overview"
+    
+    - alert: WeakPasswordDetected
+      expr: increase(weak_password_detected_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        component: secret-validation
+        service: secrets-management
+      annotations:
+        summary: "Weak password detected"
+        description: "Weak password detected for secret {{ $labels.secret_name }} in namespace {{ $labels.namespace }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/weak-password-detected"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-validation-overview"
+    
+    - alert: DuplicateSecretDetected
+      expr: increase(duplicate_secret_detected_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        component: secret-validation
+        service: secrets-management
+      annotations:
+        summary: "Duplicate secret detected"
+        description: "Duplicate secret detected for {{ $labels.secret_name }} in namespace {{ $labels.namespace }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/duplicate-secret-detected"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-validation-overview"
+
+  - name: secret-audit
+    rules:
+    - alert: UnauthorizedSecretAccess
+      expr: increase(unauthorized_secret_access_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: secret-audit
+        service: secrets-management
+      annotations:
+        summary: "Unauthorized secret access detected"
+        description: "Unauthorized access attempt to secret {{ $labels.secret_name }} by {{ $labels.user }} from {{ $labels.source_ip }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/unauthorized-secret-access"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-audit-overview"
+    
+    - alert: SecretAccessAnomaly
+      expr: increase(secret_access_anomaly_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        component: secret-audit
+        service: secrets-management
+      annotations:
+        summary: "Secret access anomaly detected"
+        description: "Unusual access pattern detected for secret {{ $labels.secret_name }} by {{ $labels.user }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-access-anomaly"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-audit-overview"
+    
+    - alert: SecretModificationDetected
+      expr: increase(secret_modification_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: info
+        component: secret-audit
+        service: secrets-management
+      annotations:
+        summary: "Secret modification detected"
+        description: "Secret {{ $labels.secret_name }} was modified by {{ $labels.user }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/secret-modification-detected"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/secret-audit-overview"
+
+  - name: backup-and-recovery
+    rules:
+    - alert: VaultBackupFailed
+      expr: increase(vault_backup_failed_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: backup
+        service: secrets-management
+      annotations:
+        summary: "Vault backup failed"
+        description: "Vault backup failed for {{ $labels.instance }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-backup-failed"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/backup-overview"
+    
+    - alert: VaultBackupStale
+      expr: time() - vault_backup_last_success_timestamp > 86400
+      for: 1h
+      labels:
+        severity: warning
+        component: backup
+        service: secrets-management
+      annotations:
+        summary: "Vault backup is stale"
+        description: "Vault backup for {{ $labels.instance }} is older than 24 hours"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-backup-stale"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/backup-overview"
+    
+    - alert: VaultBackupCorrupted
+      expr: increase(vault_backup_corrupted_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: backup
+        service: secrets-management
+      annotations:
+        summary: "Vault backup is corrupted"
+        description: "Vault backup for {{ $labels.instance }} is corrupted"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-backup-corrupted"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/backup-overview"
+
+  - name: performance
+    rules:
+    - alert: VaultHighMemoryUsage
+      expr: vault_memory_usage_percent > 80
+      for: 5m
+      labels:
+        severity: warning
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "High memory usage in Vault"
+        description: "Vault {{ $labels.instance }} memory usage is {{ $value }}%"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-high-memory-usage"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+    
+    - alert: VaultHighCPUUsage
+      expr: vault_cpu_usage_percent > 80
+      for: 5m
+      labels:
+        severity: warning
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "High CPU usage in Vault"
+        description: "Vault {{ $labels.instance }} CPU usage is {{ $value }}%"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-high-cpu-usage"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+    
+    - alert: VaultHighDiskUsage
+      expr: vault_disk_usage_percent > 80
+      for: 5m
+      labels:
+        severity: warning
+        component: vault
+        service: secrets-management
+      annotations:
+        summary: "High disk usage in Vault"
+        description: "Vault {{ $labels.instance }} disk usage is {{ $value }}%"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-high-disk-usage"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/vault-overview"
+
+  - name: security
+    rules:
+    - alert: VaultSecurityScanFailed
+      expr: increase(vault_security_scan_failed_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: security
+        service: secrets-management
+      annotations:
+        summary: "Vault security scan failed"
+        description: "Security scan failed for Vault {{ $labels.instance }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-security-scan-failed"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/security-overview"
+    
+    - alert: VaultVulnerabilityDetected
+      expr: increase(vault_vulnerability_detected_total[1h]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        component: security
+        service: secrets-management
+      annotations:
+        summary: "Vulnerability detected in Vault"
+        description: "Vulnerability {{ $labels.cve_id }} detected in Vault {{ $labels.instance }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-vulnerability-detected"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/security-overview"
+    
+    - alert: VaultCertificateExpiringSoon
+      expr: vault_certificate_expires_in_hours < 168
+      for: 0m
+      labels:
+        severity: warning
+        component: security
+        service: secrets-management
+      annotations:
+        summary: "Vault certificate expiring soon"
+        description: "Vault certificate for {{ $labels.instance }} expires in {{ $value }} hours"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/vault-certificate-expiring-soon"
+        dashboard_url: "https://grafana.cancer-genomics.local/d/security-overview"

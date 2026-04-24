@@ -1,0 +1,93 @@
+---
+# ArgoCD Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cmd-params-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cmd-params-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # Server configuration
+  server.insecure: "false"
+  server.disable.auth: "false"
+  server.enable.grpc.web: "true"
+  server.enable.proxy.extension: "true"
+  server.port: "8080"
+  server.grpc.port: "8081"
+  server.secure: "true"
+  
+  # Repository configuration
+  reposerver.parallelism.limit: "10"
+  reposerver.log.format: "json"
+  
+  # Controller configuration
+  controller.status.processors: "20"
+  controller.operation.processors: "10"
+  controller.self.heal.timeout.seconds: "5"
+  controller.repo.server.timeout.seconds: "60"
+  controller.status.hard.limit: "100000"
+  controller.operation.hard.limit: "100000"
+  
+  # Application controller configuration
+  application.instanceLabelKey: "argocd.argoproj.io/instance"
+  application.instanceLabelValue: "cancer-genomics"
+  
+  # Resource exclusions
+  resource.exclusions: |
+    - apiGroups:
+        - cilium.io
+      kinds:
+        - CiliumIdentity
+      clusters:
+        - "*"
+    - apiGroups:
+        - cilium.io
+      kinds:
+        - CiliumEndpoint
+      clusters:
+        - "*"
+    - apiGroups:
+        - cilium.io
+      kinds:
+        - CiliumNode
+      clusters:
+        - "*"
+  
+  # Resource inclusions
+  resource.inclusions: |
+    - apiGroups:
+        - kafka.strimzi.io
+      kinds:
+        - "*"
+      clusters:
+        - "*"
+    - apiGroups:
+        - argoproj.io
+      kinds:
+        - "*"
+      clusters:
+        - "*"
+    - apiGroups:
+        - monitoring.coreos.com
+      kinds:
+        - "*"
+      clusters:
+        - "*"
+  
+  # OIDC configuration
+  oidc.config: |
+    name: OIDC
+    issuer: https://keycloak.cancer-genomics.svc.cluster.local:8080/realms/cancer-genomics
+    clientId: argocd
+    clientSecret: $oidc.clientSecret
+    requestedScopes: ["openid", "profile", "email", "groups"]
+    requestedIDTokenClaims: {"groups": {"essential": true}}
+  
+  # URL configuration
+  url: https://argocd.cancer-genomics.yourdomain.com
+  
+  # Admin password (should be changed in production)
+  admin.password: "$2a$10$rRyBsGSHK6.uc8fntPwVFOBqQylyibP5QK4rXvW8kjHXk0hdQb7y2"
+  admin.passwordMtime: "2023-01-01T00:00:00Z"

@@ -1,0 +1,565 @@
+{{- if .Values.vault.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  vault-config.hcl: |
+    storage "file" {
+      path = "/vault/file"
+    }
+    
+    listener "tcp" {
+      address = "0.0.0.0:8200"
+      tls_disable = 1
+    }
+    
+    api_addr = "http://vault:8200"
+    cluster_addr = "https://vault:8201"
+    
+    ui = true
+    
+    disable_mlock = true
+    
+    seal "awskms" {
+      region     = "{{ .Values.vault.aws.region }}"
+      kms_key_id = "{{ .Values.vault.aws.kms_key_id }}"
+    }
+    
+    seal "gcpckms" {
+      project    = "{{ .Values.vault.gcp.project_id }}"
+      region     = "{{ .Values.vault.gcp.region }}"
+      key_ring   = "{{ .Values.vault.gcp.key_ring }}"
+      crypto_key = "{{ .Values.vault.gcp.crypto_key }}"
+    }
+    
+    seal "azurekeyvault" {
+      tenant_id     = "{{ .Values.vault.azure.tenant_id }}"
+      vault_name    = "{{ .Values.vault.azure.vault_name }}"
+      key_name      = "{{ .Values.vault.azure.key_name }}"
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: vault
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: vault
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: vault
+          image: "vault:{{ .Values.vault.image.tag }}"
+          imagePullPolicy: {{ .Values.vault.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8200
+              protocol: TCP
+            - name: https-internal
+              containerPort: 8201
+              protocol: TCP
+          env:
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              value: "{{ .Values.vault.dev_root_token }}"
+            - name: VAULT_DEV_LISTEN_ADDRESS
+              value: "0.0.0.0:8200"
+            - name: SKIP_SETCAP
+              value: "true"
+            - name: VAULT_ADDR
+              value: "http://0.0.0.0:8200"
+          command:
+            - vault
+            - server
+            - -config=/vault/config/vault-config.hcl
+          volumeMounts:
+            - name: vault-config
+              mountPath: /vault/config
+            - name: vault-data
+              mountPath: /vault/file
+            - name: vault-logs
+              mountPath: /vault/logs
+          resources:
+            {{- toYaml .Values.vault.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /v1/sys/health
+              port: 8200
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /v1/sys/health
+              port: 8200
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: vault-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-config
+        - name: vault-data
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-data
+        - name: vault-logs
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: vault
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8200
+      targetPort: 8200
+      protocol: TCP
+    - name: https-internal
+      port: 8201
+      targetPort: 8201
+      protocol: TCP
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: vault
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-data
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.vault.storage.size }}
+  {{- if .Values.vault.storage.storageClass }}
+  storageClassName: {{ .Values.vault.storage.storageClass }}
+  {{- end }}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+automountServiceAccountToken: true
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault
+    namespace: {{ .Release.Namespace }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: vault-agent-injector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: vault-agent-injector
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: vault-agent-injector
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+      containers:
+        - name: vault-agent-injector
+          image: "vault:{{ .Values.vault.image.tag }}"
+          imagePullPolicy: {{ .Values.vault.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: VAULT_ADDR
+              value: "http://{{ include "cancer-genomics-analysis-suite.fullname" . }}-vault:8200"
+            - name: VAULT_AGENT_INJECTOR_TLS_AUTO
+              value: "false"
+            - name: VAULT_AGENT_INJECTOR_TLS_AUTO_HOSTS
+              value: "vault-agent-injector-svc"
+            - name: VAULT_AGENT_INJECTOR_TLS_CERT_FILE
+              value: "/etc/ssl/certs/vault-agent-injector.crt"
+            - name: VAULT_AGENT_INJECTOR_TLS_KEY_FILE
+              value: "/etc/ssl/private/vault-agent-injector.key"
+            - name: VAULT_AGENT_INJECTOR_LOG_LEVEL
+              value: "info"
+            - name: VAULT_AGENT_INJECTOR_LOG_FORMAT
+              value: "standard"
+          command:
+            - vault
+            - agent
+            - -config=/vault/config/agent-config.hcl
+          volumeMounts:
+            - name: vault-agent-config
+              mountPath: /vault/config
+          resources:
+            {{- toYaml .Values.vault.agent.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: vault-agent-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-config
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  agent-config.hcl: |
+    pid_file = "/tmp/pidfile"
+    
+    vault {
+      address = "http://{{ include "cancer-genomics-analysis-suite.fullname" . }}-vault:8200"
+    }
+    
+    auto_auth {
+      method "kubernetes" {
+        mount_path = "auth/kubernetes"
+        config = {
+          role = "{{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-role"
+        }
+      }
+      
+      sink "file" {
+        config = {
+          path = "/tmp/vault-token"
+        }
+      }
+    }
+    
+    template {
+      source      = "/vault/config/template.ctmpl"
+      destination = "/tmp/secrets.json"
+      perms       = 0644
+    }
+    
+    cache {
+      use_auto_auth_token = true
+    }
+    
+    listener "tcp" {
+      address = "0.0.0.0:8080"
+      tls_disable = true
+    }
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: vault-agent-injector
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: vault-agent-injector
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+automountServiceAccountToken: true
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch", "patch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+    namespace: {{ .Release.Namespace }}
+
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionWebhook
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+webhooks:
+  - name: vault.hashicorp.com
+    clientConfig:
+      service:
+        name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector
+        namespace: {{ .Release.Namespace }}
+        path: "/mutate"
+      caBundle: {{ .Values.vault.agent.caBundle | b64enc }}
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    failurePolicy: Ignore
+    sideEffects: None
+    admissionReviewVersions: ["v1", "v1beta1"]
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-init
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-init
+      restartPolicy: OnFailure
+      containers:
+        - name: vault-init
+          image: "vault:{{ .Values.vault.image.tag }}"
+          imagePullPolicy: {{ .Values.vault.image.pullPolicy }}
+          env:
+            - name: VAULT_ADDR
+              value: "http://{{ include "cancer-genomics-analysis-suite.fullname" . }}-vault:8200"
+            - name: VAULT_TOKEN
+              value: "{{ .Values.vault.dev_root_token }}"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              # Wait for Vault to be ready
+              until vault status; do
+                echo "Waiting for Vault to be ready..."
+                sleep 5
+              done
+              
+              # Initialize Vault (if not already initialized)
+              if ! vault status | grep -q "Initialized.*true"; then
+                echo "Initializing Vault..."
+                vault operator init -key-shares=1 -key-threshold=1
+              fi
+              
+              # Enable Kubernetes auth
+              vault auth enable kubernetes || true
+              
+              # Configure Kubernetes auth
+              vault write auth/kubernetes/config \
+                token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+                kubernetes_host="https://kubernetes.default.svc.cluster.local" \
+                kubernetes_ca_cert="$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)"
+              
+              # Create Vault role
+              vault write auth/kubernetes/role/{{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-role \
+                bound_service_account_names={{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-agent-injector \
+                bound_service_account_namespaces={{ .Release.Namespace }} \
+                policies={{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-policy \
+                ttl=24h
+              
+              # Create Vault policy
+              vault policy write {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-policy - <<EOF
+              path "secret/data/cancer-genomics/*" {
+                capabilities = ["read"]
+              }
+              path "secret/data/cancer-genomics/database/*" {
+                capabilities = ["read"]
+              }
+              path "secret/data/cancer-genomics/app/*" {
+                capabilities = ["read"]
+              }
+              path "secret/data/cancer-genomics/redis/*" {
+                capabilities = ["read"]
+              }
+              path "secret/data/cancer-genomics/neo4j/*" {
+                capabilities = ["read"]
+              }
+              path "secret/data/cancer-genomics/kafka/*" {
+                capabilities = ["read"]
+              }
+              EOF
+              
+              # Create secrets
+              vault kv put secret/cancer-genomics/database \
+                username="{{ .Values.sealedSecrets.database.postgresUser }}" \
+                password="{{ .Values.sealedSecrets.database.postgresPassword }}" \
+                database="{{ .Values.sealedSecrets.database.postgresDb }}"
+              
+              vault kv put secret/cancer-genomics/app \
+                secret_key="{{ .Values.sealedSecrets.app.secretKey }}" \
+                jwt_secret_key="{{ .Values.sealedSecrets.app.jwtSecretKey }}" \
+                flask_secret_key="{{ .Values.sealedSecrets.app.flaskSecretKey }}"
+              
+              vault kv put secret/cancer-genomics/redis \
+                password="{{ .Values.sealedSecrets.redis.password }}"
+              
+              vault kv put secret/cancer-genomics/neo4j \
+                username="{{ .Values.sealedSecrets.neo4j.username }}" \
+                password="{{ .Values.sealedSecrets.neo4j.password }}" \
+                gds_license_key="{{ .Values.sealedSecrets.neo4j.gdsLicenseKey }}"
+              
+              vault kv put secret/cancer-genomics/kafka \
+                username="{{ .Values.sealedSecrets.kafka.username }}" \
+                password="{{ .Values.sealedSecrets.kafka.password }}" \
+                jaas_config="{{ .Values.sealedSecrets.kafka.jaasConfig }}"
+              
+              echo "Vault initialization completed successfully!"
+          resources:
+            {{- toYaml .Values.vault.init.resources | nindent 12 }}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-init
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+automountServiceAccountToken: true
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-init
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-init
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-init
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-vault-init
+    namespace: {{ .Release.Namespace }}
+{{- end }}

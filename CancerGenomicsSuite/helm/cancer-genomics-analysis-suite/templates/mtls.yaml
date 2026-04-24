@@ -1,0 +1,165 @@
+{{- if .Values.security.mtls.enabled }}
+# Certificate Authority for mTLS
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-ca
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: mtls
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.security.mtls.ca.cert | b64enc }}
+  tls.key: {{ .Values.security.mtls.ca.key | b64enc }}
+---
+# Web Application mTLS Certificate
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-web-mtls
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: web
+    mtls: "true"
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.security.mtls.web.cert | b64enc }}
+  tls.key: {{ .Values.security.mtls.web.key | b64enc }}
+---
+# Celery Worker mTLS Certificate
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery-mtls
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: celery
+    mtls: "true"
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.security.mtls.celery.cert | b64enc }}
+  tls.key: {{ .Values.security.mtls.celery.key | b64enc }}
+---
+# PostgreSQL mTLS Certificate
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql-mtls
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: postgresql
+    mtls: "true"
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.security.mtls.postgresql.cert | b64enc }}
+  tls.key: {{ .Values.security.mtls.postgresql.key | b64enc }}
+---
+# Redis mTLS Certificate
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis-mtls
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: redis
+    mtls: "true"
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.security.mtls.redis.cert | b64enc }}
+  tls.key: {{ .Values.security.mtls.redis.key | b64enc }}
+---
+# mTLS Certificate Issuer
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-mtls-issuer
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  ca:
+    secretName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-ca
+---
+# Web Application Certificate Request
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-web-mtls-cert
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: web
+spec:
+  secretName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-web-mtls
+  issuerRef:
+    name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-mtls-issuer
+    kind: ClusterIssuer
+  commonName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-web
+  dnsNames:
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-web
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-web.{{ .Release.Namespace }}
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-web.{{ .Release.Namespace }}.svc.cluster.local
+  duration: {{ .Values.security.mtls.certificateDuration | default "8760h" }}
+  renewBefore: {{ .Values.security.mtls.renewBefore | default "720h" }}
+---
+# Celery Worker Certificate Request
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery-mtls-cert
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: celery
+spec:
+  secretName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery-mtls
+  issuerRef:
+    name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-mtls-issuer
+    kind: ClusterIssuer
+  commonName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery
+  dnsNames:
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery.{{ .Release.Namespace }}
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery.{{ .Release.Namespace }}.svc.cluster.local
+  duration: {{ .Values.security.mtls.certificateDuration | default "8760h" }}
+  renewBefore: {{ .Values.security.mtls.renewBefore | default "720h" }}
+---
+# PostgreSQL Certificate Request
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql-mtls-cert
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: postgresql
+spec:
+  secretName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql-mtls
+  issuerRef:
+    name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-mtls-issuer
+    kind: ClusterIssuer
+  commonName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql
+  dnsNames:
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql.{{ .Release.Namespace }}
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local
+  duration: {{ .Values.security.mtls.certificateDuration | default "8760h" }}
+  renewBefore: {{ .Values.security.mtls.renewBefore | default "720h" }}
+---
+# Redis Certificate Request
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis-mtls-cert
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: redis
+spec:
+  secretName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis-mtls
+  issuerRef:
+    name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-mtls-issuer
+    kind: ClusterIssuer
+  commonName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis
+  dnsNames:
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis.{{ .Release.Namespace }}
+    - {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis.{{ .Release.Namespace }}.svc.cluster.local
+  duration: {{ .Values.security.mtls.certificateDuration | default "8760h" }}
+  renewBefore: {{ .Values.security.mtls.renewBefore | default "720h" }}
+{{- end }}
