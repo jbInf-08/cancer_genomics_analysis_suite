@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -34,16 +35,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        registry: [ghcr.io, docker.io]
         include:
           - registry: ghcr.io
             repository: ${{ github.repository }}
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
+            use_ghcr: true
           - registry: docker.io
             repository: your-username/cancer-genomics-analysis-suite  # Change this
-            username: ${{ secrets.DOCKER_HUB_USERNAME }}
-            password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+            use_ghcr: false
     
     steps:
     - name: Checkout code
@@ -56,8 +54,8 @@ jobs:
       uses: docker/login-action@v3
       with:
         registry: ${{ matrix.registry }}
-        username: ${{ matrix.username }}
-        password: ${{ matrix.password }}
+        username: ${{ matrix.use_ghcr && github.actor || secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ matrix.use_ghcr && secrets.GITHUB_TOKEN || secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
     - name: Extract metadata
       id: meta
@@ -92,11 +90,15 @@ jobs:
 
     - name: Generate changelog
       id: changelog
-      uses: conventional-changelog-action@v3
+      uses: TriPSs/conventional-changelog-action@v5
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         version-file: 'version.txt'
         skip-on-empty: false
+        skip-bump: true
+        skip-commit: true
+        skip-tag: true
+        skip-git-pull: true
 
     - name: Update release notes
       uses: actions/github-script@v6
@@ -108,7 +110,7 @@ jobs:
           github.rest.repos.updateRelease({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            release_id: ${{ github.event.release.id }},
+            release_id: ${{ needs.create-release.outputs.release_id }},
             body: changelog
           });
 
@@ -178,10 +180,11 @@ jobs:
 
     - name: Notify deployment success
       uses: 8398a7/action-slack@v3
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       with:
         status: success
         channel: '#releases'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
         fields: repo,message,commit,author,action,eventName,ref,workflow
         text: |
           🚀 Production deployment successful!

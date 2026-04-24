@@ -275,7 +275,7 @@ header {
     transition: all 0.2s ease-in-out !important;
     white-space: nowrap !important;
     text-align: center !important;
-    min-width: fit-content !important;
+    min-width: max-content !important;
     box-sizing: border-box !important;
     line-height: 1.5 !important;
     display: inline-block !important;
