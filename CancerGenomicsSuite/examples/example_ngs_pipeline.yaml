@@ -1,0 +1,132 @@
+name: "RNA-seq Analysis Pipeline"
+version: "1.0.0"
+description: "Complete RNA-seq analysis pipeline from raw reads to differential expression"
+type: "expression_analysis"
+
+inputs:
+  fastq_files:
+    type: "file"
+    description: "Input FASTQ files (R1 and R2)"
+    required: true
+  reference_genome:
+    type: "file"
+    description: "Reference genome FASTA file"
+    required: true
+  gtf_annotation:
+    type: "file"
+    description: "GTF annotation file"
+    required: true
+  sample_name:
+    type: "string"
+    description: "Sample identifier"
+    required: true
+
+outputs:
+  aligned_bam:
+    type: "file"
+    description: "Aligned BAM file"
+  count_matrix:
+    type: "file"
+    description: "Gene count matrix"
+  quality_report:
+    type: "file"
+    description: "Quality control report"
+  differential_expression:
+    type: "file"
+    description: "Differential expression results"
+
+parameters:
+  threads: 8
+  memory: "32G"
+  quality_threshold: 20
+  adapter_sequences: ["AGATCGGAAGAGC", "AGATCGGAAGAGC"]
+
+requirements:
+  docker_image: "biocontainers/fastqc:v0.11.9_cv8"
+  min_memory: "16G"
+  min_cpu: 4
+
+metadata:
+  author: "Cancer Genomics Analysis Suite"
+  created: "2024-01-01"
+  platform: "Illumina"
+  read_type: "paired-end"
+
+steps:
+  - name: "quality_control"
+    command: "fastqc {fastq_files} -o {output_dir} --threads {threads}"
+    inputs: ["fastq_files"]
+    outputs: ["quality_report"]
+    parameters:
+      docker_image: "biocontainers/fastqc:v0.11.9_cv8"
+      environment:
+        THREADS: "{threads}"
+    timeout: 3600
+    max_retries: 2
+
+  - name: "trim_adapters"
+    command: "trimmomatic PE -threads {threads} {fastq_files} {output_dir}/trimmed_R1.fastq {output_dir}/unpaired_R1.fastq {output_dir}/trimmed_R2.fastq {output_dir}/unpaired_R2.fastq ILLUMINACLIP:{adapter_file}:2:30:10 LEADING:{quality_threshold} TRAILING:{quality_threshold} SLIDINGWINDOW:4:{quality_threshold} MINLEN:36"
+    inputs: ["fastq_files"]
+    outputs: ["trimmed_fastq"]
+    dependencies: ["quality_control"]
+    parameters:
+      docker_image: "biocontainers/trimmomatic:v0.39_cv8"
+      environment:
+        THREADS: "{threads}"
+        QUALITY_THRESHOLD: "{quality_threshold}"
+    timeout: 7200
+    max_retries: 3
+
+  - name: "align_reads"
+    command: "hisat2 -x {reference_index} -1 {trimmed_fastq_R1} -2 {trimmed_fastq_R2} -S {output_dir}/aligned.sam --threads {threads} --dta"
+    inputs: ["trimmed_fastq", "reference_genome"]
+    outputs: ["aligned_sam"]
+    dependencies: ["trim_adapters"]
+    parameters:
+      docker_image: "biocontainers/hisat2:v2.2.1_cv1"
+      environment:
+        THREADS: "{threads}"
+    timeout: 14400
+    max_retries: 2
+
+  - name: "convert_to_bam"
+    command: "samtools view -bS {aligned_sam} | samtools sort -o {output_dir}/aligned.bam -@ {threads}"
+    inputs: ["aligned_sam"]
+    outputs: ["aligned_bam"]
+    dependencies: ["align_reads"]
+    parameters:
+      docker_image: "biocontainers/samtools:v1.15.1_cv1"
+      environment:
+        THREADS: "{threads}"
+    timeout: 3600
+    max_retries: 2
+
+  - name: "index_bam"
+    command: "samtools index {aligned_bam}"
+    inputs: ["aligned_bam"]
+    outputs: ["aligned_bam_index"]
+    dependencies: ["convert_to_bam"]
+    parameters:
+      docker_image: "biocontainers/samtools:v1.15.1_cv1"
+    timeout: 1800
+    max_retries: 2
+
+  - name: "count_features"
+    command: "htseq-count -f bam -r pos -s no -t exon -i gene_id {aligned_bam} {gtf_annotation} > {output_dir}/counts.txt"
+    inputs: ["aligned_bam", "gtf_annotation"]
+    outputs: ["count_matrix"]
+    dependencies: ["index_bam"]
+    parameters:
+      docker_image: "biocontainers/htseq:v2.0.2_cv1"
+    timeout: 7200
+    max_retries: 2
+
+  - name: "generate_report"
+    command: "multiqc {output_dir} -o {output_dir}/multiqc_report"
+    inputs: ["quality_report", "count_matrix"]
+    outputs: ["final_report"]
+    dependencies: ["count_features"]
+    parameters:
+      docker_image: "biocontainers/multiqc:v1.12_cv1"
+    timeout: 1800
+    max_retries: 1

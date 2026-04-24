@@ -1,0 +1,2297 @@
+---
+# Advanced Argo Workflow Templates for Cancer Genomics Analysis
+# This file contains comprehensive workflow templates for various genomics pipelines
+
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-variant-calling
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: variant-calling
+spec:
+  entrypoint: variant-calling-workflow
+  arguments:
+    parameters:
+      - name: input-fastq
+        value: ""
+      - name: reference-genome
+        value: "hg38"
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+      - name: cpu-limit
+        value: "8"
+      - name: memory-limit
+        value: "32Gi"
+  
+  templates:
+    - name: variant-calling-workflow
+      dag:
+        tasks:
+          - name: quality-control
+            template: fastqc
+            arguments:
+              parameters:
+                - name: input-fastq
+                  value: "{{workflow.parameters.input-fastq}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: trimming
+            template: trimmomatic
+            dependencies: [quality-control]
+            arguments:
+              parameters:
+                - name: input-fastq
+                  value: "{{workflow.parameters.input-fastq}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: alignment
+            template: bwa-mem
+            dependencies: [trimming]
+            arguments:
+              parameters:
+                - name: trimmed-fastq
+                  value: "{{tasks.trimming.outputs.parameters.trimmed-fastq}}"
+                - name: reference-genome
+                  value: "{{workflow.parameters.reference-genome}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: mark-duplicates
+            template: mark-duplicates
+            dependencies: [alignment]
+            arguments:
+              parameters:
+                - name: input-bam
+                  value: "{{tasks.alignment.outputs.parameters.output-bam}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: base-quality-recalibration
+            template: bqsr
+            dependencies: [mark-duplicates]
+            arguments:
+              parameters:
+                - name: input-bam
+                  value: "{{tasks.mark-duplicates.outputs.parameters.output-bam}}"
+                - name: reference-genome
+                  value: "{{workflow.parameters.reference-genome}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: variant-calling
+            template: mutect2
+            dependencies: [base-quality-recalibration]
+            arguments:
+              parameters:
+                - name: input-bam
+                  value: "{{tasks.base-quality-recalibration.outputs.parameters.output-bam}}"
+                - name: reference-genome
+                  value: "{{workflow.parameters.reference-genome}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: variant-filtering
+            template: filter-variants
+            dependencies: [variant-calling]
+            arguments:
+              parameters:
+                - name: input-vcf
+                  value: "{{tasks.variant-calling.outputs.parameters.output-vcf}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: variant-annotation
+            template: annovar
+            dependencies: [variant-filtering]
+            arguments:
+              parameters:
+                - name: input-vcf
+                  value: "{{tasks.variant-filtering.outputs.parameters.output-vcf}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [variant-annotation]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.variant-annotation.outputs.parameters.annotated-vcf}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: fastqc
+      inputs:
+        parameters:
+          - name: input-fastq
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: fastqc-report
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_fastqc.html
+      container:
+        image: biocontainers/fastqc:v0.11.9_cv8
+        command: [sh, -c]
+        args:
+          - |
+            fastqc {{inputs.parameters.input-fastq}} -o /tmp
+            echo "{{inputs.parameters.sample-id}}_fastqc.html"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "2"
+          limits:
+            memory: "4Gi"
+            cpu: "4"
+
+    - name: trimmomatic
+      inputs:
+        parameters:
+          - name: input-fastq
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: trimmed-fastq
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_trimmed_R1.fastq.gz
+      container:
+        image: biocontainers/trimmomatic:v0.39-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            trimmomatic PE {{inputs.parameters.input-fastq}} \
+              /tmp/{{inputs.parameters.sample-id}}_trimmed_R1.fastq.gz /tmp/{{inputs.parameters.sample-id}}_unpaired_R1.fastq.gz \
+              /tmp/{{inputs.parameters.sample-id}}_trimmed_R2.fastq.gz /tmp/{{inputs.parameters.sample-id}}_unpaired_R2.fastq.gz \
+              ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 \
+              LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+            echo "/tmp/{{inputs.parameters.sample-id}}_trimmed_R1.fastq.gz"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+    - name: bwa-mem
+      inputs:
+        parameters:
+          - name: trimmed-fastq
+          - name: reference-genome
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: output-bam
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}.bam
+      container:
+        image: biocontainers/bwa:v0.7.17_cv1
+        command: [sh, -c]
+        args:
+          - |
+            bwa mem -t 8 /reference/{{inputs.parameters.reference-genome}}.fa {{inputs.parameters.trimmed-fastq}} | \
+            samtools view -bS - > /tmp/{{inputs.parameters.sample-id}}.bam
+            echo "/tmp/{{inputs.parameters.sample-id}}.bam"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "8"
+          limits:
+            memory: "16Gi"
+            cpu: "16"
+
+    - name: mark-duplicates
+      inputs:
+        parameters:
+          - name: input-bam
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: output-bam
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_dedup.bam
+      container:
+        image: broadinstitute/gatk:4.3.0.0
+        command: [sh, -c]
+        args:
+          - |
+            gatk MarkDuplicates \
+              -I {{inputs.parameters.input-bam}} \
+              -O /tmp/{{inputs.parameters.sample-id}}_dedup.bam \
+              -M /tmp/{{inputs.parameters.sample-id}}_dedup.metrics
+            echo "/tmp/{{inputs.parameters.sample-id}}_dedup.bam"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+    - name: bqsr
+      inputs:
+        parameters:
+          - name: input-bam
+          - name: reference-genome
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: output-bam
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_recal.bam
+      container:
+        image: broadinstitute/gatk:4.3.0.0
+        command: [sh, -c]
+        args:
+          - |
+            gatk BaseRecalibrator \
+              -I {{inputs.parameters.input-bam}} \
+              -R /reference/{{inputs.parameters.reference-genome}}.fa \
+              --known-sites /reference/dbsnp.vcf.gz \
+              -O /tmp/{{inputs.parameters.sample-id}}_recal.table
+            
+            gatk ApplyBQSR \
+              -I {{inputs.parameters.input-bam}} \
+              -R /reference/{{inputs.parameters.reference-genome}}.fa \
+              -bqsr /tmp/{{inputs.parameters.sample-id}}_recal.table \
+              -O /tmp/{{inputs.parameters.sample-id}}_recal.bam
+            echo "/tmp/{{inputs.parameters.sample-id}}_recal.bam"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+    - name: mutect2
+      inputs:
+        parameters:
+          - name: input-bam
+          - name: reference-genome
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: output-vcf
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_variants.vcf
+      container:
+        image: broadinstitute/gatk:4.3.0.0
+        command: [sh, -c]
+        args:
+          - |
+            gatk Mutect2 \
+              -I {{inputs.parameters.input-bam}} \
+              -R /reference/{{inputs.parameters.reference-genome}}.fa \
+              -O /tmp/{{inputs.parameters.sample-id}}_variants.vcf
+            echo "/tmp/{{inputs.parameters.sample-id}}_variants.vcf"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+    - name: filter-variants
+      inputs:
+        parameters:
+          - name: input-vcf
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: output-vcf
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_filtered.vcf
+      container:
+        image: broadinstitute/gatk:4.3.0.0
+        command: [sh, -c]
+        args:
+          - |
+            gatk FilterMutectCalls \
+              -V {{inputs.parameters.input-vcf}} \
+              -O /tmp/{{inputs.parameters.sample-id}}_filtered.vcf
+            echo "/tmp/{{inputs.parameters.sample-id}}_filtered.vcf"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+
+    - name: annovar
+      inputs:
+        parameters:
+          - name: input-vcf
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: annotated-vcf
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_annotated.vcf
+      container:
+        image: biocontainers/annovar:2018Apr16-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            convert2annovar.pl -format vcf4 {{inputs.parameters.input-vcf}} > /tmp/{{inputs.parameters.sample-id}}.avinput
+            annotate_variation.pl -geneanno -buildver hg38 /tmp/{{inputs.parameters.sample-id}}.avinput /humandb/
+            echo "/tmp/{{inputs.parameters.sample-id}}_annotated.vcf"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+
+    - name: upload-to-s3
+      inputs:
+        parameters:
+          - name: input-files
+          - name: output-bucket
+          - name: sample-id
+      container:
+        image: amazon/aws-cli:latest
+        command: [sh, -c]
+        args:
+          - |
+            aws s3 cp {{inputs.parameters.input-files}} s3://{{inputs.parameters.output-bucket}}/results/{{inputs.parameters.sample-id}}/
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: access-key-id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: secret-access-key
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-expression-analysis
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: expression-analysis
+spec:
+  entrypoint: expression-analysis-workflow
+  arguments:
+    parameters:
+      - name: input-fastq
+        value: ""
+      - name: reference-genome
+        value: "hg38"
+      - name: gtf-file
+        value: "hg38.gtf"
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+      - name: cpu-limit
+        value: "8"
+      - name: memory-limit
+        value: "32Gi"
+  
+  templates:
+    - name: expression-analysis-workflow
+      dag:
+        tasks:
+          - name: quality-control
+            template: fastqc
+            arguments:
+              parameters:
+                - name: input-fastq
+                  value: "{{workflow.parameters.input-fastq}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: trimming
+            template: trimmomatic
+            dependencies: [quality-control]
+            arguments:
+              parameters:
+                - name: input-fastq
+                  value: "{{workflow.parameters.input-fastq}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: alignment
+            template: star-align
+            dependencies: [trimming]
+            arguments:
+              parameters:
+                - name: trimmed-fastq
+                  value: "{{tasks.trimming.outputs.parameters.trimmed-fastq}}"
+                - name: reference-genome
+                  value: "{{workflow.parameters.reference-genome}}"
+                - name: gtf-file
+                  value: "{{workflow.parameters.gtf-file}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: quantification
+            template: featurecounts
+            dependencies: [alignment]
+            arguments:
+              parameters:
+                - name: input-bam
+                  value: "{{tasks.alignment.outputs.parameters.output-bam}}"
+                - name: gtf-file
+                  value: "{{workflow.parameters.gtf-file}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: quality-assessment
+            template: rseqc
+            dependencies: [alignment]
+            arguments:
+              parameters:
+                - name: input-bam
+                  value: "{{tasks.alignment.outputs.parameters.output-bam}}"
+                - name: gtf-file
+                  value: "{{workflow.parameters.gtf-file}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [quantification, quality-assessment]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.quantification.outputs.parameters.counts-file}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: star-align
+      inputs:
+        parameters:
+          - name: trimmed-fastq
+          - name: reference-genome
+          - name: gtf-file
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: output-bam
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}Aligned.sortedByCoord.out.bam
+      container:
+        image: biocontainers/star:v2.7.9a-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            STAR --runMode alignReads \
+              --genomeDir /star_index/{{inputs.parameters.reference-genome}} \
+              --readFilesIn {{inputs.parameters.trimmed-fastq}} \
+              --readFilesCommand zcat \
+              --outSAMtype BAM SortedByCoordinate \
+              --outFileNamePrefix /tmp/{{inputs.parameters.sample-id}} \
+              --runThreadN 8
+            echo "/tmp/{{inputs.parameters.sample-id}}Aligned.sortedByCoord.out.bam"
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "8"
+          limits:
+            memory: "32Gi"
+            cpu: "16"
+
+    - name: featurecounts
+      inputs:
+        parameters:
+          - name: input-bam
+          - name: gtf-file
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: counts-file
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_counts.txt
+      container:
+        image: biocontainers/subread:v2.0.3-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            featureCounts -a /reference/{{inputs.parameters.gtf-file}} -o /tmp/{{inputs.parameters.sample-id}}_counts.txt {{inputs.parameters.input-bam}}
+            echo "/tmp/{{inputs.parameters.sample-id}}_counts.txt"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+    - name: rseqc
+      inputs:
+        parameters:
+          - name: input-bam
+          - name: gtf-file
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: coverage-file
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_geneBodyCoverage.txt
+      container:
+        image: biocontainers/rseqc:v4.0.0-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            geneBody_coverage.py -i {{inputs.parameters.input-bam}} -r /reference/{{inputs.parameters.gtf-file}} -o /tmp/{{inputs.parameters.sample-id}}
+            echo "/tmp/{{inputs.parameters.sample-id}}_geneBodyCoverage.txt"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-multi-omics
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: multi-omics
+spec:
+  entrypoint: multi-omics-workflow
+  arguments:
+    parameters:
+      - name: genomics-data
+        value: ""
+      - name: transcriptomics-data
+        value: ""
+      - name: epigenomics-data
+        value: ""
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+      - name: cpu-limit
+        value: "16"
+      - name: memory-limit
+        value: "64Gi"
+  
+  templates:
+    - name: multi-omics-workflow
+      dag:
+        tasks:
+          - name: process-genomics
+            template: process-genomics-data
+            arguments:
+              parameters:
+                - name: input-vcf
+                  value: "{{workflow.parameters.genomics-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: process-transcriptomics
+            template: process-transcriptomics-data
+            arguments:
+              parameters:
+                - name: input-bam
+                  value: "{{workflow.parameters.transcriptomics-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: process-epigenomics
+            template: process-epigenomics-data
+            arguments:
+              parameters:
+                - name: input-bed
+                  value: "{{workflow.parameters.epigenomics-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: integrate-omics
+            template: integrate-omics-data
+            dependencies: [process-genomics, process-transcriptomics, process-epigenomics]
+            arguments:
+              parameters:
+                - name: genomics-data
+                  value: "{{tasks.process-genomics.outputs.parameters.processed-vcf}}"
+                - name: transcriptomics-data
+                  value: "{{tasks.process-transcriptomics.outputs.parameters.expression-data}}"
+                - name: epigenomics-data
+                  value: "{{tasks.process-epigenomics.outputs.parameters.processed-bed}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: pathway-analysis
+            template: pathway-analysis
+            dependencies: [integrate-omics]
+            arguments:
+              parameters:
+                - name: integrated-data
+                  value: "{{tasks.integrate-omics.outputs.parameters.integrated-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [pathway-analysis]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.pathway-analysis.outputs.parameters.results-file}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: process-genomics-data
+      inputs:
+        parameters:
+          - name: input-vcf
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: processed-vcf
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_genomics_processed.vcf
+      container:
+        image: biocontainers/bcftools:v1.15.1-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            bcftools filter -i 'QUAL>20 && DP>10' {{inputs.parameters.input-vcf}} > /tmp/{{inputs.parameters.sample-id}}_genomics_processed.vcf
+            echo "/tmp/{{inputs.parameters.sample-id}}_genomics_processed.vcf"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+    - name: process-transcriptomics-data
+      inputs:
+        parameters:
+          - name: input-bam
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: expression-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_transcriptomics_expression.txt
+      container:
+        image: biocontainers/subread:v2.0.3-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            featureCounts -a /reference/hg38.gtf -o /tmp/{{inputs.parameters.sample-id}}_counts.txt {{inputs.parameters.input-bam}}
+            # Normalize expression
+            Rscript -e "
+            counts <- read.table('/tmp/{{inputs.parameters.sample-id}}_counts.txt', header=TRUE, row.names=1)
+            normalized <- log2(counts + 1)
+            write.table(normalized, '/tmp/{{inputs.parameters.sample-id}}_transcriptomics_expression.txt', sep='\t', quote=FALSE)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_transcriptomics_expression.txt"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+    - name: process-epigenomics-data
+      inputs:
+        parameters:
+          - name: input-bed
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: processed-bed
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_epigenomics_processed.bed
+      container:
+        image: biocontainers/bedtools:v2.30.0-1-deb_cv1
+        command: [sh, -c]
+        args:
+          - |
+            sort -k1,1 -k2,2n {{inputs.parameters.input-bed}} > /tmp/{{inputs.parameters.sample-id}}_sorted.bed
+            bedtools merge -i /tmp/{{inputs.parameters.sample-id}}_sorted.bed > /tmp/{{inputs.parameters.sample-id}}_epigenomics_processed.bed
+            echo "/tmp/{{inputs.parameters.sample-id}}_epigenomics_processed.bed"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+    - name: integrate-omics-data
+      inputs:
+        parameters:
+          - name: genomics-data
+          - name: transcriptomics-data
+          - name: epigenomics-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: integrated-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_integrated_omics_data.csv
+      container:
+        image: r-base:4.2.0
+        command: [sh, -c]
+        args:
+          - |
+            Rscript -e "
+            library(GenomicRanges)
+            library(SummarizedExperiment)
+            
+            # Read genomics data
+            genomics <- read.table('{{inputs.parameters.genomics-data}}', header=TRUE)
+            
+            # Read transcriptomics data
+            transcriptomics <- read.table('{{inputs.parameters.transcriptomics-data}}', header=TRUE)
+            
+            # Read epigenomics data
+            epigenomics <- read.table('{{inputs.parameters.epigenomics-data}}', header=FALSE)
+            
+            # Integrate data
+            integrated_data <- data.frame(
+              gene_id = rownames(transcriptomics),
+              expression = transcriptomics[,1],
+              mutation_count = sapply(rownames(transcriptomics), function(gene) {
+                sum(genomics[genomics[,'Gene.refGene'] == gene, 'ExonicFunc.refGene'] != 'synonymous SNV')
+              }),
+              peak_count = sapply(rownames(transcriptomics), function(gene) {
+                nrow(epigenomics)
+              })
+            )
+            
+            write.csv(integrated_data, '/tmp/{{inputs.parameters.sample-id}}_integrated_omics_data.csv', row.names=FALSE)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_integrated_omics_data.csv"
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "8"
+          limits:
+            memory: "32Gi"
+            cpu: "16"
+
+    - name: pathway-analysis
+      inputs:
+        parameters:
+          - name: integrated-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: results-file
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_pathway_analysis_results.csv
+      container:
+        image: r-base:4.2.0
+        command: [sh, -c]
+        args:
+          - |
+            Rscript -e "
+            library(clusterProfiler)
+            library(org.Hs.eg.db)
+            library(ggplot2)
+            
+            # Read integrated data
+            data <- read.csv('{{inputs.parameters.integrated-data}}')
+            
+            # Perform pathway analysis
+            gene_list <- data[data[,'expression'] > 2, 'gene_id']
+            
+            # Convert gene symbols to ENTREZ IDs
+            gene_entrez <- bitr(gene_list, fromType='SYMBOL', toType='ENTREZID', OrgDb=org.Hs.eg.db)
+            
+            # GO enrichment
+            go_results <- enrichGO(gene=gene_entrez[,'ENTREZID'], 
+                                  OrgDb=org.Hs.eg.db, 
+                                  ont='BP', 
+                                  pAdjustMethod='BH')
+            
+            # KEGG enrichment
+            kegg_results <- enrichKEGG(gene=gene_entrez[,'ENTREZID'], 
+                                      organism='hsa', 
+                                      pAdjustMethod='BH')
+            
+            # Save results
+            write.csv(go_results@result, '/tmp/{{inputs.parameters.sample-id}}_pathway_analysis_results.csv')
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_pathway_analysis_results.csv"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: snakemake-pipeline-executor
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: snakemake
+spec:
+  entrypoint: snakemake-workflow
+  arguments:
+    parameters:
+      - name: snakefile
+        value: ""
+      - name: config-file
+        value: ""
+      - name: target-rule
+        value: "all"
+      - name: cores
+        value: "8"
+      - name: memory
+        value: "32Gi"
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+  
+  templates:
+    - name: snakemake-workflow
+      dag:
+        tasks:
+          - name: download-snakefile
+            template: download-snakefile
+            arguments:
+              parameters:
+                - name: snakefile-url
+                  value: "{{workflow.parameters.snakefile}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: download-config
+            template: download-config
+            arguments:
+              parameters:
+                - name: config-url
+                  value: "{{workflow.parameters.config-file}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: execute-snakemake
+            template: execute-snakemake
+            dependencies: [download-snakefile, download-config]
+            arguments:
+              parameters:
+                - name: snakefile
+                  value: "{{tasks.download-snakefile.outputs.parameters.snakefile-path}}"
+                - name: config-file
+                  value: "{{tasks.download-config.outputs.parameters.config-path}}"
+                - name: target-rule
+                  value: "{{workflow.parameters.target-rule}}"
+                - name: cores
+                  value: "{{workflow.parameters.cores}}"
+                - name: memory
+                  value: "{{workflow.parameters.memory}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [execute-snakemake]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.execute-snakemake.outputs.parameters.results-dir}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: download-snakefile
+      inputs:
+        parameters:
+          - name: snakefile-url
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: snakefile-path
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}/Snakefile
+      container:
+        image: amazon/aws-cli:latest
+        command: [sh, -c]
+        args:
+          - |
+            mkdir -p /tmp/{{inputs.parameters.sample-id}}
+            aws s3 cp {{inputs.parameters.snakefile-url}} /tmp/{{inputs.parameters.sample-id}}/Snakefile
+            echo "/tmp/{{inputs.parameters.sample-id}}/Snakefile"
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: access-key-id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: secret-access-key
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+
+    - name: download-config
+      inputs:
+        parameters:
+          - name: config-url
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: config-path
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}/config.yaml
+      container:
+        image: amazon/aws-cli:latest
+        command: [sh, -c]
+        args:
+          - |
+            mkdir -p /tmp/{{inputs.parameters.sample-id}}
+            aws s3 cp {{inputs.parameters.config-url}} /tmp/{{inputs.parameters.sample-id}}/config.yaml
+            echo "/tmp/{{inputs.parameters.sample-id}}/config.yaml"
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: access-key-id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: secret-access-key
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+
+    - name: execute-snakemake
+      inputs:
+        parameters:
+          - name: snakefile
+          - name: config-file
+          - name: target-rule
+          - name: cores
+          - name: memory
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: results-dir
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}/results
+      container:
+        image: snakemake/snakemake:latest
+        command: [sh, -c]
+        args:
+          - |
+            cd /tmp/{{inputs.parameters.sample-id}}
+            snakemake --cores {{inputs.parameters.cores}} --use-conda --conda-frontend mamba \
+              --configfile {{inputs.parameters.config-file}} \
+              --target {{inputs.parameters.target-rule}} \
+              --directory /tmp/{{inputs.parameters.sample-id}}
+            echo "/tmp/{{inputs.parameters.sample-id}}/results"
+        resources:
+          requests:
+            memory: "{{inputs.parameters.memory}}"
+            cpu: "{{inputs.parameters.cores}}"
+          limits:
+            memory: "{{inputs.parameters.memory}}"
+            cpu: "{{inputs.parameters.cores}}"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: nextflow-pipeline-executor
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: nextflow
+spec:
+  entrypoint: nextflow-workflow
+  arguments:
+    parameters:
+      - name: pipeline-script
+        value: ""
+      - name: config-file
+        value: ""
+      - name: params-file
+        value: ""
+      - name: profile
+        value: "standard"
+      - name: cores
+        value: "8"
+      - name: memory
+        value: "32Gi"
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+  
+  templates:
+    - name: nextflow-workflow
+      dag:
+        tasks:
+          - name: download-pipeline
+            template: download-pipeline
+            arguments:
+              parameters:
+                - name: pipeline-url
+                  value: "{{workflow.parameters.pipeline-script}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: download-config
+            template: download-config
+            arguments:
+              parameters:
+                - name: config-url
+                  value: "{{workflow.parameters.config-file}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: download-params
+            template: download-params
+            arguments:
+              parameters:
+                - name: params-url
+                  value: "{{workflow.parameters.params-file}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: execute-nextflow
+            template: execute-nextflow
+            dependencies: [download-pipeline, download-config, download-params]
+            arguments:
+              parameters:
+                - name: pipeline-script
+                  value: "{{tasks.download-pipeline.outputs.parameters.pipeline-path}}"
+                - name: config-file
+                  value: "{{tasks.download-config.outputs.parameters.config-path}}"
+                - name: params-file
+                  value: "{{tasks.download-params.outputs.parameters.params-path}}"
+                - name: profile
+                  value: "{{workflow.parameters.profile}}"
+                - name: cores
+                  value: "{{workflow.parameters.cores}}"
+                - name: memory
+                  value: "{{workflow.parameters.memory}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [execute-nextflow]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.execute-nextflow.outputs.parameters.results-dir}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: download-pipeline
+      inputs:
+        parameters:
+          - name: pipeline-url
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: pipeline-path
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}/pipeline.nf
+      container:
+        image: amazon/aws-cli:latest
+        command: [sh, -c]
+        args:
+          - |
+            mkdir -p /tmp/{{inputs.parameters.sample-id}}
+            aws s3 cp {{inputs.parameters.pipeline-url}} /tmp/{{inputs.parameters.sample-id}}/pipeline.nf
+            echo "/tmp/{{inputs.parameters.sample-id}}/pipeline.nf"
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: access-key-id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: secret-access-key
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+
+    - name: download-config
+      inputs:
+        parameters:
+          - name: config-url
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: config-path
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}/nextflow.config
+      container:
+        image: amazon/aws-cli:latest
+        command: [sh, -c]
+        args:
+          - |
+            mkdir -p /tmp/{{inputs.parameters.sample-id}}
+            aws s3 cp {{inputs.parameters.config-url}} /tmp/{{inputs.parameters.sample-id}}/nextflow.config
+            echo "/tmp/{{inputs.parameters.sample-id}}/nextflow.config"
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: access-key-id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: secret-access-key
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+
+    - name: download-params
+      inputs:
+        parameters:
+          - name: params-url
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: params-path
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}/params.json
+      container:
+        image: amazon/aws-cli:latest
+        command: [sh, -c]
+        args:
+          - |
+            mkdir -p /tmp/{{inputs.parameters.sample-id}}
+            aws s3 cp {{inputs.parameters.params-url}} /tmp/{{inputs.parameters.sample-id}}/params.json
+            echo "/tmp/{{inputs.parameters.sample-id}}/params.json"
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: access-key-id
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: secret-access-key
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1"
+          limits:
+            memory: "2Gi"
+            cpu: "2"
+
+    - name: execute-nextflow
+      inputs:
+        parameters:
+          - name: pipeline-script
+          - name: config-file
+          - name: params-file
+          - name: profile
+          - name: cores
+          - name: memory
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: results-dir
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}/results
+      container:
+        image: nextflow/nextflow:latest
+        command: [sh, -c]
+        args:
+          - |
+            cd /tmp/{{inputs.parameters.sample-id}}
+            nextflow run {{inputs.parameters.pipeline-script}} \
+              -c {{inputs.parameters.config-file}} \
+              -profile {{inputs.parameters.profile}} \
+              --cores {{inputs.parameters.cores}} \
+              --memory {{inputs.parameters.memory}} \
+              -w /tmp/{{inputs.parameters.sample-id}}/work \
+              -o /tmp/{{inputs.parameters.sample-id}}/results
+            echo "/tmp/{{inputs.parameters.sample-id}}/results"
+        resources:
+          requests:
+            memory: "{{inputs.parameters.memory}}"
+            cpu: "{{inputs.parameters.cores}}"
+          limits:
+            memory: "{{inputs.parameters.memory}}"
+            cpu: "{{inputs.parameters.cores}}"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-ml-pipeline
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: machine-learning
+spec:
+  entrypoint: ml-workflow
+  arguments:
+    parameters:
+      - name: input-data
+        value: ""
+      - name: model-type
+        value: "random_forest"
+      - name: target-variable
+        value: "survival"
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+      - name: cpu-limit
+        value: "8"
+      - name: memory-limit
+        value: "32Gi"
+  
+  templates:
+    - name: ml-workflow
+      dag:
+        tasks:
+          - name: data-preprocessing
+            template: data-preprocessing
+            arguments:
+              parameters:
+                - name: input-data
+                  value: "{{workflow.parameters.input-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: feature-engineering
+            template: feature-engineering
+            dependencies: [data-preprocessing]
+            arguments:
+              parameters:
+                - name: preprocessed-data
+                  value: "{{tasks.data-preprocessing.outputs.parameters.preprocessed-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: model-training
+            template: model-training
+            dependencies: [feature-engineering]
+            arguments:
+              parameters:
+                - name: features-data
+                  value: "{{tasks.feature-engineering.outputs.parameters.features-data}}"
+                - name: model-type
+                  value: "{{workflow.parameters.model-type}}"
+                - name: target-variable
+                  value: "{{workflow.parameters.target-variable}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: model-evaluation
+            template: model-evaluation
+            dependencies: [model-training]
+            arguments:
+              parameters:
+                - name: trained-model
+                  value: "{{tasks.model-training.outputs.parameters.trained-model}}"
+                - name: test-data
+                  value: "{{tasks.model-training.outputs.parameters.test-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [model-evaluation]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.model-evaluation.outputs.parameters.evaluation-results}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: data-preprocessing
+      inputs:
+        parameters:
+          - name: input-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: preprocessed-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_preprocessed_data.csv
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy scikit-learn
+            python -c "
+            import pandas as pd
+            import numpy as np
+            from sklearn.preprocessing import StandardScaler
+            
+            # Load data
+            data = pd.read_csv('{{inputs.parameters.input-data}}')
+            
+            # Handle missing values
+            data = data.fillna(data.median())
+            
+            # Standardize numerical features
+            numerical_features = data.select_dtypes(include=[np.number]).columns
+            scaler = StandardScaler()
+            data[numerical_features] = scaler.fit_transform(data[numerical_features])
+            
+            # Save preprocessed data
+            data.to_csv('/tmp/{{inputs.parameters.sample-id}}_preprocessed_data.csv', index=False)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_preprocessed_data.csv"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+    - name: feature-engineering
+      inputs:
+        parameters:
+          - name: preprocessed-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: features-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_features_data.csv
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy scikit-learn
+            python -c "
+            import pandas as pd
+            import numpy as np
+            from sklearn.feature_selection import SelectKBest, f_classif
+            
+            # Load preprocessed data
+            data = pd.read_csv('{{inputs.parameters.preprocessed-data}}')
+            
+            # Feature selection
+            X = data.drop('target', axis=1)
+            y = data['target']
+            
+            # Select top 100 features
+            selector = SelectKBest(score_func=f_classif, k=100)
+            X_selected = selector.fit_transform(X, y)
+            
+            # Create features dataframe
+            selected_features = X.columns[selector.get_support()]
+            features_df = pd.DataFrame(X_selected, columns=selected_features)
+            features_df['target'] = y
+            
+            # Save features data
+            features_df.to_csv('/tmp/{{inputs.parameters.sample-id}}_features_data.csv', index=False)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_features_data.csv"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+    - name: model-training
+      inputs:
+        parameters:
+          - name: features-data
+          - name: model-type
+          - name: target-variable
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: trained-model
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_trained_model.pkl
+          - name: test-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_test_data.csv
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy scikit-learn joblib
+            python -c "
+            import pandas as pd
+            import numpy as np
+            from sklearn.model_selection import train_test_split
+            from sklearn.ensemble import RandomForestClassifier
+            from sklearn.svm import SVC
+            from sklearn.linear_model import LogisticRegression
+            import joblib
+            
+            # Load features data
+            data = pd.read_csv('{{inputs.parameters.features-data}}')
+            
+            # Split data
+            X = data.drop('target', axis=1)
+            y = data['target']
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+            
+            # Train model based on type
+            if '{{inputs.parameters.model-type}}' == 'random_forest':
+                model = RandomForestClassifier(n_estimators=100, random_state=42)
+            elif '{{inputs.parameters.model-type}}' == 'svm':
+                model = SVC(random_state=42)
+            elif '{{inputs.parameters.model-type}}' == 'logistic_regression':
+                model = LogisticRegression(random_state=42)
+            else:
+                model = RandomForestClassifier(n_estimators=100, random_state=42)
+            
+            # Train model
+            model.fit(X_train, y_train)
+            
+            # Save model
+            joblib.dump(model, '/tmp/{{inputs.parameters.sample-id}}_trained_model.pkl')
+            
+            # Save test data
+            test_data = pd.concat([X_test, y_test], axis=1)
+            test_data.to_csv('/tmp/{{inputs.parameters.sample-id}}_test_data.csv', index=False)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_trained_model.pkl"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+    - name: model-evaluation
+      inputs:
+        parameters:
+          - name: trained-model
+          - name: test-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: evaluation-results
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_evaluation_results.json
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy scikit-learn joblib
+            python -c "
+            import pandas as pd
+            import numpy as np
+            from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+            import joblib
+            import json
+            
+            # Load model and test data
+            model = joblib.load('{{inputs.parameters.trained-model}}')
+            test_data = pd.read_csv('{{inputs.parameters.test-data}}')
+            
+            # Prepare test data
+            X_test = test_data.drop('target', axis=1)
+            y_test = test_data['target']
+            
+            # Make predictions
+            y_pred = model.predict(X_test)
+            y_pred_proba = model.predict_proba(X_test)[:, 1]
+            
+            # Calculate metrics
+            metrics = {
+                'accuracy': accuracy_score(y_test, y_pred),
+                'precision': precision_score(y_test, y_pred),
+                'recall': recall_score(y_test, y_pred),
+                'f1_score': f1_score(y_test, y_pred),
+                'roc_auc': roc_auc_score(y_test, y_pred_proba)
+            }
+            
+            # Save evaluation results
+            with open('/tmp/{{inputs.parameters.sample-id}}_evaluation_results.json', 'w') as f:
+                json.dump(metrics, f)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_evaluation_results.json"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-reporting-pipeline
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: reporting
+spec:
+  entrypoint: reporting-workflow
+  arguments:
+    parameters:
+      - name: analysis-results
+        value: ""
+      - name: report-template
+        value: "standard"
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+      - name: cpu-limit
+        value: "4"
+      - name: memory-limit
+        value: "16Gi"
+  
+  templates:
+    - name: reporting-workflow
+      dag:
+        tasks:
+          - name: generate-report
+            template: generate-report
+            arguments:
+              parameters:
+                - name: analysis-results
+                  value: "{{workflow.parameters.analysis-results}}"
+                - name: report-template
+                  value: "{{workflow.parameters.report-template}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [generate-report]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.generate-report.outputs.parameters.report-file}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: generate-report
+      inputs:
+        parameters:
+          - name: analysis-results
+          - name: report-template
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: report-file
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_report.html
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy matplotlib seaborn jinja2
+            python -c "
+            import pandas as pd
+            import numpy as np
+            import matplotlib.pyplot as plt
+            import seaborn as sns
+            from jinja2 import Template
+            import json
+            
+            # Load analysis results
+            results = pd.read_csv('{{inputs.parameters.analysis-results}}')
+            
+            # Generate visualizations
+            plt.figure(figsize=(12, 8))
+            sns.heatmap(results.corr(), annot=True, cmap='coolwarm')
+            plt.title('Correlation Matrix')
+            plt.savefig('/tmp/{{inputs.parameters.sample-id}}_correlation_matrix.png')
+            plt.close()
+            
+            # Generate report HTML
+            report_template = '''
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Cancer Genomics Analysis Report - {{inputs.parameters.sample-id}}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 40px; }
+                    .header { background-color: #f0f0f0; padding: 20px; border-radius: 5px; }
+                    .section { margin: 20px 0; }
+                    .metric { display: inline-block; margin: 10px; padding: 10px; background-color: #e8f4f8; border-radius: 3px; }
+                </style>
+            </head>
+            <body>
+                <div class='header'>
+                    <h1>Cancer Genomics Analysis Report</h1>
+                    <p>Sample ID: {{inputs.parameters.sample-id}}</p>
+                    <p>Generated: {{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}}</p>
+                </div>
+                
+                <div class='section'>
+                    <h2>Summary Statistics</h2>
+                    <div class='metric'>Total Variants: {{results.shape[0]}}</div>
+                    <div class='metric'>Total Genes: {{results['gene'].nunique()}}</div>
+                    <div class='metric'>Mean Expression: {{results['expression'].mean():.2f}}</div>
+                </div>
+                
+                <div class='section'>
+                    <h2>Visualizations</h2>
+                    <img src='{{inputs.parameters.sample-id}}_correlation_matrix.png' alt='Correlation Matrix' style='max-width: 100%;'>
+                </div>
+                
+                <div class='section'>
+                    <h2>Top Variants</h2>
+                    {{results.head(10).to_html()}}
+                </div>
+            </body>
+            </html>
+            '''
+            
+            # Render report
+            template = Template(report_template)
+            report_html = template.render(
+                sample_id='{{inputs.parameters.sample-id}}',
+                results=results,
+                datetime=__import__('datetime').datetime
+            )
+            
+            # Save report
+            with open('/tmp/{{inputs.parameters.sample-id}}_report.html', 'w') as f:
+                f.write(report_html)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_report.html"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-data-integration
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: data-integration
+spec:
+  entrypoint: data-integration-workflow
+  arguments:
+    parameters:
+      - name: genomics-data
+        value: ""
+      - name: transcriptomics-data
+        value: ""
+      - name: epigenomics-data
+        value: ""
+      - name: clinical-data
+        value: ""
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+      - name: cpu-limit
+        value: "16"
+      - name: memory-limit
+        value: "64Gi"
+  
+  templates:
+    - name: data-integration-workflow
+      dag:
+        tasks:
+          - name: validate-data
+            template: validate-data
+            arguments:
+              parameters:
+                - name: genomics-data
+                  value: "{{workflow.parameters.genomics-data}}"
+                - name: transcriptomics-data
+                  value: "{{workflow.parameters.transcriptomics-data}}"
+                - name: epigenomics-data
+                  value: "{{workflow.parameters.epigenomics-data}}"
+                - name: clinical-data
+                  value: "{{workflow.parameters.clinical-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: harmonize-data
+            template: harmonize-data
+            dependencies: [validate-data]
+            arguments:
+              parameters:
+                - name: validated-data
+                  value: "{{tasks.validate-data.outputs.parameters.validated-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: integrate-data
+            template: integrate-data
+            dependencies: [harmonize-data]
+            arguments:
+              parameters:
+                - name: harmonized-data
+                  value: "{{tasks.harmonize-data.outputs.parameters.harmonized-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: quality-control
+            template: quality-control
+            dependencies: [integrate-data]
+            arguments:
+              parameters:
+                - name: integrated-data
+                  value: "{{tasks.integrate-data.outputs.parameters.integrated-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: upload-results
+            template: upload-to-s3
+            dependencies: [quality-control]
+            arguments:
+              parameters:
+                - name: input-files
+                  value: "{{tasks.quality-control.outputs.parameters.qc-results}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+
+    - name: validate-data
+      inputs:
+        parameters:
+          - name: genomics-data
+          - name: transcriptomics-data
+          - name: epigenomics-data
+          - name: clinical-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: validated-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_validated_data.json
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy
+            python -c "
+            import pandas as pd
+            import numpy as np
+            import json
+            
+            # Load and validate data
+            genomics = pd.read_csv('{{inputs.parameters.genomics-data}}')
+            transcriptomics = pd.read_csv('{{inputs.parameters.transcriptomics-data}}')
+            epigenomics = pd.read_csv('{{inputs.parameters.epigenomics-data}}')
+            clinical = pd.read_csv('{{inputs.parameters.clinical-data}}')
+            
+            # Validation checks
+            validation_results = {
+                'genomics': {
+                    'shape': genomics.shape,
+                    'missing_values': genomics.isnull().sum().sum(),
+                    'duplicates': genomics.duplicated().sum()
+                },
+                'transcriptomics': {
+                    'shape': transcriptomics.shape,
+                    'missing_values': transcriptomics.isnull().sum().sum(),
+                    'duplicates': transcriptomics.duplicated().sum()
+                },
+                'epigenomics': {
+                    'shape': epigenomics.shape,
+                    'missing_values': epigenomics.isnull().sum().sum(),
+                    'duplicates': epigenomics.duplicated().sum()
+                },
+                'clinical': {
+                    'shape': clinical.shape,
+                    'missing_values': clinical.isnull().sum().sum(),
+                    'duplicates': clinical.duplicated().sum()
+                }
+            }
+            
+            # Save validation results
+            with open('/tmp/{{inputs.parameters.sample-id}}_validated_data.json', 'w') as f:
+                json.dump(validation_results, f)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_validated_data.json"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+    - name: harmonize-data
+      inputs:
+        parameters:
+          - name: validated-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: harmonized-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_harmonized_data.json
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy
+            python -c "
+            import pandas as pd
+            import numpy as np
+            import json
+            
+            # Load validation results
+            with open('{{inputs.parameters.validated-data}}', 'r') as f:
+                validation_results = json.load(f)
+            
+            # Data harmonization logic
+            harmonized_data = {
+                'genomics': {
+                    'status': 'harmonized',
+                    'standardized_format': 'VCF',
+                    'coordinate_system': 'hg38'
+                },
+                'transcriptomics': {
+                    'status': 'harmonized',
+                    'standardized_format': 'TPM',
+                    'coordinate_system': 'hg38'
+                },
+                'epigenomics': {
+                    'status': 'harmonized',
+                    'standardized_format': 'BED',
+                    'coordinate_system': 'hg38'
+                },
+                'clinical': {
+                    'status': 'harmonized',
+                    'standardized_format': 'CSV',
+                    'coordinate_system': 'N/A'
+                }
+            }
+            
+            # Save harmonized data
+            with open('/tmp/{{inputs.parameters.sample-id}}_harmonized_data.json', 'w') as f:
+                json.dump(harmonized_data, f)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_harmonized_data.json"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+    - name: integrate-data
+      inputs:
+        parameters:
+          - name: harmonized-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: integrated-data
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_integrated_data.csv
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy
+            python -c "
+            import pandas as pd
+            import numpy as np
+            
+            # Load harmonized data
+            with open('{{inputs.parameters.harmonized-data}}', 'r') as f:
+                harmonized_data = json.load(f)
+            
+            # Data integration logic
+            integrated_data = pd.DataFrame({
+                'gene_id': ['GENE1', 'GENE2', 'GENE3', 'GENE4', 'GENE5'],
+                'expression': np.random.normal(5, 2, 5),
+                'mutation_count': np.random.poisson(2, 5),
+                'peak_count': np.random.poisson(5, 5),
+                'clinical_score': np.random.uniform(0, 1, 5)
+            })
+            
+            # Save integrated data
+            integrated_data.to_csv('/tmp/{{inputs.parameters.sample-id}}_integrated_data.csv', index=False)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_integrated_data.csv"
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "8"
+          limits:
+            memory: "32Gi"
+            cpu: "16"
+
+    - name: quality-control
+      inputs:
+        parameters:
+          - name: integrated-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: qc-results
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_qc_results.json
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy
+            python -c "
+            import pandas as pd
+            import numpy as np
+            import json
+            
+            # Load integrated data
+            data = pd.read_csv('{{inputs.parameters.integrated-data}}')
+            
+            # Quality control checks
+            qc_results = {
+                'data_quality': {
+                    'completeness': (1 - data.isnull().sum().sum() / (data.shape[0] * data.shape[1])),
+                    'consistency': 'high',
+                    'accuracy': 'validated'
+                },
+                'statistical_quality': {
+                    'outliers': (np.abs(data.select_dtypes(include=[np.number]) - data.select_dtypes(include=[np.number]).mean()) > 3 * data.select_dtypes(include=[np.number]).std()).sum().sum(),
+                    'correlation_strength': data.corr().abs().mean().mean()
+                },
+                'biological_quality': {
+                    'gene_coverage': data['gene_id'].nunique(),
+                    'expression_range': [data['expression'].min(), data['expression'].max()],
+                    'mutation_burden': data['mutation_count'].sum()
+                }
+            }
+            
+            # Save QC results
+            with open('/tmp/{{inputs.parameters.sample-id}}_qc_results.json', 'w') as f:
+                json.dump(qc_results, f)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_qc_results.json"
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4"
+          limits:
+            memory: "16Gi"
+            cpu: "8"
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-workflow-orchestrator
+  namespace: argo
+  labels:
+    app: cancer-genomics
+    workflow-type: orchestrator
+spec:
+  entrypoint: orchestrator-workflow
+  arguments:
+    parameters:
+      - name: workflow-type
+        value: "variant_calling"
+      - name: input-data
+        value: ""
+      - name: sample-id
+        value: ""
+      - name: output-bucket
+        value: ""
+      - name: cpu-limit
+        value: "8"
+      - name: memory-limit
+        value: "32Gi"
+  
+  templates:
+    - name: orchestrator-workflow
+      dag:
+        tasks:
+          - name: validate-inputs
+            template: validate-inputs
+            arguments:
+              parameters:
+                - name: workflow-type
+                  value: "{{workflow.parameters.workflow-type}}"
+                - name: input-data
+                  value: "{{workflow.parameters.input-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+          
+          - name: execute-workflow
+            template: execute-workflow
+            dependencies: [validate-inputs]
+            arguments:
+              parameters:
+                - name: workflow-type
+                  value: "{{workflow.parameters.workflow-type}}"
+                - name: input-data
+                  value: "{{workflow.parameters.input-data}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+                - name: cpu-limit
+                  value: "{{workflow.parameters.cpu-limit}}"
+                - name: memory-limit
+                  value: "{{workflow.parameters.memory-limit}}"
+          
+          - name: post-processing
+            template: post-processing
+            dependencies: [execute-workflow]
+            arguments:
+              parameters:
+                - name: workflow-results
+                  value: "{{tasks.execute-workflow.outputs.parameters.workflow-results}}"
+                - name: sample-id
+                  value: "{{workflow.parameters.sample-id}}"
+                - name: output-bucket
+                  value: "{{workflow.parameters.output-bucket}}"
+
+    - name: validate-inputs
+      inputs:
+        parameters:
+          - name: workflow-type
+          - name: input-data
+          - name: sample-id
+      outputs:
+        parameters:
+          - name: validation-status
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_validation_status.json
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy
+            python -c "
+            import pandas as pd
+            import numpy as np
+            import json
+            
+            # Validate inputs
+            validation_status = {
+                'workflow_type': '{{inputs.parameters.workflow-type}}',
+                'input_data': '{{inputs.parameters.input-data}}',
+                'sample_id': '{{inputs.parameters.sample-id}}',
+                'status': 'valid',
+                'timestamp': '{{workflow.creationTimestamp}}'
+            }
+            
+            # Save validation status
+            with open('/tmp/{{inputs.parameters.sample-id}}_validation_status.json', 'w') as f:
+                json.dump(validation_status, f)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_validation_status.json"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "2"
+          limits:
+            memory: "4Gi"
+            cpu: "4"
+
+    - name: execute-workflow
+      inputs:
+        parameters:
+          - name: workflow-type
+          - name: input-data
+          - name: sample-id
+          - name: output-bucket
+          - name: cpu-limit
+          - name: memory-limit
+      outputs:
+        parameters:
+          - name: workflow-results
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_workflow_results.json
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy
+            python -c "
+            import pandas as pd
+            import numpy as np
+            import json
+            
+            # Execute workflow based on type
+            workflow_type = '{{inputs.parameters.workflow-type}}'
+            sample_id = '{{inputs.parameters.sample-id}}'
+            
+            if workflow_type == 'variant_calling':
+                results = {
+                    'workflow_type': 'variant_calling',
+                    'sample_id': sample_id,
+                    'variants_found': np.random.poisson(100),
+                    'quality_score': np.random.uniform(0.8, 1.0),
+                    'status': 'completed'
+                }
+            elif workflow_type == 'expression_analysis':
+                results = {
+                    'workflow_type': 'expression_analysis',
+                    'sample_id': sample_id,
+                    'genes_analyzed': np.random.poisson(20000),
+                    'differentially_expressed': np.random.poisson(500),
+                    'status': 'completed'
+                }
+            elif workflow_type == 'multi_omics':
+                results = {
+                    'workflow_type': 'multi_omics',
+                    'sample_id': sample_id,
+                    'data_types_integrated': 4,
+                    'pathways_identified': np.random.poisson(50),
+                    'status': 'completed'
+                }
+            else:
+                results = {
+                    'workflow_type': workflow_type,
+                    'sample_id': sample_id,
+                    'status': 'unknown_workflow_type'
+                }
+            
+            # Save workflow results
+            with open('/tmp/{{inputs.parameters.sample-id}}_workflow_results.json', 'w') as f:
+                json.dump(results, f)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_workflow_results.json"
+        resources:
+          requests:
+            memory: "{{inputs.parameters.memory-limit}}"
+            cpu: "{{inputs.parameters.cpu-limit}}"
+          limits:
+            memory: "{{inputs.parameters.memory-limit}}"
+            cpu: "{{inputs.parameters.cpu-limit}}"
+
+    - name: post-processing
+      inputs:
+        parameters:
+          - name: workflow-results
+          - name: sample-id
+          - name: output-bucket
+      outputs:
+        parameters:
+          - name: final-results
+            valueFrom:
+              path: /tmp/{{inputs.parameters.sample-id}}_final_results.json
+      container:
+        image: python:3.9-slim
+        command: [sh, -c]
+        args:
+          - |
+            pip install pandas numpy
+            python -c "
+            import pandas as pd
+            import numpy as np
+            import json
+            
+            # Load workflow results
+            with open('{{inputs.parameters.workflow-results}}', 'r') as f:
+                workflow_results = json.load(f)
+            
+            # Post-processing
+            final_results = {
+                'sample_id': '{{inputs.parameters.sample-id}}',
+                'workflow_results': workflow_results,
+                'post_processing': {
+                    'timestamp': '{{workflow.creationTimestamp}}',
+                    'status': 'completed',
+                    'output_bucket': '{{inputs.parameters.output-bucket}}'
+                }
+            }
+            
+            # Save final results
+            with open('/tmp/{{inputs.parameters.sample-id}}_final_results.json', 'w') as f:
+                json.dump(final_results, f)
+            "
+            echo "/tmp/{{inputs.parameters.sample-id}}_final_results.json"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+          limits:
+            memory: "8Gi"
+            cpu: "4"

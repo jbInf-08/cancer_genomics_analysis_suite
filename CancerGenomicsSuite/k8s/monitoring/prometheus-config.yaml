@@ -1,0 +1,502 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+      external_labels:
+        cluster: 'cancer-genomics'
+        environment: 'production'
+
+    rule_files:
+      - "/etc/prometheus/rules/*.yml"
+
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+
+    scrape_configs:
+      # Prometheus itself
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      # Kubernetes API server
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+          - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: default;kubernetes;https
+
+      # Kubernetes nodes
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+          - role: node
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+
+      # Kubernetes pods
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+
+      # Cancer Genomics Application
+      - job_name: 'cancer-genomics-app'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - cancer-genomics
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: cancer-genomics-web
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # Celery Workers
+      - job_name: 'celery-workers'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - cancer-genomics
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: cancer-genomics-celery
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # PostgreSQL
+      - job_name: 'postgresql'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - cancer-genomics
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: postgresql
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # Redis
+      - job_name: 'redis'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - cancer-genomics
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: redis
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # Neo4j
+      - job_name: 'neo4j'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - neo4j
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: neo4j-metrics
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # Kafka
+      - job_name: 'kafka'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - kafka
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: kafka
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # Argo Workflows
+      - job_name: 'argo-workflows'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - argo
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: argo-workflows-server-metrics
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # Nginx Ingress
+      - job_name: 'nginx-ingress'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - ingress-nginx
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: ingress-nginx-controller-metrics
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # Node Exporter
+      - job_name: 'node-exporter'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_endpoints_name]
+            action: keep
+            regex: node-exporter
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # cAdvisor
+      - job_name: 'cadvisor'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_endpoints_name]
+            action: keep
+            regex: cadvisor
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+      # kube-state-metrics
+      - job_name: 'kube-state-metrics'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_endpoints_name]
+            action: keep
+            regex: kube-state-metrics
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: metrics
+
+  # Alert rules for cancer genomics application
+  cancer-genomics-alerts.yml: |
+    groups:
+      - name: cancer-genomics-app
+        rules:
+          - alert: CancerGenomicsAppDown
+            expr: up{job="cancer-genomics-app"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Cancer Genomics application is down"
+              description: "Cancer Genomics application instance {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: CancerGenomicsAppHighErrorRate
+            expr: rate(http_requests_total{job="cancer-genomics-app",status=~"5.."}[5m]) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High error rate in Cancer Genomics application"
+              description: "Cancer Genomics application {{ $labels.instance }} has a high error rate of {{ $value }} errors per second."
+
+          - alert: CancerGenomicsAppHighResponseTime
+            expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="cancer-genomics-app"}[5m])) > 2
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High response time in Cancer Genomics application"
+              description: "95th percentile response time for Cancer Genomics application {{ $labels.instance }} is {{ $value }} seconds."
+
+          - alert: CancerGenomicsAppHighMemoryUsage
+            expr: (process_resident_memory_bytes{job="cancer-genomics-app"} / 1024 / 1024 / 1024) > 4
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High memory usage in Cancer Genomics application"
+              description: "Cancer Genomics application {{ $labels.instance }} is using {{ $value }} GB of memory."
+
+          - alert: CancerGenomicsAppHighCPUUsage
+            expr: rate(process_cpu_seconds_total{job="cancer-genomics-app"}[5m]) > 0.8
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High CPU usage in Cancer Genomics application"
+              description: "Cancer Genomics application {{ $labels.instance }} has high CPU usage of {{ $value }}."
+
+      - name: celery-workers
+        rules:
+          - alert: CeleryWorkerDown
+            expr: up{job="celery-workers"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Celery worker is down"
+              description: "Celery worker instance {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: CeleryWorkerHighQueueLength
+            expr: celery_queue_length > 100
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High queue length in Celery worker"
+              description: "Celery worker {{ $labels.instance }} has a high queue length of {{ $value }} tasks."
+
+          - alert: CeleryWorkerHighFailureRate
+            expr: rate(celery_task_failed_total[5m]) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High failure rate in Celery worker"
+              description: "Celery worker {{ $labels.instance }} has a high failure rate of {{ $value }} failures per second."
+
+      - name: database
+        rules:
+          - alert: PostgreSQLDown
+            expr: up{job="postgresql"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "PostgreSQL is down"
+              description: "PostgreSQL instance {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: PostgreSQLHighConnections
+            expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High connection count in PostgreSQL"
+              description: "PostgreSQL {{ $labels.instance }} has {{ $value }}% of max connections in use."
+
+          - alert: PostgreSQLHighDiskUsage
+            expr: (pg_database_size_bytes / 1024 / 1024 / 1024) > 100
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High disk usage in PostgreSQL"
+              description: "PostgreSQL database {{ $labels.instance }} is using {{ $value }} GB of disk space."
+
+          - alert: RedisDown
+            expr: up{job="redis"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Redis is down"
+              description: "Redis instance {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: RedisHighMemoryUsage
+            expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.8
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High memory usage in Redis"
+              description: "Redis {{ $labels.instance }} is using {{ $value }}% of max memory."
+
+      - name: neo4j
+        rules:
+          - alert: Neo4jDown
+            expr: up{job="neo4j"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Neo4j is down"
+              description: "Neo4j instance {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: Neo4jHighMemoryUsage
+            expr: neo4j_memory_heap_used_bytes / neo4j_memory_heap_max_bytes > 0.8
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High memory usage in Neo4j"
+              description: "Neo4j {{ $labels.instance }} is using {{ $value }}% of heap memory."
+
+          - alert: Neo4jSlowQueries
+            expr: neo4j_query_duration_seconds > 10
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Slow queries in Neo4j"
+              description: "Neo4j {{ $labels.instance }} has queries taking {{ $value }} seconds."
+
+      - name: kafka
+        rules:
+          - alert: KafkaDown
+            expr: up{job="kafka"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kafka is down"
+              description: "Kafka instance {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: KafkaHighLag
+            expr: kafka_consumer_lag_sum > 1000
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High consumer lag in Kafka"
+              description: "Kafka topic {{ $labels.topic }} has a consumer lag of {{ $value }} messages."
+
+          - alert: KafkaHighDiskUsage
+            expr: kafka_log_size_bytes / 1024 / 1024 / 1024 > 50
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High disk usage in Kafka"
+              description: "Kafka topic {{ $labels.topic }} is using {{ $value }} GB of disk space."
+
+      - name: argo-workflows
+        rules:
+          - alert: ArgoWorkflowsDown
+            expr: up{job="argo-workflows"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Argo Workflows is down"
+              description: "Argo Workflows instance {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: ArgoWorkflowsHighFailureRate
+            expr: rate(argo_workflows_failed_total[5m]) > 0.1
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High failure rate in Argo Workflows"
+              description: "Argo Workflows {{ $labels.instance }} has a high failure rate of {{ $value }} failures per second."
+
+      - name: kubernetes
+        rules:
+          - alert: KubernetesNodeDown
+            expr: up{job="kubernetes-nodes"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Kubernetes node is down"
+              description: "Kubernetes node {{ $labels.instance }} has been down for more than 1 minute."
+
+          - alert: KubernetesPodCrashLooping
+            expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod is crash looping"
+              description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is crash looping."
+
+          - alert: KubernetesPodNotReady
+            expr: kube_pod_status_phase{phase!="Running"} > 0
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod is not ready"
+              description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} is not ready."
+
+          - alert: KubernetesHighCPUUsage
+            expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High CPU usage on Kubernetes node"
+              description: "Kubernetes node {{ $labels.instance }} has high CPU usage of {{ $value }}%."
+
+          - alert: KubernetesHighMemoryUsage
+            expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High memory usage on Kubernetes node"
+              description: "Kubernetes node {{ $labels.instance }} has high memory usage of {{ $value }}%."
+
+          - alert: KubernetesHighDiskUsage
+            expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High disk usage on Kubernetes node"
+              description: "Kubernetes node {{ $labels.instance }} has high disk usage of {{ $value }}%."

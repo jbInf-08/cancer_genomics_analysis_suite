@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-test-connection"
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "cancer-genomics-analysis-suite.fullname" . }}-web:8050/health']

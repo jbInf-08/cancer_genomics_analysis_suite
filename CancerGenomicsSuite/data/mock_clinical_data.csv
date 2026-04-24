@@ -1,0 +1,21 @@
+sample_id,patient_id,age,gender,race,ethnicity,primary_diagnosis,cancer_stage,tumor_grade,histology,treatment_status,chemotherapy,radiation_therapy,targeted_therapy,immunotherapy,surgery,response_to_treatment,overall_survival_days,progression_free_survival_days,metastasis_status,recurrence_status,comorbidities,smoking_status,alcohol_consumption,family_history
+S001,P001,65,Female,White,Non-Hispanic,Invasive Ductal Carcinoma,Stage IIB,Grade 2,Invasive Ductal Carcinoma,Active,Yes,Yes,Yes,No,Yes,Partial Response,450,320,No,No,Diabetes,Former,Moderate,Yes
+S002,P002,58,Male,Asian,Non-Hispanic,Adenocarcinoma,Stage IIIA,Grade 3,Adenocarcinoma,Active,Yes,Yes,Yes,Yes,Yes,Stable Disease,380,280,Yes,No,Hypertension,Current,Heavy,No
+S003,P003,72,Female,Black,Non-Hispanic,Adenocarcinoma,Stage IIA,Grade 2,Adenocarcinoma,Completed,Yes,No,No,No,Yes,Complete Response,520,450,No,No,None,Never,None,Yes
+S004,P004,61,Male,White,Hispanic,Adenocarcinoma,Stage IV,Grade 3,Adenocarcinoma,Active,Yes,Yes,Yes,Yes,No,Progressive Disease,180,120,Yes,Yes,COPD,Current,Heavy,No
+S005,P005,55,Female,White,Non-Hispanic,Serous Carcinoma,Stage IIIC,Grade 3,Serous Carcinoma,Active,Yes,Yes,Yes,No,Yes,Partial Response,300,220,No,No,Obesity,Former,Light,Yes
+S006,P006,68,Male,White,Non-Hispanic,Adenocarcinoma,Stage IV,Grade 3,Adenocarcinoma,Active,Yes,Yes,Yes,Yes,No,Stable Disease,200,150,Yes,No,Diabetes,Current,Moderate,No
+S007,P007,49,Female,White,Non-Hispanic,Melanoma,Stage IIIB,Grade 3,Melanoma,Active,No,Yes,Yes,Yes,Yes,Complete Response,400,350,No,No,None,Never,None,Yes
+S008,P008,74,Male,White,Non-Hispanic,Glioblastoma,Stage IV,Grade 4,Glioblastoma,Active,Yes,Yes,Yes,Yes,Yes,Progressive Disease,120,80,No,No,Stroke,Former,Moderate,No
+S009,P009,62,Female,Asian,Non-Hispanic,Hepatocellular Carcinoma,Stage IIIA,Grade 2,Hepatocellular Carcinoma,Active,Yes,No,Yes,Yes,Yes,Partial Response,350,280,No,No,Hepatitis B,Never,None,No
+S010,P010,59,Male,White,Non-Hispanic,Adenocarcinoma,Stage IIB,Grade 2,Adenocarcinoma,Completed,Yes,Yes,Yes,No,Yes,Complete Response,480,420,No,No,None,Former,Light,Yes
+S011,P011,67,Female,Black,Non-Hispanic,Invasive Ductal Carcinoma,Stage IIIA,Grade 3,Invasive Ductal Carcinoma,Active,Yes,Yes,Yes,Yes,Yes,Stable Disease,320,250,Yes,No,Diabetes,Former,Moderate,Yes
+S012,P012,53,Male,White,Non-Hispanic,Adenocarcinoma,Stage IV,Grade 3,Adenocarcinoma,Active,Yes,Yes,Yes,Yes,No,Progressive Disease,160,100,Yes,Yes,COPD,Current,Heavy,No
+S013,P013,71,Female,White,Non-Hispanic,Adenocarcinoma,Stage IIA,Grade 2,Adenocarcinoma,Completed,Yes,No,No,No,Yes,Complete Response,500,430,No,No,Hypertension,Never,None,No
+S014,P014,64,Male,Asian,Non-Hispanic,Adenocarcinoma,Stage IIIB,Grade 3,Adenocarcinoma,Active,Yes,Yes,Yes,Yes,Yes,Partial Response,280,200,No,No,None,Former,Light,Yes
+S015,P015,56,Female,White,Non-Hispanic,Serous Carcinoma,Stage IIIC,Grade 3,Serous Carcinoma,Active,Yes,Yes,Yes,No,Yes,Stable Disease,340,260,No,No,Obesity,Former,Moderate,Yes
+S016,P016,69,Male,White,Non-Hispanic,Adenocarcinoma,Stage IV,Grade 3,Adenocarcinoma,Active,Yes,Yes,Yes,Yes,No,Progressive Disease,190,130,Yes,No,Diabetes,Current,Heavy,No
+S017,P017,48,Female,White,Non-Hispanic,Melanoma,Stage IIIA,Grade 3,Melanoma,Active,No,Yes,Yes,Yes,Yes,Complete Response,420,380,No,No,None,Never,None,Yes
+S018,P018,75,Male,White,Non-Hispanic,Glioblastoma,Stage IV,Grade 4,Glioblastoma,Active,Yes,Yes,Yes,Yes,Yes,Progressive Disease,110,70,No,No,Stroke,Former,Moderate,No
+S019,P019,63,Female,Asian,Non-Hispanic,Hepatocellular Carcinoma,Stage IIIB,Grade 2,Hepatocellular Carcinoma,Active,Yes,No,Yes,Yes,Yes,Partial Response,330,270,No,No,Hepatitis B,Never,None,No
+S020,P020,60,Male,White,Non-Hispanic,Adenocarcinoma,Stage IIA,Grade 2,Adenocarcinoma,Completed,Yes,Yes,Yes,No,Yes,Complete Response,460,400,No,No,None,Former,Light,Yes

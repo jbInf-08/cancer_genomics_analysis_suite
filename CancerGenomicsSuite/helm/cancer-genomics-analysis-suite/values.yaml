@@ -1,0 +1,1555 @@
+# Default values for cancer-genomics-analysis-suite
+# This is a YAML-formatted file with Vault + SealedSecrets integration
+
+# Global configuration
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: ""
+  
+  # Cloud provider configuration
+  cloudProvider: ""  # aws, gcp, azure, or empty for generic
+  region: ""
+  
+  # Domain configuration
+  domain: ""
+  apiDomain: ""
+  
+  # Secrets management strategy
+  secretsStrategy: "vault"  # vault, sealed-secrets, cloud-manager, hybrid
+  
+  # Vault configuration
+  vault:
+    enabled: true
+    address: "https://vault.cancer-genomics.local"
+    namespace: "cancer-genomics"
+    authMethod: "kubernetes"  # kubernetes, aws, gcp, azure, token
+    role: "cancer-genomics-role"
+    path: "secret/cancer-genomics"
+    tls:
+      enabled: true
+      verify: true
+      caCert: ""
+      clientCert: ""
+      clientKey: ""
+    autoUnseal:
+      enabled: false
+      provider: "aws"  # aws, gcp, azure
+      keyName: "vault-unseal-key"
+    backup:
+      enabled: true
+      schedule: "0 2 * * *"  # Daily at 2 AM
+      retention: "30d"
+      storage:
+        type: "s3"  # s3, gcs, azure
+        bucket: "vault-backups"
+        region: "us-west-2"
+    monitoring:
+      enabled: true
+      metrics:
+        enabled: true
+        port: 8200
+        path: "/v1/sys/metrics"
+      healthCheck:
+        enabled: true
+        interval: "30s"
+        timeout: "10s"
+        retries: 3
+  
+  # AWS specific configuration
+  aws:
+    eksClusterName: ""
+    loadBalancerType: "nlb"  # nlb, alb, clb
+    s3Bucket: ""
+    rdsInstance: ""
+    elasticacheCluster: ""
+    secretsManager:
+      enabled: false
+      region: "us-west-2"
+      secrets:
+        - name: "cancer-genomics/database/password"
+          key: "POSTGRES_PASSWORD"
+        - name: "cancer-genomics/redis/password"
+          key: "REDIS_PASSWORD"
+        - name: "cancer-genomics/app/secret-key"
+          key: "SECRET_KEY"
+        - name: "cancer-genomics/app/jwt-secret"
+          key: "JWT_SECRET"
+    
+  # GCP specific configuration
+  gcp:
+    gkeClusterName: ""
+    projectId: ""
+    loadBalancerType: "external"  # external, internal
+    gcsBucket: ""
+    cloudSqlInstance: ""
+    memorystoreInstance: ""
+    secretManager:
+      enabled: false
+      projectId: ""
+      secrets:
+        - name: "cancer-genomics-database-password"
+          key: "POSTGRES_PASSWORD"
+        - name: "cancer-genomics-redis-password"
+          key: "REDIS_PASSWORD"
+        - name: "cancer-genomics-app-secret-key"
+          key: "SECRET_KEY"
+        - name: "cancer-genomics-app-jwt-secret"
+          key: "JWT_SECRET"
+    
+  # Azure specific configuration
+  azure:
+    aksClusterName: ""
+    resourceGroup: ""
+    loadBalancerType: "standard"  # standard, basic
+    storageAccount: ""
+    postgresqlServer: ""
+    redisCache: ""
+    keyVault:
+      enabled: false
+      name: ""
+      secrets:
+        - name: "cancer-genomics-database-password"
+          key: "POSTGRES_PASSWORD"
+        - name: "cancer-genomics-redis-password"
+          key: "REDIS_PASSWORD"
+        - name: "cancer-genomics-app-secret-key"
+          key: "SECRET_KEY"
+        - name: "cancer-genomics-app-jwt-secret"
+          key: "JWT_SECRET"
+
+# Image configuration
+image:
+  registry: docker.io
+  repository: your-username/cancer-genomics-analysis-suite
+  tag: latest
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+# Image pull secrets
+imagePullSecrets: []
+
+# Service account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsNonRoot: true
+
+# Container security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Web application configuration
+web:
+  replicaCount: 3
+  
+  image:
+    registry: docker.io
+    repository: your-username/cancer-genomics-analysis-suite
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 8050
+    targetPort: 8050
+    annotations: {}
+  
+  ingress:
+    enabled: false
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: cancer-genomics.yourdomain.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: cancer-genomics-tls
+        hosts:
+          - cancer-genomics.yourdomain.com
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  
+  # Environment variables
+  env:
+    - name: FLASK_ENV
+      value: "production"
+    - name: LOG_LEVEL
+      value: "INFO"
+  
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8050
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8050
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Celery worker configuration
+celery:
+  worker:
+    replicaCount: 2
+    
+    image:
+      registry: docker.io
+      repository: your-username/cancer-genomics-analysis-suite
+      tag: latest
+      pullPolicy: IfNotPresent
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    
+    # Environment variables
+    env:
+      - name: FLASK_ENV
+        value: "production"
+      - name: LOG_LEVEL
+        value: "INFO"
+  
+  beat:
+    replicaCount: 1
+    
+    image:
+      registry: docker.io
+      repository: your-username/cancer-genomics-analysis-suite
+      tag: latest
+      pullPolicy: IfNotPresent
+    
+    resources:
+      limits:
+        cpu: 200m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+    
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    
+    # Environment variables
+    env:
+      - name: FLASK_ENV
+        value: "production"
+      - name: LOG_LEVEL
+        value: "INFO"
+
+# Nginx configuration
+nginx:
+  enabled: true
+  replicaCount: 2
+  
+  image:
+    registry: docker.io
+    repository: nginx
+    tag: 1.25-alpine
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 80
+    annotations: {}
+  
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# PostgreSQL configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "postgres-password"
+    username: "postgres"
+    password: "postgres-password"
+    database: "genomics_db"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+# Redis configuration
+redis:
+  enabled: true
+  auth:
+    enabled: false
+    password: ""
+  
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+      storageClass: ""
+    
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: cancer-genomics.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: cancer-genomics-tls
+      hosts:
+        - cancer-genomics.yourdomain.com
+  
+  # API-specific ingress
+  api:
+    enabled: false
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/rate-limit: "1000"
+      nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    hosts:
+      - host: api.cancer-genomics.yourdomain.com
+        paths:
+          - path: /(.*)
+            pathType: Prefix
+    tls:
+      - secretName: api-cancer-genomics-tls
+        hosts:
+          - api.cancer-genomics.yourdomain.com
+  
+  # Admin-specific ingress
+  admin:
+    enabled: false
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/rate-limit: "10"
+      nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    hosts:
+      - host: admin.cancer-genomics.yourdomain.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: admin-cancer-genomics-tls
+        hosts:
+          - admin.cancer-genomics.yourdomain.com
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {}
+  
+  prometheusRule:
+    enabled: true
+    labels: {}
+  
+  grafana:
+    enabled: false
+    dashboard:
+      enabled: false
+  
+  alertmanager:
+    smtp:
+      smarthost: ""
+      from: ""
+      username: ""
+      password: ""
+    slack:
+      apiUrl: ""
+    webhook:
+      url: ""
+      critical: ""
+      security: ""
+    email:
+      default: "admin@yourdomain.com"
+      critical: "critical-alerts@yourdomain.com"
+      highImpact: "high-impact@yourdomain.com"
+      pipeline: "pipeline-alerts@yourdomain.com"
+      system: "system-alerts@yourdomain.com"
+      security: "security-alerts@yourdomain.com"
+      data: "data-alerts@yourdomain.com"
+
+# Enhanced Security configuration
+security:
+  # Network policies
+  networkPolicy:
+    enabled: false
+  
+  # mTLS configuration
+  mtls:
+    enabled: false
+    certificateDuration: "8760h"  # 1 year
+    renewBefore: "720h"  # 30 days
+    
+    # CA configuration (should be provided via external secrets)
+    ca:
+      cert: ""  # Base64 encoded CA certificate
+      key: ""   # Base64 encoded CA private key
+    
+    # Component certificates (should be provided via external secrets)
+    web:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+    
+    celery:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+    
+    postgresql:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+    
+    redis:
+      cert: ""  # Base64 encoded certificate
+      key: ""   # Base64 encoded private key
+  
+  # Secrets management
+  secrets:
+    rotation:
+      enabled: false
+      schedule: "0 2 * * *"  # Daily at 2 AM
+      rotateDbPassword: true
+      rotateRedisPassword: true
+      rotateAppSecrets: true
+      restartPods: true
+      image: "bitnami/kubectl:latest"
+    
+    audit:
+      enabled: false
+      schedule: "0 */6 * * *"  # Every 6 hours
+      webhookUrl: ""
+      image: "bitnami/kubectl:latest"
+    
+    validation:
+      enabled: false
+      image: "gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0"
+      rules:
+        - name: "password-strength"
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$"
+        - name: "jwt-secret-length"
+          minLength: 64
+  
+  # WAF configuration
+  waf:
+    enabled: false
+    replicas: 2
+    image: "nginx:1.25-alpine"
+    mode: "blocking"  # blocking, detection
+    logLevel: "info"
+  
+  # Security monitoring
+  monitoring:
+    enabled: false
+    interval: "30s"
+    scrapeTimeout: "10s"
+  
+  # Compliance monitoring
+  compliance:
+    enabled: false
+    interval: "60s"
+    scrapeTimeout: "15s"
+  
+  # Incident response
+  incidentResponse:
+    enabled: false
+    interval: "30s"
+    scrapeTimeout: "10s"
+  
+  # Certificate monitoring
+  certificateMonitoring:
+    enabled: false
+    schedule: "0 */6 * * *"  # Every 6 hours
+    alertWebhookUrl: ""
+    image: "bitnami/kubectl:latest"
+  
+  # Pod security policy
+  podSecurityPolicy:
+    enabled: false
+  
+  # RBAC
+  rbac:
+    create: true
+
+# Persistence configuration
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+
+# Configuration management
+config:
+  # Application configuration
+  app:
+    name: "Cancer Genomics Analysis Suite"
+    version: "1.0.0"
+    environment: "production"
+    debug: false
+  
+  # Database configuration
+  database:
+    host: "postgresql"
+    port: 5432
+    name: "genomics_db"
+    user: "postgres"
+    sslmode: "prefer"
+  
+  # Redis configuration
+  redis:
+    host: "redis-master"
+    port: 6379
+    db: 0
+    password: ""
+  
+  # Celery configuration
+  celery:
+    broker_url: "redis://redis-master:6379/0"
+    result_backend: "redis://redis-master:6379/0"
+    task_serializer: "json"
+    result_serializer: "json"
+    accept_content: ["json"]
+    timezone: "UTC"
+    enable_utc: true
+  
+  # External APIs
+  apis:
+    ensembl:
+      base_url: "https://rest.ensembl.org"
+      timeout: 30
+    uniprot:
+      base_url: "https://www.uniprot.org/uniprot"
+      timeout: 30
+    clinvar:
+      base_url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+      timeout: 30
+  
+  # Feature flags
+  features:
+    auth_enabled: true
+    api_enabled: true
+    dashboard_enabled: true
+    reporting_enabled: true
+    ml_enabled: true
+    blast_enabled: true
+    annotation_enabled: true
+
+# Secrets configuration
+secrets:
+  # Database secrets
+  database:
+    create: true
+    name: "postgres-secrets"
+    data:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres-password"
+      POSTGRES_DB: "genomics_db"
+  
+  # Application secrets
+  app:
+    create: true
+    name: "app-secrets"
+    data:
+      SECRET_KEY: "your-production-secret-key-change-this"
+      JWT_SECRET_KEY: "your-jwt-secret-key-change-this"
+  
+  # External API keys
+  apis:
+    create: false
+    name: "api-secrets"
+    data:
+      ENSEMBL_API_KEY: ""
+      UNIPROT_API_KEY: ""
+      CLINVAR_API_KEY: ""
+
+# Autoscaling configuration
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Network policies
+networkPolicy:
+  enabled: false
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8050
+
+# Service mesh configuration
+serviceMesh:
+  enabled: false
+  istio:
+    enabled: false
+    virtualService:
+      enabled: false
+    destinationRule:
+      enabled: false
+    gateway:
+      enabled: false
+
+# Backup configuration
+backup:
+  enabled: false
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "7d"
+  storage:
+    enabled: false
+    size: 50Gi
+    storageClass: ""
+
+# Development configuration
+dev:
+  enabled: false
+  hotReload: false
+  debugMode: false
+  logLevel: "DEBUG"
+
+# Argo Workflows configuration
+argoWorkflows:
+  enabled: false
+  namespace: "argo"
+  
+  # Workflow templates
+  templates:
+    blastPipeline:
+      enabled: true
+      image: "your-username/cancer-genomics-analysis-suite:latest"
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 4Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    
+    annotationPipeline:
+      enabled: true
+      image: "your-username/cancer-genomics-analysis-suite:latest"
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+    
+    mlPipeline:
+      enabled: true
+      image: "your-username/cancer-genomics-analysis-suite:latest"
+      resources:
+        limits:
+          cpu: 4000m
+          memory: 8Gi
+        requests:
+          cpu: 1000m
+          memory: 2Gi
+    
+    reportingPipeline:
+      enabled: true
+      image: "your-username/cancer-genomics-analysis-suite:latest"
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+  
+  # Workflow configuration
+  config:
+    workflowNamespace: "cancer-genomics-workflows"
+    serviceAccount: "argo-workflow-sa"
+    artifactRepository:
+      type: "s3"  # s3, gcs, azure
+      s3:
+        bucket: ""
+        region: ""
+        endpoint: ""
+        accessKeySecret:
+          name: "argo-workflow-artifacts"
+          key: "accesskey"
+        secretKeySecret:
+          name: "argo-workflow-artifacts"
+          key: "secretkey"
+      gcs:
+        bucket: ""
+        keyFormat: "{{workflow.namespace}}/{{workflow.name}}/{{pod.name}}"
+        serviceAccountKeySecret:
+          name: "argo-workflow-artifacts"
+          key: "serviceaccount.json"
+      azure:
+        container: ""
+        accountName: ""
+        accountKeySecret:
+          name: "argo-workflow-artifacts"
+          key: "accountkey"
+  
+  # Workflow scheduling
+  cronWorkflows:
+    enabled: false
+    schedules:
+      - name: "daily-blast-analysis"
+        schedule: "0 2 * * *"  # Daily at 2 AM
+        workflowTemplate: "blast-pipeline"
+      - name: "weekly-ml-training"
+        schedule: "0 3 * * 0"  # Weekly on Sunday at 3 AM
+        workflowTemplate: "ml-pipeline"
+  
+  # Workflow monitoring
+  monitoring:
+    enabled: true
+    prometheus:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+    grafana:
+      enabled: false
+      dashboard:
+        enabled: false
+
+# Kafka Configuration
+kafka:
+  enabled: true
+  replicaCount: 3
+  
+  image:
+    registry: confluentinc
+    repository: cp-kafka
+    tag: "7.4.0"
+    pullPolicy: IfNotPresent
+  
+  numPartitions: 3
+  replicationFactor: 3
+  
+  persistence:
+    enabled: true
+    size: 100Gi
+    storageClass: ""
+  
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+    requests:
+      cpu: 500m
+      memory: 1Gi
+  
+  sasl:
+    enabled: false
+    username: "kafka"
+    password: "kafka-password"
+  
+  env: []
+  
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# ZooKeeper Configuration
+zookeeper:
+  enabled: true
+  replicaCount: 3
+  
+  image:
+    registry: confluentinc
+    repository: cp-zookeeper
+    tag: "7.4.0"
+    pullPolicy: IfNotPresent
+  
+  persistence:
+    dataSize: 20Gi
+    logsSize: 10Gi
+    storageClass: ""
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  
+  env: []
+  
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Neo4j Configuration
+neo4j:
+  enabled: true
+  replicaCount: 1
+  
+  image:
+    registry: neo4j
+    repository: neo4j
+    tag: "5.15.0-enterprise"
+    pullPolicy: IfNotPresent
+  
+  auth:
+    username: "neo4j"
+    password: "neo4j-password"
+  
+  database:
+    name: "genomics"
+  
+  memory:
+    heapInitial: "1G"
+    heapMax: "4G"
+    pageCache: "2G"
+  
+  logging:
+    level: "INFO"
+  
+  persistence:
+    dataSize: 50Gi
+    logsSize: 10Gi
+    importSize: 20Gi
+    storageClass: ""
+  
+  resources:
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+  
+  gds:
+    licenseKey: ""
+  
+  env: []
+  
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# Kafka Stream Processors Configuration
+kafkaStreamProcessors:
+  enabled: true
+  
+  image:
+    registry: docker.io
+    repository: your-username/cancer-genomics-analysis-suite
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  topics:
+    mutations: "mutations"
+    alerts: "alerts"
+    clinicalFeeds: "clinical-feeds"
+    patientData: "patient-data"
+    analytics: "analytics"
+    metrics: "metrics"
+    workflowRequests: "workflow-requests"
+    workflowStatus: "workflow-status"
+    workflowTasks: "workflow-tasks"
+    taskStatus: "task-status"
+  
+  mutationAlert:
+    replicaCount: 2
+    webhookUrl: ""
+    email:
+      smtpHost: ""
+      smtpPort: "587"
+      from: ""
+      to: ""
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    env: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  
+  clinicalFeed:
+    replicaCount: 2
+    dataSources: ["epic", "cerner", "allscripts"]
+    validation:
+      enabled: true
+    anonymization:
+      enabled: true
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    env: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  
+  analytics:
+    replicaCount: 1
+    prometheusPushgateway: ""
+    windowSize: "5m"
+    aggregationInterval: "1m"
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    env: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+# Snakemake Workflows Configuration
+snakemakeWorkflows:
+  enabled: true
+  
+  image:
+    registry: docker.io
+    repository: your-username/cancer-genomics-analysis-suite
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  controller:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    env: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  
+  executor:
+    replicaCount: 2
+    maxConcurrentJobs: 10
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    env: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  
+  storage:
+    workflowsSize: 100Gi
+    outputsSize: 500Gi
+    storageClass: ""
+  
+  defaultResources:
+    cpu: "2"
+    memory: "4Gi"
+    disk: "10Gi"
+  
+  logging:
+    level: "INFO"
+  
+  retry:
+    maxAttempts: 3
+    backoffFactor: 2
+
+# Nextflow Workflows Configuration
+nextflowWorkflows:
+  enabled: true
+  
+  image:
+    registry: docker.io
+    repository: your-username/cancer-genomics-analysis-suite
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  controller:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    env: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  
+  executor:
+    replicaCount: 2
+    maxConcurrentJobs: 10
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    env: []
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  
+  storage:
+    workflowsSize: 100Gi
+    outputsSize: 500Gi
+    storageClass: ""
+  
+  defaultResources:
+    cpu: "2"
+    memory: "4Gi"
+    disk: "10Gi"
+  
+  logging:
+    level: "INFO"
+  
+  retry:
+    maxAttempts: 3
+    backoffFactor: 2
+
+# Certificates Configuration
+certificates:
+  letsencrypt:
+    email: "admin@yourdomain.com"
+  
+  monitoring:
+    webhookUrl: ""
+
+# Enhanced Secrets Management Configuration
+secretsManagement:
+  # Primary strategy: vault, sealed-secrets, cloud-manager, hybrid
+  strategy: "vault"
+  
+  # Vault integration
+  vault:
+    enabled: true
+    address: "https://vault.cancer-genomics.local"
+    namespace: "cancer-genomics"
+    authMethod: "kubernetes"
+    role: "cancer-genomics-role"
+    path: "secret/cancer-genomics"
+    
+    # Secret paths and policies
+    paths:
+      database: "secret/cancer-genomics/database"
+      app: "secret/cancer-genomics/app"
+      redis: "secret/cancer-genomics/redis"
+      neo4j: "secret/cancer-genomics/neo4j"
+      kafka: "secret/cancer-genomics/kafka"
+      apis: "secret/cancer-genomics/apis"
+      oauth: "secret/cancer-genomics/oauth"
+      cloud: "secret/cancer-genomics/cloud"
+      monitoring: "secret/cancer-genomics/monitoring"
+      notifications: "secret/cancer-genomics/notifications"
+    
+    # Secret rotation configuration
+    rotation:
+      enabled: true
+      schedule: "0 2 * * *"  # Daily at 2 AM
+      policies:
+        database:
+          enabled: true
+          interval: "30d"  # Rotate every 30 days
+          autoRestart: true
+        app:
+          enabled: true
+          interval: "90d"  # Rotate every 90 days
+          autoRestart: true
+        redis:
+          enabled: true
+          interval: "30d"
+          autoRestart: true
+        neo4j:
+          enabled: true
+          interval: "30d"
+          autoRestart: true
+        kafka:
+          enabled: true
+          interval: "30d"
+          autoRestart: true
+        apis:
+          enabled: false  # Manual rotation for API keys
+          interval: "365d"
+          autoRestart: false
+        oauth:
+          enabled: false  # Manual rotation for OAuth secrets
+          interval: "365d"
+          autoRestart: false
+        cloud:
+          enabled: true
+          interval: "90d"
+          autoRestart: true
+        monitoring:
+          enabled: true
+          interval: "60d"
+          autoRestart: true
+        notifications:
+          enabled: true
+          interval: "60d"
+          autoRestart: true
+    
+    # Secret validation
+    validation:
+      enabled: true
+      rules:
+        password:
+          minLength: 16
+          requireUppercase: true
+          requireLowercase: true
+          requireNumbers: true
+          requireSpecialChars: true
+        jwtSecret:
+          minLength: 64
+          requireRandom: true
+        apiKey:
+          minLength: 32
+          requireRandom: true
+    
+    # Audit logging
+    audit:
+      enabled: true
+      logLevel: "INFO"
+      retention: "90d"
+      webhook:
+        enabled: false
+        url: ""
+        headers: {}
+  
+  # SealedSecrets integration (fallback/backup)
+  sealedSecrets:
+    enabled: true
+    controller:
+      namespace: "kube-system"
+      name: "sealed-secrets-controller"
+      publicKey: ""  # Will be auto-discovered if empty
+    
+    # Sealed secret templates
+    templates:
+      database:
+        name: "postgres-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres-password"
+          POSTGRES_DB: "genomics_db"
+      
+      app:
+        name: "app-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          SECRET_KEY: "your-production-secret-key-change-this"
+          JWT_SECRET_KEY: "your-jwt-secret-key-change-this"
+          FLASK_SECRET_KEY: "your-flask-secret-key-change-this"
+      
+      redis:
+        name: "redis-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          REDIS_PASSWORD: "redis-password"
+      
+      neo4j:
+        name: "neo4j-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          NEO4J_USERNAME: "neo4j"
+          NEO4J_PASSWORD: "neo4j-password"
+          NEO4J_GDS_LICENSE_KEY: ""
+      
+      kafka:
+        name: "kafka-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          KAFKA_USERNAME: "kafka"
+          KAFKA_PASSWORD: "kafka-password"
+          KAFKA_JAAS_CONFIG: ""
+      
+      apis:
+        name: "api-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          ENSEMBL_API_KEY: ""
+          UNIPROT_API_KEY: ""
+          CLINVAR_API_KEY: ""
+          COSMIC_API_KEY: ""
+          NCBI_API_KEY: ""
+      
+      oauth:
+        name: "oauth-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          GOOGLE_CLIENT_ID: ""
+          GOOGLE_CLIENT_SECRET: ""
+          GITHUB_CLIENT_ID: ""
+          GITHUB_CLIENT_SECRET: ""
+          MICROSOFT_CLIENT_ID: ""
+          MICROSOFT_CLIENT_SECRET: ""
+      
+      aws:
+        name: "aws-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          AWS_ACCESS_KEY_ID: ""
+          AWS_SECRET_ACCESS_KEY: ""
+          AWS_SESSION_TOKEN: ""
+          AWS_REGION: "us-west-2"
+      
+      gcp:
+        name: "gcp-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          GCP_PROJECT_ID: ""
+          GCP_SERVICE_ACCOUNT_KEY: ""
+          GOOGLE_APPLICATION_CREDENTIALS: ""
+      
+      azure:
+        name: "azure-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          AZURE_CLIENT_ID: ""
+          AZURE_CLIENT_SECRET: ""
+          AZURE_TENANT_ID: ""
+          AZURE_SUBSCRIPTION_ID: ""
+      
+      monitoring:
+        name: "monitoring-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          PROMETHEUS_PASSWORD: ""
+          GRAFANA_PASSWORD: ""
+          ALERTMANAGER_WEBHOOK_URL: ""
+      
+      notifications:
+        name: "notifications-sealed-secret"
+        namespace: "cancer-genomics"
+        data:
+          SMTP_HOST: ""
+          SMTP_PORT: "587"
+          SMTP_USERNAME: ""
+          SMTP_PASSWORD: ""
+          SLACK_WEBHOOK_URL: ""
+          DISCORD_WEBHOOK_URL: ""
+          TEAMS_WEBHOOK_URL: ""
+  
+  # Cloud Secret Manager integration
+  cloudSecretManager:
+    enabled: false
+    provider: "aws"  # aws, gcp, azure
+    
+    aws:
+      region: "us-west-2"
+      secrets:
+        - name: "cancer-genomics/database/password"
+          key: "POSTGRES_PASSWORD"
+          rotation: true
+          interval: "30d"
+        - name: "cancer-genomics/redis/password"
+          key: "REDIS_PASSWORD"
+          rotation: true
+          interval: "30d"
+        - name: "cancer-genomics/app/secret-key"
+          key: "SECRET_KEY"
+          rotation: true
+          interval: "90d"
+        - name: "cancer-genomics/app/jwt-secret"
+          key: "JWT_SECRET"
+          rotation: true
+          interval: "90d"
+    
+    gcp:
+      projectId: ""
+      secrets:
+        - name: "cancer-genomics-database-password"
+          key: "POSTGRES_PASSWORD"
+          rotation: true
+          interval: "30d"
+        - name: "cancer-genomics-redis-password"
+          key: "REDIS_PASSWORD"
+          rotation: true
+          interval: "30d"
+        - name: "cancer-genomics-app-secret-key"
+          key: "SECRET_KEY"
+          rotation: true
+          interval: "90d"
+        - name: "cancer-genomics-app-jwt-secret"
+          key: "JWT_SECRET"
+          rotation: true
+          interval: "90d"
+    
+    azure:
+      keyVaultName: ""
+      secrets:
+        - name: "cancer-genomics-database-password"
+          key: "POSTGRES_PASSWORD"
+          rotation: true
+          interval: "30d"
+        - name: "cancer-genomics-redis-password"
+          key: "REDIS_PASSWORD"
+          rotation: true
+          interval: "30d"
+        - name: "cancer-genomics-app-secret-key"
+          key: "SECRET_KEY"
+          rotation: true
+          interval: "90d"
+        - name: "cancer-genomics-app-jwt-secret"
+          key: "JWT_SECRET"
+          rotation: true
+          interval: "90d"
+  
+  # Secret injection and monitoring
+  injection:
+    enabled: true
+    strategy: "init-container"  # init-container, sidecar, operator
+    
+    initContainer:
+      image: "vault:1.15.2"
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+    
+    sidecar:
+      image: "vault:1.15.2"
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
+    
+    operator:
+      enabled: false
+      image: "hashicorp/vault-secrets-operator:0.3.0"
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+  
+  # Secret monitoring and alerting
+  monitoring:
+    enabled: true
+    
+    metrics:
+      enabled: true
+      port: 9090
+      path: "/metrics"
+    
+    alerts:
+      enabled: true
+      rules:
+        - name: "SecretRotationFailed"
+          condition: "secret_rotation_failed > 0"
+          severity: "critical"
+          message: "Secret rotation failed for {{ $labels.secret_name }}"
+        
+        - name: "SecretInjectionFailed"
+          condition: "secret_injection_failed > 0"
+          severity: "critical"
+          message: "Secret injection failed for pod {{ $labels.pod_name }}"
+        
+        - name: "SecretExpiringSoon"
+          condition: "secret_expires_in_hours < 24"
+          severity: "warning"
+          message: "Secret {{ $labels.secret_name }} expires in {{ $value }} hours"
+        
+        - name: "VaultUnavailable"
+          condition: "vault_health_status != 1"
+          severity: "critical"
+          message: "Vault is unavailable or unhealthy"
+        
+        - name: "SealedSecretsControllerDown"
+          condition: "sealed_secrets_controller_up != 1"
+          severity: "critical"
+          message: "SealedSecrets controller is down"
+    
+    dashboards:
+      enabled: true
+      grafana:
+        enabled: true
+        dashboardId: "secrets-management"
+        refreshInterval: "30s"
+
+# CI/CD Pipeline configuration
+cicd:
+  enabled: false
+  
+  # GitHub Actions
+  github:
+    enabled: false
+    repository: "your-org/cancer-genomics-analysis-suite"
+    branch: "main"
+    secrets:
+      - name: "DOCKER_USERNAME"
+      - name: "DOCKER_PASSWORD"
+      - name: "KUBECONFIG"
+      - name: "HELM_REPO"
+  
+  # GitLab CI
+  gitlab:
+    enabled: false
+    repository: "your-org/cancer-genomics-analysis-suite"
+    branch: "main"
+    variables:
+      - name: "DOCKER_USERNAME"
+      - name: "DOCKER_PASSWORD"
+      - name: "KUBECONFIG"
+      - name: "HELM_REPO"
+  
+  # Jenkins
+  jenkins:
+    enabled: false
+    url: ""
+    credentials:
+      - name: "docker-credentials"
+      - name: "kube-credentials"
+  
+  # Deployment strategies
+  deployment:
+    strategy: "rolling"  # rolling, blue-green, canary
+    environments:
+      - name: "dev"
+        namespace: "cancer-genomics-dev"
+        replicas: 1
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+      - name: "staging"
+        namespace: "cancer-genomics-staging"
+        replicas: 2
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+      - name: "production"
+        namespace: "cancer-genomics-prod"
+        replicas: 3
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi

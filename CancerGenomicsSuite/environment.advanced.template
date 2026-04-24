@@ -1,0 +1,243 @@
+# Advanced Technologies Configuration Template
+# Copy this file to .env and configure according to your setup
+
+# =============================================================================
+# PIPELINE ORCHESTRATION CONFIGURATION
+# =============================================================================
+
+# Nextflow Configuration
+NEXTFLOW_ENABLED=true
+NEXTFLOW_EXECUTABLE=nextflow
+NEXTFLOW_WORK_DIR=nextflow_work
+NEXTFLOW_CACHE_DIR=nextflow_cache
+NEXTFLOW_CONFIG_FILE=nextflow.config
+
+# Snakemake Configuration
+SNAKEMAKE_ENABLED=true
+SNAKEMAKE_EXECUTABLE=snakemake
+SNAKEMAKE_WORK_DIR=snakemake_work
+SNAKEMAKE_CONFIG_FILE=snakemake_config.yaml
+
+# Pipeline Execution Settings
+MAX_CONCURRENT_PIPELINES=5
+PIPELINE_TIMEOUT=7200
+ENABLE_PIPELINE_MONITORING=true
+DEFAULT_MEMORY_LIMIT=8GB
+DEFAULT_CPU_LIMIT=4
+ENABLE_RESOURCE_TRACKING=true
+
+# =============================================================================
+# GRAPH ANALYTICS CONFIGURATION
+# =============================================================================
+
+# Neo4j Configuration
+NEO4J_ENABLED=true
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=your_neo4j_password
+NEO4J_DATABASE=neo4j
+
+# NetworkX Configuration
+NETWORKX_ENABLED=true
+NETWORKX_CACHE_SIZE=1000
+NETWORKX_PARALLEL_PROCESSING=true
+
+# Graph Visualization Settings
+ENABLE_INTERACTIVE_VISUALIZATION=true
+MAX_NODES_FOR_VISUALIZATION=10000
+VISUALIZATION_EXPORT_FORMATS=png,svg,html
+
+# Graph Analysis Settings
+ENABLE_CENTRALITY_ANALYSIS=true
+ENABLE_COMMUNITY_DETECTION=true
+ENABLE_PATHWAY_ANALYSIS=true
+
+# =============================================================================
+# APACHE KAFKA CONFIGURATION
+# =============================================================================
+
+# Kafka Connection Settings
+KAFKA_ENABLED=false
+KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+KAFKA_CLIENT_ID=cancer_genomics_kafka
+KAFKA_SECURITY_PROTOCOL=PLAINTEXT
+
+# Kafka Producer Settings
+KAFKA_PRODUCER_ACKS=all
+KAFKA_PRODUCER_RETRIES=3
+KAFKA_PRODUCER_BATCH_SIZE=16384
+KAFKA_PRODUCER_LINGER_MS=10
+
+# Kafka Consumer Settings
+KAFKA_CONSUMER_GROUP_ID=cancer_genomics_group
+KAFKA_CONSUMER_AUTO_OFFSET_RESET=earliest
+KAFKA_CONSUMER_ENABLE_AUTO_COMMIT=true
+KAFKA_CONSUMER_MAX_POLL_RECORDS=500
+
+# Kafka Topics
+KAFKA_DATA_TOPIC=genomics_data
+KAFKA_RESULTS_TOPIC=analysis_results
+KAFKA_ALERTS_TOPIC=alerts
+
+# Kafka Streaming Settings
+ENABLE_STREAM_PROCESSING=true
+STREAM_PROCESSING_PARALLELISM=4
+STREAM_PROCESSING_TIMEOUT=300
+
+# =============================================================================
+# OAUTH2 AUTHENTICATION CONFIGURATION
+# =============================================================================
+
+# OAuth2 General Settings
+OAUTH2_ENABLED=true
+OAUTH2_BASE_URL=http://localhost:5000
+OAUTH2_SESSION_TIMEOUT=3600
+OAUTH2_CSRF_PROTECTION=true
+
+# Keycloak Configuration
+KEYCLOAK_ENABLED=false
+KEYCLOAK_SERVER_URL=http://localhost:8080
+KEYCLOAK_REALM=cancer-genomics
+KEYCLOAK_CLIENT_ID=cancer-genomics-app
+KEYCLOAK_CLIENT_SECRET=your_keycloak_client_secret
+
+# Auth0 Configuration
+AUTH0_ENABLED=false
+AUTH0_DOMAIN=your-domain.auth0.com
+AUTH0_CLIENT_ID=your_auth0_client_id
+AUTH0_CLIENT_SECRET=your_auth0_client_secret
+
+# JWT Token Settings
+JWT_SECRET_KEY=your_jwt_secret_key_here
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRY=3600
+JWT_REFRESH_TOKEN_EXPIRY=604800
+
+# User Management Settings
+USER_REGISTRATION_ENABLED=true
+USER_EMAIL_VERIFICATION_REQUIRED=false
+MAX_TOKENS_PER_USER=5
+TOKEN_ROTATION_ENABLED=true
+
+# =============================================================================
+# FEATURE FLAGS
+# =============================================================================
+
+# Enable/Disable Advanced Technologies
+ENABLE_PIPELINE_ORCHESTRATION=true
+ENABLE_GRAPH_ANALYTICS=true
+ENABLE_KAFKA_STREAMING=false
+ENABLE_OAUTH2_AUTH=true
+
+# =============================================================================
+# EXTERNAL SERVICE CONFIGURATION
+# =============================================================================
+
+# Neo4j Cloud (if using Neo4j AuraDB)
+# NEO4J_URI=neo4j+s://your-instance.databases.neo4j.io
+# NEO4J_USERNAME=neo4j
+# NEO4J_PASSWORD=your_aura_password
+
+# Kafka Cloud (if using Confluent Cloud)
+# KAFKA_BOOTSTRAP_SERVERS=pkc-xxxxx.us-west-2.aws.confluent.cloud:9092
+# KAFKA_SECURITY_PROTOCOL=SASL_SSL
+# KAFKA_SASL_MECHANISM=PLAIN
+# KAFKA_SASL_USERNAME=your_confluent_api_key
+# KAFKA_SASL_PASSWORD=your_confluent_secret
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+
+# SSL/TLS Settings
+SSL_ENABLED=false
+SSL_CERT_FILE=path/to/cert.pem
+SSL_KEY_FILE=path/to/key.pem
+
+# CORS Settings
+CORS_ENABLED=true
+CORS_ORIGINS=*
+CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS
+CORS_HEADERS=Content-Type,Authorization
+CORS_SUPPORTS_CREDENTIALS=true
+
+# =============================================================================
+# MONITORING AND LOGGING
+# =============================================================================
+
+# Logging Configuration
+LOG_LEVEL=INFO
+LOG_FORMAT=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+LOG_FILE=logs/advanced_technologies.log
+
+# Monitoring Settings
+ENABLE_METRICS=true
+METRICS_PORT=9090
+ENABLE_HEALTH_CHECKS=true
+HEALTH_CHECK_INTERVAL=30
+
+# =============================================================================
+# DEVELOPMENT SETTINGS
+# =============================================================================
+
+# Development Mode
+DEBUG=false
+TESTING=false
+MOCK_EXTERNAL_APIS=false
+
+# Development Tools
+ENABLE_DEBUG_TOOLBAR=false
+ENABLE_PROFILER=false
+ENABLE_SQL_LOGGING=false
+
+# =============================================================================
+# DEPLOYMENT SETTINGS
+# =============================================================================
+
+# Environment
+ENVIRONMENT=development
+FLASK_ENV=development
+
+# Server Configuration
+HOST=0.0.0.0
+PORT=5000
+WORKERS=1
+
+# Database Configuration (if using external database)
+DATABASE_URL=sqlite:///cancer_genomics.db
+REDIS_URL=redis://localhost:6379/0
+
+# =============================================================================
+# NOTES
+# =============================================================================
+
+# 1. Pipeline Orchestration:
+#    - Ensure Nextflow and Snakemake are installed and accessible
+#    - Configure appropriate resource limits for your environment
+#    - Set up proper working directories with sufficient disk space
+
+# 2. Graph Analytics:
+#    - Install and configure Neo4j server
+#    - Ensure NetworkX dependencies are installed
+#    - Configure appropriate cache sizes for your data
+
+# 3. Kafka Streaming:
+#    - Install and configure Apache Kafka
+#    - Set up appropriate topics and partitions
+#    - Configure security settings for production use
+
+# 4. OAuth2 Authentication:
+#    - Set up Keycloak or Auth0 instance
+#    - Configure client applications and secrets
+#    - Set up proper JWT token management
+
+# 5. Security:
+#    - Use strong passwords and secrets
+#    - Enable SSL/TLS in production
+#    - Configure proper CORS settings
+#    - Implement proper access controls
+
+# 6. Monitoring:
+#    - Set up monitoring for all services
+#    - Configure appropriate log levels
+#    - Implement health checks and alerts

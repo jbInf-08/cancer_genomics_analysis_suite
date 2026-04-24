@@ -1,0 +1,599 @@
+{{- if .Values.monitoring.enabled }}
+# PrometheusRule for mutation alerts
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-mutation-alerts
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: monitoring
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+  - name: cancer-genomics-mutation-alerts
+    rules:
+    # High-impact mutation detected
+    - alert: HighImpactMutationDetected
+      expr: increase(cancer_genomics_mutations_high_impact_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        category: mutation
+        impact: high
+      annotations:
+        summary: "High-impact mutation detected in patient sample"
+        description: "A high-impact mutation has been detected in patient sample {{ $labels.sample_id }}. Gene: {{ $labels.gene }}, Variant: {{ $labels.variant }}, Impact: {{ $labels.impact }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/high-impact-mutation"
+    
+    # Novel mutation detected
+    - alert: NovelMutationDetected
+      expr: increase(cancer_genomics_mutations_novel_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        category: mutation
+        type: novel
+      annotations:
+        summary: "Novel mutation detected in patient sample"
+        description: "A novel mutation has been detected in patient sample {{ $labels.sample_id }}. Gene: {{ $labels.gene }}, Variant: {{ $labels.variant }}, Clinical significance: {{ $labels.clinical_significance }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/novel-mutation"
+    
+    # Pathogenic mutation detected
+    - alert: PathogenicMutationDetected
+      expr: increase(cancer_genomics_mutations_pathogenic_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        category: mutation
+        pathogenicity: pathogenic
+      annotations:
+        summary: "Pathogenic mutation detected in patient sample"
+        description: "A pathogenic mutation has been detected in patient sample {{ $labels.sample_id }}. Gene: {{ $labels.gene }}, Variant: {{ $labels.variant }}, ClinVar ID: {{ $labels.clinvar_id }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/pathogenic-mutation"
+    
+    # Drug resistance mutation detected
+    - alert: DrugResistanceMutationDetected
+      expr: increase(cancer_genomics_mutations_drug_resistance_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        category: mutation
+        type: drug_resistance
+      annotations:
+        summary: "Drug resistance mutation detected"
+        description: "A drug resistance mutation has been detected in patient sample {{ $labels.sample_id }}. Gene: {{ $labels.gene }}, Variant: {{ $labels.variant }}, Drug: {{ $labels.drug }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/drug-resistance-mutation"
+    
+    # High mutation burden detected
+    - alert: HighMutationBurdenDetected
+      expr: cancer_genomics_mutation_burden_per_mb > 10
+      for: 5m
+      labels:
+        severity: warning
+        category: mutation
+        type: burden
+      annotations:
+        summary: "High mutation burden detected in patient sample"
+        description: "High mutation burden ({{ $value }} mutations/Mb) detected in patient sample {{ $labels.sample_id }}. This may indicate microsatellite instability or DNA repair deficiency."
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/high-mutation-burden"
+    
+    # Microsatellite instability detected
+    - alert: MicrosatelliteInstabilityDetected
+      expr: cancer_genomics_msi_status == 1
+      for: 0m
+      labels:
+        severity: warning
+        category: mutation
+        type: msi
+      annotations:
+        summary: "Microsatellite instability detected"
+        description: "Microsatellite instability (MSI) has been detected in patient sample {{ $labels.sample_id }}. MSI score: {{ $labels.msi_score }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/microsatellite-instability"
+    
+    # Copy number variation detected
+    - alert: SignificantCopyNumberVariationDetected
+      expr: abs(cancer_genomics_copy_number_variation) > 2
+      for: 0m
+      labels:
+        severity: warning
+        category: mutation
+        type: cnv
+      annotations:
+        summary: "Significant copy number variation detected"
+        description: "Significant copy number variation (CNV: {{ $value }}) detected in patient sample {{ $labels.sample_id }}. Gene: {{ $labels.gene }}, Chromosome: {{ $labels.chromosome }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/copy-number-variation"
+    
+    # Fusion gene detected
+    - alert: FusionGeneDetected
+      expr: increase(cancer_genomics_fusion_genes_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        category: mutation
+        type: fusion
+      annotations:
+        summary: "Fusion gene detected in patient sample"
+        description: "A fusion gene has been detected in patient sample {{ $labels.sample_id }}. Fusion: {{ $labels.fusion_gene }}, Breakpoint: {{ $labels.breakpoint }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/fusion-gene"
+    
+    # Tumor mutational burden high
+    - alert: HighTumorMutationalBurden
+      expr: cancer_genomics_tmb_per_mb > 20
+      for: 5m
+      labels:
+        severity: warning
+        category: mutation
+        type: tmb
+      annotations:
+        summary: "High tumor mutational burden detected"
+        description: "High tumor mutational burden ({{ $value }} mutations/Mb) detected in patient sample {{ $labels.sample_id }}. This may indicate immunotherapy response potential."
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/high-tmb"
+    
+    # Homologous recombination deficiency detected
+    - alert: HomologousRecombinationDeficiencyDetected
+      expr: cancer_genomics_hrd_score > 42
+      for: 0m
+      labels:
+        severity: warning
+        category: mutation
+        type: hrd
+      annotations:
+        summary: "Homologous recombination deficiency detected"
+        description: "Homologous recombination deficiency (HRD) detected in patient sample {{ $labels.sample_id }}. HRD score: {{ $value }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/hrd-detection"
+
+  - name: cancer-genomics-pipeline-alerts
+    rules:
+    # Pipeline failure
+    - alert: PipelineFailure
+      expr: increase(cancer_genomics_pipeline_failures_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        category: pipeline
+      annotations:
+        summary: "Cancer genomics pipeline failure"
+        description: "Pipeline {{ $labels.pipeline_name }} has failed for sample {{ $labels.sample_id }}. Error: {{ $labels.error_message }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/pipeline-failure"
+    
+    # Pipeline timeout
+    - alert: PipelineTimeout
+      expr: cancer_genomics_pipeline_duration_seconds > 86400
+      for: 5m
+      labels:
+        severity: warning
+        category: pipeline
+      annotations:
+        summary: "Cancer genomics pipeline timeout"
+        description: "Pipeline {{ $labels.pipeline_name }} has been running for more than 24 hours for sample {{ $labels.sample_id }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/pipeline-timeout"
+    
+    # Low pipeline success rate
+    - alert: LowPipelineSuccessRate
+      expr: rate(cancer_genomics_pipeline_successes_total[1h]) / rate(cancer_genomics_pipeline_attempts_total[1h]) < 0.8
+      for: 10m
+      labels:
+        severity: warning
+        category: pipeline
+      annotations:
+        summary: "Low pipeline success rate"
+        description: "Pipeline {{ $labels.pipeline_name }} success rate is below 80% over the last hour"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/low-success-rate"
+
+  - name: cancer-genomics-system-alerts
+    rules:
+    # High memory usage
+    - alert: HighMemoryUsage
+      expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) > 0.9
+      for: 5m
+      labels:
+        severity: warning
+        category: system
+      annotations:
+        summary: "High memory usage in {{ $labels.container_name }}"
+        description: "Container {{ $labels.container_name }} in pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} of its memory limit"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/high-memory-usage"
+    
+    # High CPU usage
+    - alert: HighCPUUsage
+      expr: rate(container_cpu_usage_seconds_total[5m]) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+        category: system
+      annotations:
+        summary: "High CPU usage in {{ $labels.container_name }}"
+        description: "Container {{ $labels.container_name }} in pod {{ $labels.pod }} is using {{ $value | humanizePercentage }} CPU"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/high-cpu-usage"
+    
+    # Disk space low
+    - alert: LowDiskSpace
+      expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+      for: 5m
+      labels:
+        severity: critical
+        category: system
+      annotations:
+        summary: "Low disk space on {{ $labels.instance }}"
+        description: "Node {{ $labels.instance }} has only {{ $value | humanizePercentage }} disk space remaining on {{ $labels.mountpoint }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/low-disk-space"
+    
+    # Pod restarting frequently
+    - alert: PodRestartingFrequently
+      expr: rate(kube_pod_container_status_restarts_total[15m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+        category: system
+      annotations:
+        summary: "Pod {{ $labels.pod }} is restarting frequently"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting {{ $value }} times per second"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/pod-restarting"
+
+  - name: cancer-genomics-data-alerts
+    rules:
+    # Data processing lag
+    - alert: DataProcessingLag
+      expr: cancer_genomics_data_processing_lag_seconds > 3600
+      for: 10m
+      labels:
+        severity: warning
+        category: data
+      annotations:
+        summary: "Data processing lag detected"
+        description: "Data processing is lagging by {{ $value | humanizeDuration }} for data source {{ $labels.data_source }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/data-processing-lag"
+    
+    # Data quality issues
+    - alert: DataQualityIssues
+      expr: increase(cancer_genomics_data_quality_issues_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        category: data
+      annotations:
+        summary: "Data quality issues detected"
+        description: "Data quality issues detected in sample {{ $labels.sample_id }}. Issue: {{ $labels.issue_type }}, Severity: {{ $labels.severity }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/data-quality-issues"
+    
+    # Missing reference data
+    - alert: MissingReferenceData
+      expr: cancer_genomics_reference_data_availability == 0
+      for: 5m
+      labels:
+        severity: critical
+        category: data
+      annotations:
+        summary: "Reference data unavailable"
+        description: "Reference data {{ $labels.reference_type }} is not available for analysis"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/missing-reference-data"
+
+  - name: cancer-genomics-security-alerts
+    rules:
+    # Unauthorized access attempt
+    - alert: UnauthorizedAccessAttempt
+      expr: increase(cancer_genomics_unauthorized_access_attempts_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        category: security
+      annotations:
+        summary: "Unauthorized access attempt detected"
+        description: "Unauthorized access attempt detected from IP {{ $labels.source_ip }} to endpoint {{ $labels.endpoint }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/unauthorized-access"
+    
+    # Suspicious data access pattern
+    - alert: SuspiciousDataAccessPattern
+      expr: rate(cancer_genomics_data_access_requests_total[5m]) > 100
+      for: 5m
+      labels:
+        severity: warning
+        category: security
+      annotations:
+        summary: "Suspicious data access pattern detected"
+        description: "High rate of data access requests ({{ $value }} requests/second) from user {{ $labels.user_id }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/suspicious-access-pattern"
+    
+    # Certificate expiration warning
+    - alert: CertificateExpiringSoon
+      expr: (certmanager_certificate_expiration_timestamp_seconds - time()) < 2592000
+      for: 0m
+      labels:
+        severity: warning
+        category: security
+      annotations:
+        summary: "Certificate expiring soon"
+        description: "Certificate {{ $labels.name }} expires in {{ $value | humanizeDuration }}"
+        runbook_url: "https://docs.cancer-genomics.com/runbooks/certificate-expiration"
+
+---
+# Alertmanager configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-alertmanager-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: monitoring
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: '{{ .Values.monitoring.alertmanager.smtp.smarthost }}'
+      smtp_from: '{{ .Values.monitoring.alertmanager.smtp.from }}'
+      smtp_auth_username: '{{ .Values.monitoring.alertmanager.smtp.username }}'
+      smtp_auth_password: '{{ .Values.monitoring.alertmanager.smtp.password }}'
+      
+      # Slack configuration
+      slack_api_url: '{{ .Values.monitoring.alertmanager.slack.apiUrl }}'
+      
+      # Webhook configuration
+      webhook_url: '{{ .Values.monitoring.alertmanager.webhook.url }}'
+      
+    # Alert routing
+    route:
+      group_by: ['alertname', 'category', 'severity']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 1h
+      receiver: 'default'
+      routes:
+      # Critical mutations - immediate notification
+      - match:
+          severity: critical
+          category: mutation
+        receiver: 'critical-mutation-alerts'
+        group_wait: 0s
+        repeat_interval: 0s
+        
+      # High-impact mutations - immediate notification
+      - match:
+          severity: critical
+          impact: high
+        receiver: 'high-impact-alerts'
+        group_wait: 0s
+        repeat_interval: 0s
+        
+      # Pipeline failures - immediate notification
+      - match:
+          category: pipeline
+        receiver: 'pipeline-alerts'
+        group_wait: 30s
+        repeat_interval: 30m
+        
+      # System alerts - delayed notification
+      - match:
+          category: system
+        receiver: 'system-alerts'
+        group_wait: 5m
+        repeat_interval: 2h
+        
+      # Security alerts - immediate notification
+      - match:
+          category: security
+        receiver: 'security-alerts'
+        group_wait: 0s
+        repeat_interval: 0s
+        
+      # Data alerts - delayed notification
+      - match:
+          category: data
+        receiver: 'data-alerts'
+        group_wait: 10m
+        repeat_interval: 1h
+
+    # Receivers
+    receivers:
+    - name: 'default'
+      email_configs:
+      - to: '{{ .Values.monitoring.alertmanager.email.default }}'
+        subject: 'Cancer Genomics Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Category: {{ .Labels.category }}
+          {{ end }}
+          
+    - name: 'critical-mutation-alerts'
+      email_configs:
+      - to: '{{ .Values.monitoring.alertmanager.email.critical }}'
+        subject: 'CRITICAL: High-Impact Mutation Detected'
+        body: |
+          CRITICAL MUTATION ALERT
+          ======================
+          
+          {{ range .Alerts }}
+          Sample ID: {{ .Labels.sample_id }}
+          Gene: {{ .Labels.gene }}
+          Variant: {{ .Labels.variant }}
+          Impact: {{ .Labels.impact }}
+          
+          Description: {{ .Annotations.description }}
+          Runbook: {{ .Annotations.runbook_url }}
+          {{ end }}
+          
+      slack_configs:
+      - channel: '#critical-alerts'
+        title: 'CRITICAL: High-Impact Mutation Detected'
+        text: |
+          {{ range .Alerts }}
+          *Sample:* {{ .Labels.sample_id }}
+          *Gene:* {{ .Labels.gene }}
+          *Variant:* {{ .Labels.variant }}
+          *Impact:* {{ .Labels.impact }}
+          
+          {{ .Annotations.description }}
+          {{ end }}
+          
+      webhook_configs:
+      - url: '{{ .Values.monitoring.alertmanager.webhook.critical }}'
+        send_resolved: true
+        
+    - name: 'high-impact-alerts'
+      email_configs:
+      - to: '{{ .Values.monitoring.alertmanager.email.highImpact }}'
+        subject: 'High-Impact Mutation Alert'
+        body: |
+          HIGH-IMPACT MUTATION ALERT
+          ==========================
+          
+          {{ range .Alerts }}
+          Sample ID: {{ .Labels.sample_id }}
+          Gene: {{ .Labels.gene }}
+          Variant: {{ .Labels.variant }}
+          
+          Description: {{ .Annotations.description }}
+          Runbook: {{ .Annotations.runbook_url }}
+          {{ end }}
+          
+      slack_configs:
+      - channel: '#mutation-alerts'
+        title: 'High-Impact Mutation Alert'
+        text: |
+          {{ range .Alerts }}
+          *Sample:* {{ .Labels.sample_id }}
+          *Gene:* {{ .Labels.gene }}
+          *Variant:* {{ .Labels.variant }}
+          
+          {{ .Annotations.description }}
+          {{ end }}
+          
+    - name: 'pipeline-alerts'
+      email_configs:
+      - to: '{{ .Values.monitoring.alertmanager.email.pipeline }}'
+        subject: 'Pipeline Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          PIPELINE ALERT
+          =============
+          
+          {{ range .Alerts }}
+          Pipeline: {{ .Labels.pipeline_name }}
+          Sample: {{ .Labels.sample_id }}
+          Error: {{ .Labels.error_message }}
+          
+          Description: {{ .Annotations.description }}
+          Runbook: {{ .Annotations.runbook_url }}
+          {{ end }}
+          
+      slack_configs:
+      - channel: '#pipeline-alerts'
+        title: 'Pipeline Alert'
+        text: |
+          {{ range .Alerts }}
+          *Pipeline:* {{ .Labels.pipeline_name }}
+          *Sample:* {{ .Labels.sample_id }}
+          *Error:* {{ .Labels.error_message }}
+          
+          {{ .Annotations.description }}
+          {{ end }}
+          
+    - name: 'system-alerts'
+      email_configs:
+      - to: '{{ .Values.monitoring.alertmanager.email.system }}'
+        subject: 'System Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          SYSTEM ALERT
+          ===========
+          
+          {{ range .Alerts }}
+          Component: {{ .Labels.container_name }}
+          Pod: {{ .Labels.pod }}
+          Namespace: {{ .Labels.namespace }}
+          
+          Description: {{ .Annotations.description }}
+          Runbook: {{ .Annotations.runbook_url }}
+          {{ end }}
+          
+      slack_configs:
+      - channel: '#system-alerts'
+        title: 'System Alert'
+        text: |
+          {{ range .Alerts }}
+          *Component:* {{ .Labels.container_name }}
+          *Pod:* {{ .Labels.pod }}
+          *Namespace:* {{ .Labels.namespace }}
+          
+          {{ .Annotations.description }}
+          {{ end }}
+          
+    - name: 'security-alerts'
+      email_configs:
+      - to: '{{ .Values.monitoring.alertmanager.email.security }}'
+        subject: 'SECURITY ALERT: {{ .GroupLabels.alertname }}'
+        body: |
+          SECURITY ALERT
+          =============
+          
+          {{ range .Alerts }}
+          Source IP: {{ .Labels.source_ip }}
+          Endpoint: {{ .Labels.endpoint }}
+          User: {{ .Labels.user_id }}
+          
+          Description: {{ .Annotations.description }}
+          Runbook: {{ .Annotations.runbook_url }}
+          {{ end }}
+          
+      slack_configs:
+      - channel: '#security-alerts'
+        title: 'SECURITY ALERT'
+        text: |
+          {{ range .Alerts }}
+          *Source IP:* {{ .Labels.source_ip }}
+          *Endpoint:* {{ .Labels.endpoint }}
+          *User:* {{ .Labels.user_id }}
+          
+          {{ .Annotations.description }}
+          {{ end }}
+          
+      webhook_configs:
+      - url: '{{ .Values.monitoring.alertmanager.webhook.security }}'
+        send_resolved: true
+        
+    - name: 'data-alerts'
+      email_configs:
+      - to: '{{ .Values.monitoring.alertmanager.email.data }}'
+        subject: 'Data Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          DATA ALERT
+          =========
+          
+          {{ range .Alerts }}
+          Sample: {{ .Labels.sample_id }}
+          Data Source: {{ .Labels.data_source }}
+          Issue Type: {{ .Labels.issue_type }}
+          
+          Description: {{ .Annotations.description }}
+          Runbook: {{ .Annotations.runbook_url }}
+          {{ end }}
+          
+      slack_configs:
+      - channel: '#data-alerts'
+        title: 'Data Alert'
+        text: |
+          {{ range .Alerts }}
+          *Sample:* {{ .Labels.sample_id }}
+          *Data Source:* {{ .Labels.data_source }}
+          *Issue Type:* {{ .Labels.issue_type }}
+          
+          {{ .Annotations.description }}
+          {{ end }}
+
+    # Inhibition rules
+    inhibit_rules:
+    # Inhibit system alerts when critical mutations are firing
+    - source_match:
+        severity: critical
+        category: mutation
+      target_match:
+        category: system
+      equal: ['namespace']
+      
+    # Inhibit data alerts when pipeline failures are firing
+    - source_match:
+        category: pipeline
+      target_match:
+        category: data
+      equal: ['sample_id']
+{{- end }}

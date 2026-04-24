@@ -1,0 +1,2216 @@
+[
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "ENS_LRG_gene",
+    "primary_id": "LRG_321",
+    "display_id": "LRG_321",
+    "description": "Locus Reference Genomic record for TP53",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "ArrayExpress",
+    "primary_id": "ENSG00000141510",
+    "display_id": "ENSG00000141510",
+    "description": null,
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "DBASS5",
+    "primary_id": "384",
+    "display_id": "TP53",
+    "description": null,
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "EntrezGene",
+    "primary_id": "7157",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "GeneCards",
+    "primary_id": "11998",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "HGNC",
+    "primary_id": "HGNC:11998",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_GENE",
+    "primary_id": "191170",
+    "display_id": "TUMOR PROTEIN p53; TP53 [*191170]",
+    "description": "TUMOR PROTEIN p53; TP53;;P53;;TRANSFORMATION-RELATED PROTEIN 53; TRP53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "114480",
+    "display_id": "BREAST CANCER [#114480]",
+    "description": "BREAST CANCER;;BREAST CANCER, FAMILIAL BREAST CANCER, FAMILIAL MALE, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "114500",
+    "display_id": "COLORECTAL CANCER; CRC [#114500]",
+    "description": "COLORECTAL CANCER; CRC;;COLON CANCER",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "114550",
+    "display_id": "HEPATOCELLULAR CARCINOMA [#114550]",
+    "description": "HEPATOCELLULAR CARCINOMA;;HCC;;CANCER, HEPATOCELLULAR;;LIVER CANCER;;LIVER CELL CARCINOMA; LCC;;HEPATOMA HEPATOBLASTOMA, INCLUDED;;HEPATOBLASTOMA CAUSED BY SOMATIC MUTATION, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "137800",
+    "display_id": "GLIOMA SUSCEPTIBILITY 1; GLM1 GLIOMA OF BRAIN, FAMILIAL, INCLUDED; GLM, INCLUDED [#137800]",
+    "description": "GLIOMA SUSCEPTIBILITY 1; GLM1 GLIOMA OF BRAIN, FAMILIAL, INCLUDED; GLM, INCLUDED;;GLIOBLASTOMA MULTIFORME, INCLUDED; GBM, INCLUDED;;ASTROCYTOMA, INCLUDED;;OLIGODENDROGLIOMA, INCLUDED;;EPENDYMOMA, INCLUDED;;SUBEPENDYMOMA, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "151623",
+    "display_id": "LI-FRAUMENI SYNDROME; LFS [#151623]",
+    "description": "LI-FRAUMENI SYNDROME; LFS;;SARCOMA FAMILY SYNDROME OF LI AND FRAUMENI;;SBLA SYNDROME LI-FRAUMENI-LIKE SYNDROME, INCLUDED; LFL, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "202300",
+    "display_id": "ADRENOCORTICAL CARCINOMA, HEREDITARY; ADCC ADRENOCORTICAL CARCINOMA, PEDIATRIC, INCLUDED [#202300]",
+    "description": "ADRENOCORTICAL CARCINOMA, HEREDITARY; ADCC ADRENOCORTICAL CARCINOMA, PEDIATRIC, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "259500",
+    "display_id": "OSTEOGENIC SARCOMA [#259500]",
+    "description": "OSTEOGENIC SARCOMA;;OSTEOSARCOMA; OSRC",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "260350",
+    "display_id": "PANCREATIC CANCER [#260350]",
+    "description": "PANCREATIC CANCER;;PANCREATIC CARCINOMA;;PANCREATIC ACINAR CARCINOMA",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "260500",
+    "display_id": "PAPILLOMA OF CHOROID PLEXUS; CPP [#260500]",
+    "description": "PAPILLOMA OF CHOROID PLEXUS; CPP;;CHOROID PLEXUS PAPILLOMA CHOROID PLEXUS CARCINOMA, INCLUDED; CPC, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "607107",
+    "display_id": "NASOPHARYNGEAL CARCINOMA [%607107]",
+    "description": "NASOPHARYNGEAL CARCINOMA;;NPCA;;NPC;;NASOPHARYNGEAL CANCER NASOPHARYNGEAL CARCINOMA, SUSCEPTIBILITY TO, 1, INCLUDED; NPCA1, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "614740",
+    "display_id": "BASAL CELL CARCINOMA, SUSCEPTIBILITY TO, 7; BCC7 [#614740]",
+    "description": "BASAL CELL CARCINOMA, SUSCEPTIBILITY TO, 7; BCC7",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "MIM_MORBID",
+    "primary_id": "618165",
+    "display_id": "BONE MARROW FAILURE SYNDROME 5; BMFS5 [#618165]",
+    "description": "BONE MARROW FAILURE SYNDROME 5; BMFS5",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1643685",
+    "display_id": "R-HSA-1643685",
+    "description": "Disease",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-392499",
+    "display_id": "R-HSA-392499",
+    "description": "Metabolism of proteins",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-597592",
+    "display_id": "R-HSA-597592",
+    "description": "Post-translational protein modification",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1640170",
+    "display_id": "R-HSA-1640170",
+    "description": "Cell Cycle",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693532",
+    "display_id": "R-HSA-5693532",
+    "description": "DNA Double-Strand Break Repair",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69278",
+    "display_id": "R-HSA-69278",
+    "description": "Cell Cycle, Mitotic",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-73894",
+    "display_id": "R-HSA-73894",
+    "description": "DNA Repair",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-109582",
+    "display_id": "R-HSA-109582",
+    "description": "Hemostasis",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168249",
+    "display_id": "R-HSA-168249",
+    "description": "Innate Immune System",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168256",
+    "display_id": "R-HSA-168256",
+    "description": "Immune System",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2262752",
+    "display_id": "R-HSA-2262752",
+    "description": "Cellular responses to stress",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8953897",
+    "display_id": "R-HSA-8953897",
+    "description": "Cellular responses to stimuli",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-212436",
+    "display_id": "R-HSA-212436",
+    "description": "Generic Transcription Pathway",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-73857",
+    "display_id": "R-HSA-73857",
+    "description": "RNA Polymerase II Transcription",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-74160",
+    "display_id": "R-HSA-74160",
+    "description": "Gene expression (Transcription)",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-162582",
+    "display_id": "R-HSA-162582",
+    "description": "Signal Transduction",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5688426",
+    "display_id": "R-HSA-5688426",
+    "description": "Deubiquitination",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5689880",
+    "display_id": "R-HSA-5689880",
+    "description": "Ub-specific processing proteases",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1266738",
+    "display_id": "R-HSA-1266738",
+    "description": "Developmental Biology",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2990846",
+    "display_id": "R-HSA-2990846",
+    "description": "SUMOylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-3108232",
+    "display_id": "R-HSA-3108232",
+    "description": "SUMO E3 ligases SUMOylate target proteins",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-109581",
+    "display_id": "R-HSA-109581",
+    "description": "Apoptosis",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-109606",
+    "display_id": "R-HSA-109606",
+    "description": "Intrinsic Pathway for Apoptosis",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-114452",
+    "display_id": "R-HSA-114452",
+    "description": "Activation of BH3-only proteins",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1257604",
+    "display_id": "R-HSA-1257604",
+    "description": "PIP3 activates AKT signaling",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5357801",
+    "display_id": "R-HSA-5357801",
+    "description": "Programmed Cell Death",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5663202",
+    "display_id": "R-HSA-5663202",
+    "description": "Diseases of signal transduction by growth factor receptors and second messengers",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9006925",
+    "display_id": "R-HSA-9006925",
+    "description": "Intracellular signaling by second messengers",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69620",
+    "display_id": "R-HSA-69620",
+    "description": "Cell Cycle Checkpoints",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-3700989",
+    "display_id": "R-HSA-3700989",
+    "description": "Transcriptional Regulation by TP53",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5633008",
+    "display_id": "R-HSA-5633008",
+    "description": "TP53 Regulates Transcription of Cell Death Genes",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6803207",
+    "display_id": "R-HSA-6803207",
+    "description": "TP53 Regulates Transcription of Caspase Activators and Caspases",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5218859",
+    "display_id": "R-HSA-5218859",
+    "description": "Regulated Necrosis",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-166016",
+    "display_id": "R-HSA-166016",
+    "description": "Toll Like Receptor 4 (TLR4) Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-166166",
+    "display_id": "R-HSA-166166",
+    "description": "MyD88-independent TLR4 cascade ",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168164",
+    "display_id": "R-HSA-168164",
+    "description": "Toll Like Receptor 3 (TLR3) Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168898",
+    "display_id": "R-HSA-168898",
+    "description": "Toll-like Receptor Cascades",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-937061",
+    "display_id": "R-HSA-937061",
+    "description": "TRIF (TICAM1)-mediated TLR4 signaling ",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-157118",
+    "display_id": "R-HSA-157118",
+    "description": "Signaling by NOTCH",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6807070",
+    "display_id": "R-HSA-6807070",
+    "description": "PTEN Regulation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8943724",
+    "display_id": "R-HSA-8943724",
+    "description": "Regulation of PTEN gene transcription",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-983231",
+    "display_id": "R-HSA-983231",
+    "description": "Factors involved in megakaryocyte development and platelet production",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2559583",
+    "display_id": "R-HSA-2559583",
+    "description": "Cellular Senescence",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8853884",
+    "display_id": "R-HSA-8853884",
+    "description": "Transcriptional Regulation by VENTX",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6796648",
+    "display_id": "R-HSA-6796648",
+    "description": "TP53 Regulates Transcription of DNA Repair Genes",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-453274",
+    "display_id": "R-HSA-453274",
+    "description": "Mitotic G2-G2/M phases",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69275",
+    "display_id": "R-HSA-69275",
+    "description": "G2/M Transition",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1912408",
+    "display_id": "R-HSA-1912408",
+    "description": "Pre-NOTCH Transcription and Translation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1912422",
+    "display_id": "R-HSA-1912422",
+    "description": "Pre-NOTCH Expression and Processing",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6803204",
+    "display_id": "R-HSA-6803204",
+    "description": "TP53 Regulates Transcription of Genes Involved in Cytochrome C Release",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8878159",
+    "display_id": "R-HSA-8878159",
+    "description": "Transcriptional regulation by RUNX3",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9816359",
+    "display_id": "R-HSA-9816359",
+    "description": "Maternal to zygotic transition (MZT)",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9819196",
+    "display_id": "R-HSA-9819196",
+    "description": "Zygotic genome activation (ZGA)",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-390466",
+    "display_id": "R-HSA-390466",
+    "description": "Chaperonin-mediated protein folding",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-390471",
+    "display_id": "R-HSA-390471",
+    "description": "Association of TriC/CCT with target proteins during biosynthesis",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-391251",
+    "display_id": "R-HSA-391251",
+    "description": "Protein folding",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1280215",
+    "display_id": "R-HSA-1280215",
+    "description": "Cytokine Signaling in Immune system",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-449147",
+    "display_id": "R-HSA-449147",
+    "description": "Signaling by Interleukins",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69481",
+    "display_id": "R-HSA-69481",
+    "description": "G2/M Checkpoints",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6785807",
+    "display_id": "R-HSA-6785807",
+    "description": "Interleukin-4 and Interleukin-13 signaling",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2559580",
+    "display_id": "R-HSA-2559580",
+    "description": "Oxidative Stress Induced Senescence",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2559585",
+    "display_id": "R-HSA-2559585",
+    "description": "Oncogene Induced Senescence",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-349425",
+    "display_id": "R-HSA-349425",
+    "description": "Autodegradation of the E3 ubiquitin ligase COP1",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-446652",
+    "display_id": "R-HSA-446652",
+    "description": "Interleukin-1 family signaling",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69541",
+    "display_id": "R-HSA-69541",
+    "description": "Stabilization of p53",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69563",
+    "display_id": "R-HSA-69563",
+    "description": "p53-Dependent G1 DNA Damage Response",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69580",
+    "display_id": "R-HSA-69580",
+    "description": "p53-Dependent G1/S DNA damage checkpoint",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69615",
+    "display_id": "R-HSA-69615",
+    "description": "G1/S DNA Damage Checkpoints",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8852276",
+    "display_id": "R-HSA-8852276",
+    "description": "The role of GTSE1 in G2/M progression after G2 checkpoint",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9020702",
+    "display_id": "R-HSA-9020702",
+    "description": "Interleukin-1 signaling",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-3232118",
+    "display_id": "R-HSA-3232118",
+    "description": "SUMOylation of transcription factors",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693565",
+    "display_id": "R-HSA-5693565",
+    "description": "Recruitment and ATM-mediated phosphorylation of repair and signaling proteins at DNA double strand breaks",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693606",
+    "display_id": "R-HSA-5693606",
+    "description": "DNA Double Strand Break Response",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-166058",
+    "display_id": "R-HSA-166058",
+    "description": "MyD88:MAL(TIRAP) cascade initiated on plasma membrane",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168179",
+    "display_id": "R-HSA-168179",
+    "description": "Toll Like Receptor TLR1:TLR2 Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168188",
+    "display_id": "R-HSA-168188",
+    "description": "Toll Like Receptor TLR6:TLR2 Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-181438",
+    "display_id": "R-HSA-181438",
+    "description": "Toll Like Receptor 2 (TLR2) Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5633007",
+    "display_id": "R-HSA-5633007",
+    "description": "Regulation of TP53 Activity",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804756",
+    "display_id": "R-HSA-6804756",
+    "description": "Regulation of TP53 Activity through Phosphorylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69473",
+    "display_id": "R-HSA-69473",
+    "description": "G2/M DNA damage checkpoint",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9645723",
+    "display_id": "R-HSA-9645723",
+    "description": "Diseases of programmed cell death",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9734009",
+    "display_id": "R-HSA-9734009",
+    "description": "Defective Intrinsic Pathway for Apoptosis",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5689896",
+    "display_id": "R-HSA-5689896",
+    "description": "Ovarian tumor domain proteases",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8941855",
+    "display_id": "R-HSA-8941855",
+    "description": "RUNX3 regulates CDKN1A transcription",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2559586",
+    "display_id": "R-HSA-2559586",
+    "description": "DNA Damage/Telomere Stress Induced Senescence",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5628897",
+    "display_id": "R-HSA-5628897",
+    "description": "TP53 Regulates Metabolic Genes",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804757",
+    "display_id": "R-HSA-6804757",
+    "description": "Regulation of TP53 Degradation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804759",
+    "display_id": "R-HSA-6804759",
+    "description": "Regulation of TP53 Activity through Association with Co-factors",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6806003",
+    "display_id": "R-HSA-6806003",
+    "description": "Regulation of TP53 Expression and Degradation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6803211",
+    "display_id": "R-HSA-6803211",
+    "description": "TP53 Regulates Transcription of Death Receptors and Ligands",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-913531",
+    "display_id": "R-HSA-913531",
+    "description": "Interferon Signaling",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1169410",
+    "display_id": "R-HSA-1169410",
+    "description": "Antiviral mechanism by IFN-stimulated genes",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5620971",
+    "display_id": "R-HSA-5620971",
+    "description": "Pyroptosis",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168138",
+    "display_id": "R-HSA-168138",
+    "description": "Toll Like Receptor 9 (TLR9) Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168142",
+    "display_id": "R-HSA-168142",
+    "description": "Toll Like Receptor 10 (TLR10) Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168176",
+    "display_id": "R-HSA-168176",
+    "description": "Toll Like Receptor 5 (TLR5) Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-168181",
+    "display_id": "R-HSA-168181",
+    "description": "Toll Like Receptor 7/8 (TLR7/8) Cascade",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-975138",
+    "display_id": "R-HSA-975138",
+    "description": "TRAF6 mediated induction of NFkB and MAP kinases upon TLR7/8 or 9 activation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-975155",
+    "display_id": "R-HSA-975155",
+    "description": "MyD88 dependent cascade initiated on endosome",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-975871",
+    "display_id": "R-HSA-975871",
+    "description": "MyD88 cascade initiated on plasma membrane",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9700206",
+    "display_id": "R-HSA-9700206",
+    "description": "Signaling by ALK in cancer",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9725370",
+    "display_id": "R-HSA-9725370",
+    "description": "Signaling by ALK fusions and activated point mutants",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-445989",
+    "display_id": "R-HSA-445989",
+    "description": "TAK1-dependent IKK and NF-kappa-B activation  ",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9833482",
+    "display_id": "R-HSA-9833482",
+    "description": "PKR-mediated signaling",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804754",
+    "display_id": "R-HSA-6804754",
+    "description": "Regulation of TP53 Expression",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9758274",
+    "display_id": "R-HSA-9758274",
+    "description": "Regulation of NF-kappa B signaling",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804758",
+    "display_id": "R-HSA-6804758",
+    "description": "Regulation of TP53 Activity through Acetylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-139915",
+    "display_id": "R-HSA-139915",
+    "description": "Activation of PUMA and translocation to mitochondria",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6803205",
+    "display_id": "R-HSA-6803205",
+    "description": "TP53 regulates transcription of several additional cell death genes whose specific roles in p53-dependent apoptosis remain uncertain",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6791312",
+    "display_id": "R-HSA-6791312",
+    "description": "TP53 Regulates Transcription of Cell Cycle Genes",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804115",
+    "display_id": "R-HSA-6804115",
+    "description": "TP53 regulates transcription of additional cell cycle genes whose exact role in the p53 pathway remain uncertain",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804114",
+    "display_id": "R-HSA-6804114",
+    "description": "TP53 Regulates Transcription of Genes Involved in G2 Cell Cycle Arrest",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804116",
+    "display_id": "R-HSA-6804116",
+    "description": "TP53 Regulates Transcription of Genes Involved in G1 Cell Cycle Arrest",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69560",
+    "display_id": "R-HSA-69560",
+    "description": "Transcriptional activation of p53 responsive genes  ",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69895",
+    "display_id": "R-HSA-69895",
+    "description": "Transcriptional  activation of  cell cycle inhibitor p21 ",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2559584",
+    "display_id": "R-HSA-2559584",
+    "description": "Formation of Senescence-Associated Heterochromatin Foci (SAHF)",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804760",
+    "display_id": "R-HSA-6804760",
+    "description": "Regulation of TP53 Activity through Methylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6811555",
+    "display_id": "R-HSA-6811555",
+    "description": "PI5P Regulates TP53 Acetylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-111448",
+    "display_id": "R-HSA-111448",
+    "description": "Activation of NOXA and translocation to mitochondria",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9723905",
+    "display_id": "R-HSA-9723905",
+    "description": "Loss of function of TP53 in cancer due to loss of tetramerization ability",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9723907",
+    "display_id": "R-HSA-9723907",
+    "description": "Loss of Function of TP53 in Cancer",
+    "info_type": "DIRECT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "P04637",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "K7PPA8",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A386NBZ1",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A087WT22",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0AAQ5BHX5",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A087X1Q1",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0AAQ5BHY1",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "S4R334",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "E7EQX7",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A087WXZ1",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "H2EHT1",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "I3L0W9",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "J3KP33",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "E9PFT5",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A0U1RQC9",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0AAQ5BHZ9",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000141510",
+    "dbname": "WikiGene",
+    "primary_id": "7157",
+    "display_id": "TP53",
+    "description": "tumor protein p53",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "TP53"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "ENS_LRG_gene",
+    "primary_id": "LRG_292",
+    "display_id": "LRG_292",
+    "description": "Locus Reference Genomic record for BRCA1",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "ArrayExpress",
+    "primary_id": "ENSG00000012048",
+    "display_id": "ENSG00000012048",
+    "description": null,
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "DBASS5",
+    "primary_id": "383",
+    "display_id": "BRCA1",
+    "description": null,
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "EntrezGene",
+    "primary_id": "672",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "GeneCards",
+    "primary_id": "1100",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "HGNC",
+    "primary_id": "HGNC:1100",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "MIM_GENE",
+    "primary_id": "113705",
+    "display_id": "BRCA1 DNA REPAIR-ASSOCIATED PROTEIN; BRCA1 [*113705]",
+    "description": "BRCA1 DNA REPAIR-ASSOCIATED PROTEIN; BRCA1;;BREAST CANCER 1 GENE",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "MIM_MORBID",
+    "primary_id": "114480",
+    "display_id": "BREAST CANCER [#114480]",
+    "description": "BREAST CANCER;;BREAST CANCER, FAMILIAL BREAST CANCER, FAMILIAL MALE, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "MIM_MORBID",
+    "primary_id": "604370",
+    "display_id": "BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 1; BROVCA1 [#604370]",
+    "description": "BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 1; BROVCA1;;HBOC1 BREAST CANCER, FAMILIAL, SUSCEPTIBILITY TO, 1, INCLUDED;;OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 1, INCLUDED",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "MIM_MORBID",
+    "primary_id": "614320",
+    "display_id": "PANCREATIC CANCER, SUSCEPTIBILITY TO, 4; PNCA4 [#614320]",
+    "description": "PANCREATIC CANCER, SUSCEPTIBILITY TO, 4; PNCA4",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "MIM_MORBID",
+    "primary_id": "617883",
+    "display_id": "FANCONI ANEMIA, COMPLEMENTATION GROUP S; FANCS [#617883]",
+    "description": "FANCONI ANEMIA, COMPLEMENTATION GROUP S; FANCS",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1643685",
+    "display_id": "R-HSA-1643685",
+    "description": "Disease",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-392499",
+    "display_id": "R-HSA-392499",
+    "description": "Metabolism of proteins",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-597592",
+    "display_id": "R-HSA-597592",
+    "description": "Post-translational protein modification",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1474165",
+    "display_id": "R-HSA-1474165",
+    "description": "Reproduction",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1500620",
+    "display_id": "R-HSA-1500620",
+    "description": "Meiosis",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1640170",
+    "display_id": "R-HSA-1640170",
+    "description": "Cell Cycle",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5685942",
+    "display_id": "R-HSA-5685942",
+    "description": "HDR through Homologous Recombination (HRR)",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693532",
+    "display_id": "R-HSA-5693532",
+    "description": "DNA Double-Strand Break Repair",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693537",
+    "display_id": "R-HSA-5693537",
+    "description": "Resolution of D-Loop Structures",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693538",
+    "display_id": "R-HSA-5693538",
+    "description": "Homology Directed Repair",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693567",
+    "display_id": "R-HSA-5693567",
+    "description": "HDR through Homologous Recombination (HRR) or Single Strand Annealing (SSA)",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693568",
+    "display_id": "R-HSA-5693568",
+    "description": "Resolution of D-loop Structures through Holliday Junction Intermediates",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-73894",
+    "display_id": "R-HSA-73894",
+    "description": "DNA Repair",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-912446",
+    "display_id": "R-HSA-912446",
+    "description": "Meiotic recombination",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2262752",
+    "display_id": "R-HSA-2262752",
+    "description": "Cellular responses to stress",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8953897",
+    "display_id": "R-HSA-8953897",
+    "description": "Cellular responses to stimuli",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9711123",
+    "display_id": "R-HSA-9711123",
+    "description": "Cellular response to chemical stress",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9755511",
+    "display_id": "R-HSA-9755511",
+    "description": "KEAP1-NFE2L2 pathway",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-212436",
+    "display_id": "R-HSA-212436",
+    "description": "Generic Transcription Pathway",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-73857",
+    "display_id": "R-HSA-73857",
+    "description": "RNA Polymerase II Transcription",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-74160",
+    "display_id": "R-HSA-74160",
+    "description": "Gene expression (Transcription)",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5688426",
+    "display_id": "R-HSA-5688426",
+    "description": "Deubiquitination",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1266738",
+    "display_id": "R-HSA-1266738",
+    "description": "Developmental Biology",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-2990846",
+    "display_id": "R-HSA-2990846",
+    "description": "SUMOylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-3108214",
+    "display_id": "R-HSA-3108214",
+    "description": "SUMOylation of DNA damage response and repair proteins",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-3108232",
+    "display_id": "R-HSA-3108232",
+    "description": "SUMO E3 ligases SUMOylate target proteins",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5685938",
+    "display_id": "R-HSA-5685938",
+    "description": "HDR through Single Strand Annealing (SSA)",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69620",
+    "display_id": "R-HSA-69620",
+    "description": "Cell Cycle Checkpoints",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8951664",
+    "display_id": "R-HSA-8951664",
+    "description": "Neddylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-3700989",
+    "display_id": "R-HSA-3700989",
+    "description": "Transcriptional Regulation by TP53",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6796648",
+    "display_id": "R-HSA-6796648",
+    "description": "TP53 Regulates Transcription of DNA Repair Genes",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9730414",
+    "display_id": "R-HSA-9730414",
+    "description": "MITF-M-regulated melanocyte development",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69481",
+    "display_id": "R-HSA-69481",
+    "description": "G2/M Checkpoints",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693565",
+    "display_id": "R-HSA-5693565",
+    "description": "Recruitment and ATM-mediated phosphorylation of repair and signaling proteins at DNA double strand breaks",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693606",
+    "display_id": "R-HSA-5693606",
+    "description": "DNA Double Strand Break Response",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9856651",
+    "display_id": "R-HSA-9856651",
+    "description": "MITF-M-dependent gene expression",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-1221632",
+    "display_id": "R-HSA-1221632",
+    "description": "Meiotic synapsis",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5633007",
+    "display_id": "R-HSA-5633007",
+    "description": "Regulation of TP53 Activity",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5689901",
+    "display_id": "R-HSA-5689901",
+    "description": "Metalloprotease DUBs",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693554",
+    "display_id": "R-HSA-5693554",
+    "description": "Resolution of D-loop Structures through Synthesis-Dependent Strand Annealing (SDSA)",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693571",
+    "display_id": "R-HSA-5693571",
+    "description": "Nonhomologous End-Joining (NHEJ)",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693579",
+    "display_id": "R-HSA-5693579",
+    "description": "Homologous DNA Pairing and Strand Exchange",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693607",
+    "display_id": "R-HSA-5693607",
+    "description": "Processing of DNA double-strand break ends",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-5693616",
+    "display_id": "R-HSA-5693616",
+    "description": "Presynaptic phase of homologous DNA pairing and strand exchange",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-6804756",
+    "display_id": "R-HSA-6804756",
+    "description": "Regulation of TP53 Activity through Phosphorylation",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-69473",
+    "display_id": "R-HSA-69473",
+    "description": "G2/M DNA damage checkpoint",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-8953750",
+    "display_id": "R-HSA-8953750",
+    "description": "Transcriptional Regulation by E2F6",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9663199",
+    "display_id": "R-HSA-9663199",
+    "description": "Defective DNA double strand break response due to BRCA1 loss of function",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9675135",
+    "display_id": "R-HSA-9675135",
+    "description": "Diseases of DNA repair",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9675136",
+    "display_id": "R-HSA-9675136",
+    "description": "Diseases of DNA Double-Strand Break Repair",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9699150",
+    "display_id": "R-HSA-9699150",
+    "description": "Defective DNA double strand break response due to BARD1 loss of function",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9701190",
+    "display_id": "R-HSA-9701190",
+    "description": "Defective homologous recombination repair (HRR) due to BRCA2 loss of function",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9701192",
+    "display_id": "R-HSA-9701192",
+    "description": "Defective homologous recombination repair (HRR) due to BRCA1 loss of function",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9701193",
+    "display_id": "R-HSA-9701193",
+    "description": "Defective homologous recombination repair (HRR) due to PALB2 loss of function",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9704331",
+    "display_id": "R-HSA-9704331",
+    "description": "Defective HDR through Homologous Recombination Repair (HRR) due to PALB2 loss of BRCA1 binding function",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9704646",
+    "display_id": "R-HSA-9704646",
+    "description": "Defective HDR through Homologous Recombination Repair (HRR) due to PALB2 loss of BRCA2/RAD51/RAD51C binding function",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9709570",
+    "display_id": "R-HSA-9709570",
+    "description": "Impaired BRCA2 binding to RAD51",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9709603",
+    "display_id": "R-HSA-9709603",
+    "description": "Impaired BRCA2 binding to PALB2",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Reactome_gene",
+    "primary_id": "R-HSA-9825895",
+    "display_id": "R-HSA-9825895",
+    "description": "Regulation of MITF-M-dependent genes involved in DNA replication, damage repair and senescence",
+    "info_type": "DIRECT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "E9PC22",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "P38398",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "E7ENB7",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A9Y1QPT7",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "C6YB45",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "E7EQW4",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A2R8Y7V5",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A8V8TPY7",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "E7EUM2",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A0U1RRA9",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "H0Y8D8",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "H0Y8B8",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A2R8Y6Y9",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "K7EPC7",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "H0Y850",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "K7EJW3",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "C9IZW4",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "Uniprot_gn",
+    "primary_id": "A0A9Y1QQK3",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  },
+  {
+    "ensembl_id": "ENSG00000012048",
+    "dbname": "WikiGene",
+    "primary_id": "672",
+    "display_id": "BRCA1",
+    "description": "BRCA1 DNA repair associated",
+    "info_type": "DEPENDENT",
+    "gene_symbol": "BRCA1"
+  }
+]

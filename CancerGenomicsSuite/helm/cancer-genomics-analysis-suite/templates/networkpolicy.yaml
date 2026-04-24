@@ -1,0 +1,277 @@
+{{- if .Values.security.networkPolicy.enabled }}
+# Web Application Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-web
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: web
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: web
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress from nginx
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 14 }}
+              component: nginx
+      ports:
+        - protocol: TCP
+          port: 8050
+    # Allow ingress from monitoring
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8050
+  egress:
+    # Allow egress to database
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow egress to Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow egress to external APIs
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+---
+# Nginx Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nginx
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: nginx
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: nginx
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+    # Allow ingress from monitoring
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+  egress:
+    # Allow egress to web application
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: web
+      ports:
+        - protocol: TCP
+          port: 8050
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+---
+# PostgreSQL Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-postgresql
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: postgresql
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: postgresql
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress from web application
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: web
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow ingress from Celery workers
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: celery
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow ingress from monitoring
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 5432
+  egress:
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+---
+# Redis Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-redis
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: redis
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: redis
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress from web application
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: web
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow ingress from Celery workers
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: celery
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow ingress from monitoring
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 6379
+  egress:
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+---
+# Celery Worker Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: celery
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: celery
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow ingress from monitoring
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # Allow egress to database
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    # Allow egress to Redis
+    - to:
+        - podSelector:
+            matchLabels:
+              {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 12 }}
+              component: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    # Allow egress to external APIs
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+{{- end }}

@@ -1,0 +1,200 @@
+{{- if and .Values.global.cloudProvider (eq .Values.global.cloudProvider "aws") }}
+---
+# AWS Load Balancer Controller annotations
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-aws-lb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+  annotations:
+    {{- if eq .Values.global.aws.loadBalancerType "nlb" }}
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:{{ .Values.global.region }}:ACCOUNT_ID:certificate/CERT_ID"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    {{- else if eq .Values.global.aws.loadBalancerType "alb" }}
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb-ip"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:{{ .Values.global.region }}:ACCOUNT_ID:certificate/CERT_ID"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    {{- end }}
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8050
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: 8050
+    protocol: TCP
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+---
+# AWS EBS CSI Driver StorageClass
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: aws-ebs-gp3
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  encrypted: "true"
+  kmsKeyId: "alias/aws/ebs"
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+---
+# AWS EFS CSI Driver StorageClass
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: aws-efs
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: "fs-xxxxxxxxx"
+  directoryPerms: "0755"
+  gidRangeStart: "1000"
+  gidRangeEnd: "2000"
+reclaimPolicy: Retain
+allowVolumeExpansion: false
+volumeBindingMode: Immediate
+---
+# AWS IAM Role for Service Account (IRSA)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-aws-sa
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::ACCOUNT_ID:role/cancer-genomics-role"
+automountServiceAccountToken: true
+---
+# AWS S3 bucket access secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-s3-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+type: Opaque
+data:
+  access-key-id: ""  # Base64 encoded
+  secret-access-key: ""  # Base64 encoded
+  bucket-name: {{ .Values.global.aws.s3Bucket | b64enc }}
+  region: {{ .Values.global.region | b64enc }}
+---
+# AWS RDS connection secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-rds-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+type: Opaque
+data:
+  host: {{ .Values.global.aws.rdsInstance | b64enc }}
+  port: "NTQzMg=="  # 5432 in base64
+  username: "cancer_genomics_user"
+  password: ""  # Base64 encoded
+  database: "cancer_genomics_db"
+---
+# AWS ElastiCache connection secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-elasticache-credentials
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+type: Opaque
+data:
+  host: {{ .Values.global.aws.elasticacheCluster | b64enc }}
+  port: "NjM3OQ=="  # 6379 in base64
+  password: ""  # Base64 encoded
+---
+# AWS CloudWatch Logs configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-cloudwatch-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  aws-cloudwatch-logs.conf: |
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*cancer-genomics*.log
+        Parser            docker
+        Tag               kube.*
+        Refresh_Interval  5
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Skip_Empty_Lines  On
+
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Keep_Log            Off
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+
+    [OUTPUT]
+        Name                cloudwatch_logs
+        Match               *
+        region              {{ .Values.global.region }}
+        log_group_name      /aws/eks/{{ .Values.global.aws.eksClusterName }}/cancer-genomics
+        log_stream_prefix   cancer-genomics-
+        auto_create_group   true
+---
+# AWS X-Ray tracing configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-xray-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  xray-config.yaml: |
+    version: 1
+    sampling:
+      rules:
+        - description: "Default sampling rule"
+          service_name: "*"
+          http_method: "*"
+          url_path: "*"
+          fixed_target: 0
+          rate: 0.05
+    daemon_config:
+      udp_endpoint: "127.0.0.1:2000"
+    plugins:
+      ec2:
+        enabled: true
+      ecs:
+        enabled: false
+      elastic_beanstalk:
+        enabled: false
+{{- end }}

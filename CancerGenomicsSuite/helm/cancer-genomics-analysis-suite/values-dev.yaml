@@ -1,0 +1,162 @@
+# Development environment values
+global:
+  cloudProvider: "aws"
+  region: "us-west-2"
+  aws:
+    eksClusterName: "cancer-genomics-dev"
+    loadBalancerType: "nlb"
+    s3Bucket: "cancer-genomics-dev-data"
+    rdsInstance: "cancer-genomics-dev-db"
+    elasticacheCluster: "cancer-genomics-dev-cache"
+
+# Development-specific overrides
+web:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  env:
+    - name: FLASK_ENV
+      value: "development"
+    - name: LOG_LEVEL
+      value: "DEBUG"
+    - name: DEBUG
+      value: "true"
+
+celery:
+  worker:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    env:
+      - name: FLASK_ENV
+        value: "development"
+      - name: LOG_LEVEL
+        value: "DEBUG"
+
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "dev-password"
+    username: "postgres"
+    password: "dev-password"
+    database: "genomics_db"
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 200m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  hosts:
+    - host: cancer-genomics-dev.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Development features
+config:
+  features:
+    auth_enabled: false
+    api_enabled: true
+    dashboard_enabled: true
+    reporting_enabled: true
+    ml_enabled: true
+    blast_enabled: true
+    annotation_enabled: true
+
+# Disable monitoring in dev
+monitoring:
+  enabled: false
+
+# Enable Argo Workflows for testing
+argoWorkflows:
+  enabled: true
+  namespace: "argo-dev"
+  templates:
+    blastPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+    annotationPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+    mlPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 4Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    reportingPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
+
+# Development secrets
+secrets:
+  database:
+    create: true
+    data:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "dev-password"
+      POSTGRES_DB: "genomics_db"
+  app:
+    create: true
+    data:
+      SECRET_KEY: "dev-secret-key-not-for-production"
+      JWT_SECRET_KEY: "dev-jwt-secret-key-not-for-production"

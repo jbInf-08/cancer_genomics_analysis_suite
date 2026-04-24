@@ -1,0 +1,237 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: cancer-genomics
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: cancer-genomics-project
+    app.kubernetes.io/part-of: cancer-genomics
+spec:
+  description: "Cancer Genomics Analysis Suite Project"
+  
+  # Source repositories
+  sourceRepos:
+    - https://github.com/your-org/cancer-genomics-analysis-suite
+    - https://charts.bitnami.com/bitnami
+    - https://kubernetes.github.io/ingress-nginx
+    - https://charts.jetstack.io
+    - https://prometheus-community.github.io/helm-charts
+    - https://grafana.github.io/helm-charts
+    - https://argoproj.github.io/argo-helm
+  
+  # Destination clusters and namespaces
+  destinations:
+    - namespace: cancer-genomics
+      server: https://kubernetes.default.svc
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+    - namespace: kafka
+      server: https://kubernetes.default.svc
+    - namespace: workflows
+      server: https://kubernetes.default.svc
+    - namespace: security
+      server: https://kubernetes.default.svc
+    - namespace: backup
+      server: https://kubernetes.default.svc
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+  
+  # Cluster resource whitelist
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: ""
+      kind: Node
+    - group: ""
+      kind: PersistentVolume
+    - group: ""
+      kind: StorageClass
+    - group: "rbac.authorization.k8s.io"
+      kind: ClusterRole
+    - group: "rbac.authorization.k8s.io"
+      kind: ClusterRoleBinding
+    - group: "apiextensions.k8s.io"
+      kind: CustomResourceDefinition
+    - group: "admissionregistration.k8s.io"
+      kind: MutatingWebhookConfiguration
+    - group: "admissionregistration.k8s.io"
+      kind: ValidatingWebhookConfiguration
+    - group: "cert-manager.io"
+      kind: ClusterIssuer
+    - group: "monitoring.coreos.com"
+      kind: PrometheusRule
+    - group: "monitoring.coreos.com"
+      kind: ServiceMonitor
+    - group: "networking.k8s.io"
+      kind: NetworkPolicy
+  
+  # Namespace resource whitelist
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Secret
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ServiceAccount
+    - group: ""
+      kind: PersistentVolumeClaim
+    - group: "apps"
+      kind: Deployment
+    - group: "apps"
+      kind: StatefulSet
+    - group: "apps"
+      kind: DaemonSet
+    - group: "apps"
+      kind: ReplicaSet
+    - group: "extensions"
+      kind: Ingress
+    - group: "networking.k8s.io"
+      kind: Ingress
+    - group: "networking.k8s.io"
+      kind: NetworkPolicy
+    - group: "autoscaling"
+      kind: HorizontalPodAutoscaler
+    - group: "policy"
+      kind: PodDisruptionBudget
+    - group: "rbac.authorization.k8s.io"
+      kind: Role
+    - group: "rbac.authorization.k8s.io"
+      kind: RoleBinding
+    - group: "cert-manager.io"
+      kind: Certificate
+    - group: "cert-manager.io"
+      kind: CertificateRequest
+    - group: "cert-manager.io"
+      kind: Issuer
+    - group: "monitoring.coreos.com"
+      kind: PrometheusRule
+    - group: "monitoring.coreos.com"
+      kind: ServiceMonitor
+    - group: "bitnami.com"
+      kind: SealedSecret
+    - group: "argoproj.io"
+      kind: Application
+    - group: "argoproj.io"
+      kind: AppProject
+    - group: "argoproj.io"
+      kind: Workflow
+    - group: "argoproj.io"
+      kind: WorkflowTemplate
+    - group: "argoproj.io"
+      kind: CronWorkflow
+  
+  # Roles and permissions
+  roles:
+    - name: admin
+      description: "Admin role with full access"
+      policies:
+        - p, proj:cancer-genomics:admin, applications, *, cancer-genomics/*, allow
+        - p, proj:cancer-genomics:admin, repositories, *, *, allow
+        - p, proj:cancer-genomics:admin, certificates, *, *, allow
+        - p, proj:cancer-genomics:admin, clusters, *, *, allow
+        - p, proj:cancer-genomics:admin, gpgkeys, *, *, allow
+        - p, proj:cancer-genomics:admin, projects, *, cancer-genomics, allow
+        - p, proj:cancer-genomics:admin, logs, *, *, allow
+        - p, proj:cancer-genomics:admin, exec, *, *, allow
+        - p, proj:cancer-genomics:admin, events, *, *, allow
+        - p, proj:cancer-genomics:admin, applicationsets, *, *, allow
+      groups:
+        - cancer-genomics:admins
+    
+    - name: developer
+      description: "Developer role with limited access"
+      policies:
+        - p, proj:cancer-genomics:developer, applications, get, cancer-genomics/*, allow
+        - p, proj:cancer-genomics:developer, applications, sync, cancer-genomics/*, allow
+        - p, proj:cancer-genomics:developer, applications, action/*, cancer-genomics/*, allow
+        - p, proj:cancer-genomics:developer, logs, get, cancer-genomics/*, allow
+        - p, proj:cancer-genomics:developer, events, get, cancer-genomics/*, allow
+      groups:
+        - cancer-genomics:developers
+    
+    - name: readonly
+      description: "Read-only role for monitoring"
+      policies:
+        - p, proj:cancer-genomics:readonly, applications, get, cancer-genomics/*, allow
+        - p, proj:cancer-genomics:readonly, logs, get, cancer-genomics/*, allow
+        - p, proj:cancer-genomics:readonly, events, get, cancer-genomics/*, allow
+      groups:
+        - cancer-genomics:readonly
+  
+  # Sync windows
+  syncWindows:
+    - kind: allow
+      schedule: "0 9 * * 1-5"  # 9 AM to 5 PM, Monday to Friday
+      duration: 8h
+      applications:
+        - cancer-genomics-*
+      namespaces:
+        - cancer-genomics
+        - monitoring
+        - kafka
+        - workflows
+        - security
+        - backup
+      clusters:
+        - https://kubernetes.default.svc
+      manualSync: true
+    
+    - kind: deny
+      schedule: "0 0 * * 0"  # Sunday maintenance window
+      duration: 4h
+      applications:
+        - cancer-genomics-*
+      namespaces:
+        - cancer-genomics
+        - monitoring
+        - kafka
+        - workflows
+        - security
+        - backup
+      clusters:
+        - https://kubernetes.default.svc
+      manualSync: false
+    
+    - kind: deny
+      schedule: "0 2 * * *"  # Daily backup window
+      duration: 2h
+      applications:
+        - cancer-genomics-backup
+      namespaces:
+        - backup
+      clusters:
+        - https://kubernetes.default.svc
+      manualSync: false
+  
+  # Orphaned resources
+  orphanedResources:
+    warn: true
+    ignore:
+      - group: ""
+        kind: Secret
+        name: ".*-tls"
+      - group: ""
+        kind: ConfigMap
+        name: ".*-config"
+      - group: "monitoring.coreos.com"
+        kind: ServiceMonitor
+        name: ".*"
+      - group: "monitoring.coreos.com"
+        kind: PrometheusRule
+        name: ".*"
+  
+  # Signature keys
+  signatureKeys:
+    - keyID: "your-gpg-key-id"
+      keyType: "GPG"
+  
+  # Project namespace
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: ResourceQuota
+    - group: ""
+      kind: LimitRange
+    - group: ""
+      kind: NetworkPolicy

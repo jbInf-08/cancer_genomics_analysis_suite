@@ -1,0 +1,523 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: cancer-genomics-analysis-workflow
+  namespace: cancer-genomics-workflows
+  labels:
+    app: cancer-genomics-analysis-suite
+    workflow-type: cancer-genomics
+spec:
+  entrypoint: main-workflow
+  arguments:
+    parameters:
+      - name: workflow-type
+        value: "full"
+      - name: sample-list
+        value: ""
+      - name: image-tag
+        value: "latest"
+      - name: environment
+        value: "staging"
+      - name: git-commit
+        value: ""
+      - name: git-branch
+        value: "main"
+  
+  templates:
+    # Main workflow template
+    - name: main-workflow
+      steps:
+        - - name: validate-inputs
+            template: validate-inputs
+        - - name: prepare-data
+            template: prepare-data
+            when: "{{workflow.parameters.workflow-type}} == 'full' || {{workflow.parameters.workflow-type}} == 'blast-only'"
+        - - name: blast-analysis
+            template: blast-analysis
+            when: "{{workflow.parameters.workflow-type}} == 'full' || {{workflow.parameters.workflow-type}} == 'blast-only'"
+        - - name: variant-annotation
+            template: variant-annotation
+            when: "{{workflow.parameters.workflow-type}} == 'full' || {{workflow.parameters.workflow-type}} == 'ml-only'"
+        - - name: ml-prediction
+            template: ml-prediction
+            when: "{{workflow.parameters.workflow-type}} == 'full' || {{workflow.parameters.workflow-type}} == 'ml-only'"
+        - - name: neo4j-analysis
+            template: neo4j-analysis
+            when: "{{workflow.parameters.workflow-type}} == 'full'"
+        - - name: generate-report
+            template: generate-report
+            when: "{{workflow.parameters.workflow-type}} == 'full' || {{workflow.parameters.workflow-type}} == 'report-only'"
+        - - name: stream-processing
+            template: stream-processing
+            when: "{{workflow.parameters.workflow-type}} == 'full'"
+        - - name: cleanup
+            template: cleanup
+    
+    # Input validation template
+    - name: validate-inputs
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-c", |
+          import json
+          import sys
+          
+          workflow_type = "{{workflow.parameters.workflow-type}}"
+          sample_list = "{{workflow.parameters.sample-list}}"
+          environment = "{{workflow.parameters.environment}}"
+          
+          valid_types = ["full", "blast-only", "ml-only", "report-only"]
+          valid_envs = ["staging", "production"]
+          
+          if workflow_type not in valid_types:
+              print(f"Invalid workflow type: {workflow_type}")
+              sys.exit(1)
+          
+          if environment not in valid_envs:
+              print(f"Invalid environment: {environment}")
+              sys.exit(1)
+          
+          if sample_list:
+              samples = sample_list.split(",")
+              if len(samples) == 0:
+                  print("Empty sample list")
+                  sys.exit(1)
+          
+          print("Input validation passed")
+          print(f"Workflow type: {workflow_type}")
+          print(f"Environment: {environment}")
+          print(f"Samples: {sample_list}")
+        ]
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+    
+    # Data preparation template
+    - name: prepare-data
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-m", "modules.data_preparation.prepare_input_data"]
+        env:
+          - name: SAMPLE_LIST
+            value: "{{workflow.parameters.sample-list}}"
+          - name: ENVIRONMENT
+            value: "{{workflow.parameters.environment}}"
+          - name: GIT_COMMIT
+            value: "{{workflow.parameters.git-commit}}"
+          - name: GIT_BRANCH
+            value: "{{workflow.parameters.git-branch}}"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-data-pvc
+    
+    # BLAST analysis template
+    - name: blast-analysis
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-m", "modules.blast_analysis.run_blast_pipeline"]
+        env:
+          - name: BLAST_DB_PATH
+            value: "/data/blastdb"
+          - name: INPUT_DATA_PATH
+            value: "/data/input"
+          - name: OUTPUT_PATH
+            value: "/data/blast_results"
+          - name: BLAST_EVALUE
+            value: "1e-5"
+          - name: BLAST_MAX_TARGET_SEQS
+            value: "100"
+          - name: BLAST_NUM_THREADS
+            value: "4"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+          - name: blastdb-volume
+            mountPath: /data/blastdb
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-data-pvc
+        - name: blastdb-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-blastdb-pvc
+    
+    # Variant annotation template
+    - name: variant-annotation
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-m", "modules.variant_annotation.annotate_variants"]
+        env:
+          - name: BLAST_RESULTS_PATH
+            value: "/data/blast_results"
+          - name: REFERENCE_GENOME_PATH
+            value: "/data/reference/hg38.fa"
+          - name: ANNOTATION_DB_PATH
+            value: "/data/annotation_db"
+          - name: OUTPUT_PATH
+            value: "/data/annotated_variants"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+          - name: reference-volume
+            mountPath: /data/reference
+          - name: annotation-volume
+            mountPath: /data/annotation_db
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-data-pvc
+        - name: reference-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-reference-pvc
+        - name: annotation-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-annotation-pvc
+    
+    # ML prediction template
+    - name: ml-prediction
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-m", "modules.ml_prediction.run_ml_pipeline"]
+        env:
+          - name: ANNOTATED_VARIANTS_PATH
+            value: "/data/annotated_variants"
+          - name: ML_MODEL_PATH
+            value: "/data/models"
+          - name: OUTPUT_PATH
+            value: "/data/ml_predictions"
+          - name: ML_THRESHOLD
+            value: "0.5"
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2000m"
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+          - name: models-volume
+            mountPath: /data/models
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-data-pvc
+        - name: models-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-models-pvc
+    
+    # Neo4j analysis template
+    - name: neo4j-analysis
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-m", "modules.graph_analytics.neo4j_analysis"]
+        env:
+          - name: NEO4J_URI
+            value: "bolt://cancer-genomics-neo4j:7687"
+          - name: NEO4J_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: cancer-genomics-neo4j-secrets
+                key: username
+          - name: NEO4J_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cancer-genomics-neo4j-secrets
+                key: password
+          - name: ML_PREDICTIONS_PATH
+            value: "/data/ml_predictions"
+          - name: OUTPUT_PATH
+            value: "/data/neo4j_analysis"
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-data-pvc
+    
+    # Report generation template
+    - name: generate-report
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-m", "modules.reporting.generate_analysis_report"]
+        env:
+          - name: BLAST_RESULTS_PATH
+            value: "/data/blast_results"
+          - name: ANNOTATED_VARIANTS_PATH
+            value: "/data/annotated_variants"
+          - name: ML_PREDICTIONS_PATH
+            value: "/data/ml_predictions"
+          - name: NEO4J_ANALYSIS_PATH
+            value: "/data/neo4j_analysis"
+          - name: OUTPUT_PATH
+            value: "/data/reports"
+          - name: REPORT_TEMPLATE_PATH
+            value: "/data/templates"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+          - name: templates-volume
+            mountPath: /data/templates
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: cancer-genomics-data-pvc
+        - name: templates-volume
+          configMap:
+            name: cancer-genomics-report-templates
+    
+    # Stream processing template
+    - name: stream-processing
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-m", "modules.real_time_processing.kafka_stream_processor"]
+        env:
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            value: "cancer-genomics-kafka:9092"
+          - name: NEO4J_URI
+            value: "bolt://cancer-genomics-neo4j:7687"
+          - name: NEO4J_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: cancer-genomics-neo4j-secrets
+                key: username
+          - name: NEO4J_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cancer-genomics-neo4j-secrets
+                key: password
+          - name: POSTGRES_HOST
+            value: "cancer-genomics-postgresql"
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_DB
+            value: "genomics_db"
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cancer-genomics-postgresql-secrets
+                key: postgres-password
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+    
+    # Cleanup template
+    - name: cleanup
+      container:
+        image: "{{workflow.parameters.image-tag}}"
+        command: [python]
+        args: ["-c", |
+          import os
+          import shutil
+          
+          # Clean up temporary files
+          temp_dirs = ["/tmp", "/data/temp"]
+          for temp_dir in temp_dirs:
+              if os.path.exists(temp_dir):
+                  for item in os.listdir(temp_dir):
+                      item_path = os.path.join(temp_dir, item)
+                      try:
+                          if os.path.isfile(item_path):
+                              os.unlink(item_path)
+                          elif os.path.isdir(item_path):
+                              shutil.rmtree(item_path)
+                      except Exception as e:
+                          print(f"Error cleaning {item_path}: {e}")
+          
+          print("Cleanup completed successfully")
+        ]
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cancer-genomics-data-pvc
+  namespace: cancer-genomics-workflows
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cancer-genomics-blastdb-pvc
+  namespace: cancer-genomics-workflows
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cancer-genomics-reference-pvc
+  namespace: cancer-genomics-workflows
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cancer-genomics-annotation-pvc
+  namespace: cancer-genomics-workflows
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cancer-genomics-models-pvc
+  namespace: cancer-genomics-workflows
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cancer-genomics-report-templates
+  namespace: cancer-genomics-workflows
+data:
+  report_template.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Cancer Genomics Analysis Report</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .header { background-color: #1f4e79; color: white; padding: 20px; }
+            .section { margin: 20px 0; }
+            .metric { display: inline-block; margin: 10px; padding: 10px; background-color: #f0f0f0; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>Cancer Genomics Analysis Report</h1>
+            <p>Generated on: {{ timestamp }}</p>
+        </div>
+        
+        <div class="section">
+            <h2>Summary</h2>
+            <div class="metric">Total Mutations: {{ total_mutations }}</div>
+            <div class="metric">Critical Mutations: {{ critical_mutations }}</div>
+            <div class="metric">Patients Analyzed: {{ total_patients }}</div>
+        </div>
+        
+        <div class="section">
+            <h2>Analysis Results</h2>
+            <!-- Analysis results will be inserted here -->
+        </div>
+    </body>
+    </html>
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cancer-genomics-neo4j-secrets
+  namespace: cancer-genomics-workflows
+type: Opaque
+data:
+  username: bmVvNGo=  # neo4j
+  password: bmVvNGotcGFzc3dvcmQ=  # neo4j-password
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cancer-genomics-postgresql-secrets
+  namespace: cancer-genomics-workflows
+type: Opaque
+data:
+  postgres-password: cG9zdGdyZXMtcGFzc3dvcmQ=  # postgres-password

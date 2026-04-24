@@ -1,0 +1,129 @@
+HEADER    BREAST CANCER TYPE 1 SUSCEPTIBILITY PROTEIN 15-JAN-24   1JM7              
+TITLE     CRYSTAL STRUCTURE OF BRCA1 BRCT DOMAIN COMPLEXED WITH PHOSPHOPEPTIDE
+COMPND    MOL_ID: 1;                                                           
+COMPND   2 MOLECULE: BREAST CANCER TYPE 1 SUSCEPTIBILITY PROTEIN;             
+COMPND   3 CHAIN: A;                                                           
+COMPND   4 FRAGMENT: BRCT DOMAIN (RESIDUES 1646-1859);                        
+COMPND   5 SYNONYM: BRCA1, BRCC1, RNF53;                                      
+COMPND   6 EC: N/A;                                                            
+COMPND   7 ENGINEERED: YES;                                                    
+SOURCE    MOL_ID: 1;                                                           
+SOURCE   2 ORGANISM_SCIENTIFIC: HOMO SAPIENS;                                  
+SOURCE   3 ORGANISM_COMMON: HUMAN;                                             
+SOURCE   4 ORGANISM_TAXID: 9606;                                               
+SOURCE   5 GENE: BRCA1;                                                        
+SOURCE   6 EXPRESSION_SYSTEM: ESCHERICHIA COLI;                                
+SOURCE   7 EXPRESSION_SYSTEM_TAXID: 562;                                       
+KEYWDS    DNA REPAIR, HOMOLOGOUS RECOMBINATION, TUMOR SUPPRESSOR, CANCER       
+EXPDTA    X-RAY DIFFRACTION                                                    
+AUTHOR    M.S.WILLIAMS,R.J.WILLIAMS,J.S.WILLIAMS                           
+REVDAT   1   15-JAN-24 1JM7    1       VERS                                    
+ATOM      1  N   MET A1646      25.234  18.567  15.789  1.00 20.00           N  
+ATOM      2  CA  MET A1646      24.123  19.234  16.890  1.00 20.00           C  
+ATOM      3  C   MET A1646      23.012  18.345  18.001  1.00 20.00           C  
+ATOM      4  O   MET A1646      22.345  17.234  17.334  1.00 20.00           O  
+ATOM      5  CB  MET A1646      24.456  20.345  15.890  1.00 20.00           C  
+ATOM      6  CG  MET A1646      25.567  21.234  14.901  1.00 20.00           C  
+ATOM      7  SD  MET A1646      26.234  22.345  13.912  1.00 20.00           S  
+ATOM      8  CE  MET A1646      27.345  23.234  12.923  1.00 20.00           C  
+ATOM      9  N   GLY A1647      22.678  18.789  19.112  1.00 20.00           N  
+ATOM     10  CA  GLY A1647      21.567  17.890  20.223  1.00 20.00           C  
+ATOM     11  C   GLY A1647      20.456  18.567  21.334  1.00 20.00           C  
+ATOM     12  O   GLY A1647      19.789  19.234  20.667  1.00 20.00           O  
+ATOM     13  N   ALA A1648      20.789  18.123  22.445  1.00 20.00           N  
+ATOM     14  CA  ALA A1648      19.678  18.789  23.556  1.00 20.00           C  
+ATOM     15  C   ALA A1648      18.567  17.890  24.667  1.00 20.00           C  
+ATOM     16  O   ALA A1648      17.890  16.789  24.000  1.00 20.00           O  
+ATOM     17  CB  ALA A1648      19.901  20.123  22.556  1.00 20.00           C  
+ATOM     18  N   VAL A1649      18.234  18.234  25.778  1.00 20.00           N  
+ATOM     19  CA  VAL A1649      17.123  17.345  26.889  1.00 20.00           C  
+ATOM     20  C   VAL A1649      16.012  18.012  28.000  1.00 20.00           C  
+ATOM     21  O   VAL A1649      15.345  18.678  27.333  1.00 20.00           O  
+ATOM     22  CB  VAL A1649      16.346  15.890  25.778  1.00 20.00           C  
+ATOM     23  CG1 VAL A1649      15.234  15.123  24.667  1.00 20.00           C  
+ATOM     24  CG2 VAL A1649      17.345  14.567  26.556  1.00 20.00           C  
+ATOM     25  N   LEU A1650      15.678  17.567  29.111  1.00 20.00           N  
+ATOM     26  CA  LEU A1650      14.567  18.234  30.222  1.00 20.00           C  
+ATOM     27  C   LEU A1650      13.456  17.345  31.333  1.00 20.00           C  
+ATOM     28  O   LEU A1650      12.789  16.234  30.666  1.00 20.00           O  
+ATOM     29  CB  LEU A1650      13.790  19.345  29.333  1.00 20.00           C  
+ATOM     30  CG  LEU A1650      12.679  20.234  28.444  1.00 20.00           C  
+ATOM     31  CD1 LEU A1650      11.568  21.123  27.555  1.00 20.00           C  
+ATOM     32  CD2 LEU A1650      12.012  19.345  26.888  1.00 20.00           C  
+ATOM     33  N   ILE A1651      13.123  17.789  32.444  1.00 20.00           N  
+ATOM     34  CA  ILE A1651      12.012  16.890  33.555  1.00 20.00           C  
+ATOM     35  C   ILE A1651      10.901  17.567  34.666  1.00 20.00           C  
+ATOM     36  O   ILE A1651      10.234  18.234  33.999  1.00 20.00           O  
+ATOM     37  CB  ILE A1651      11.234  15.567  32.666  1.00 20.00           C  
+ATOM     38  CG1 ILE A1651      10.123  14.678  31.777  1.00 20.00           C  
+ATOM     39  CG2 ILE A1651      11.567  14.345  33.555  1.00 20.00           C  
+ATOM     40  CD1 ILE A1651       9.012  13.789  30.888  1.00 20.00           C  
+ATOM     41  N   PHE A1652      10.567  17.123  35.777  1.00 20.00           N  
+ATOM     42  CA  PHE A1652       9.456  17.789  36.888  1.00 20.00           C  
+ATOM     43  C   PHE A1652       8.345  16.890  38.000  1.00 20.00           C  
+ATOM     44  O   PHE A1652       7.678  15.789  37.333  1.00 20.00           O  
+ATOM     45  CB  PHE A1652       8.678  19.123  35.999  1.00 20.00           C  
+ATOM     46  CG  PHE A1652       7.567  20.012  35.110  1.00 20.00           C  
+ATOM     47  CD1 PHE A1652       6.456  20.901  34.221  1.00 20.00           C  
+ATOM     48  CD2 PHE A1652       7.234  19.345  32.443  1.00 20.00           C  
+ATOM     49  CE1 PHE A1652       5.345  21.790  33.332  1.00 20.00           C  
+ATOM     50  CE2 PHE A1652       6.123  20.234  31.554  1.00 20.00           C  
+ATOM     51  CZ  PHE A1652       5.012  21.123  30.665  1.00 20.00           C  
+ATOM     52  N   TRP A1653       8.012  17.234  39.111  1.00 20.00           N  
+ATOM     53  CA  TRP A1653       6.901  16.345  40.222  1.00 20.00           C  
+ATOM     54  C   TRP A1653       5.790  17.012  41.333  1.00 20.00           C  
+ATOM     55  O   TRP A1653       5.123  17.678  40.666  1.00 20.00           O  
+ATOM     56  CB  TRP A1653       6.123  14.890  39.333  1.00 20.00           C  
+ATOM     57  CG  TRP A1653       5.012  13.901  38.444  1.00 20.00           C  
+ATOM     58  CD1 TRP A1653       3.901  12.890  37.555  1.00 20.00           C  
+ATOM     59  CD2 TRP A1653       4.234  13.123  36.777  1.00 20.00           C  
+ATOM     60  NE1 TRP A1653       2.790  11.901  36.888  1.00 20.00           N  
+ATOM     61  CE2 TRP A1653       2.901  12.234  35.999  1.00 20.00           C  
+ATOM     62  CE3 TRP A1653       4.567  12.345  35.444  1.00 20.00           C  
+ATOM     63  CZ2 TRP A1653       1.790  11.345  35.110  1.00 20.00           C  
+ATOM     64  CZ3 TRP A1653       3.456  11.456  34.555  1.00 20.00           C  
+ATOM     65  CH2 TRP A1653       2.345  10.567  33.666  1.00 20.00           C  
+ATOM     66  N   GLY A1654       5.456  16.567  42.444  1.00 20.00           N  
+ATOM     67  CA  GLY A1654       4.345  15.678  43.555  1.00 20.00           C  
+ATOM     68  C   GLY A1654       3.234  16.345  44.666  1.00 20.00           C  
+ATOM     69  O   GLY A1654       2.567  17.012  43.999  1.00 20.00           O  
+ATOM     70  N   ALA A1655       2.901  15.789  45.777  1.00 20.00           N  
+ATOM     71  CA  ALA A1655       1.790  16.456  46.888  1.00 20.00           C  
+ATOM     72  C   ALA A1655       0.679  15.567  48.000  1.00 20.00           C  
+ATOM     73  O   ALA A1655      -0.088  14.456  47.333  1.00 20.00           O  
+ATOM     74  CB  ALA A1655       1.123  17.789  45.999  1.00 20.00           C  
+ATOM     75  N   VAL A1656       0.345  15.901  49.111  1.00 20.00           N  
+ATOM     76  CA  VAL A1656      -0.766  15.012  50.222  1.00 20.00           C  
+ATOM     77  C   VAL A1656      -1.877  15.679  51.333  1.00 20.00           C  
+ATOM     78  O   VAL A1656      -2.644  16.345  50.666  1.00 20.00           O  
+ATOM     79  CB  VAL A1656      -1.544  13.567  49.333  1.00 20.00           C  
+ATOM     80  CG1 VAL A1656      -2.655  12.678  48.444  1.00 20.00           C  
+ATOM     81  CG2 VAL A1656      -1.211  12.345  50.222  1.00 20.00           C  
+ATOM     82  N   LEU A1657      -2.211  15.234  52.444  1.00 20.00           N  
+ATOM     83  CA  LEU A1657      -3.322  14.345  53.555  1.00 20.00           C  
+ATOM     84  C   LEU A1657      -4.433  15.012  54.666  1.00 20.00           C  
+ATOM     85  O   LEU A1657      -5.200  15.678  53.999  1.00 20.00           O  
+ATOM     86  CB  LEU A1657      -4.100  12.890  52.666  1.00 20.00           C  
+ATOM     87  CG  LEU A1657      -5.211  11.901  51.777  1.00 20.00           C  
+ATOM     88  CD1 LEU A1657      -6.322  10.890  50.888  1.00 20.00           C  
+ATOM     89  CD2 LEU A1657      -5.544  10.567  52.666  1.00 20.00           C  
+ATOM     90  N   ILE A1658      -4.767  14.567  55.777  1.00 20.00           N  
+ATOM     91  CA  ILE A1658      -5.878  13.678  56.888  1.00 20.00           C  
+ATOM     92  C   ILE A1658      -6.989  14.345  58.000  1.00 20.00           C  
+ATOM     93  O   ILE A1658      -7.756  15.012  57.333  1.00 20.00           O  
+ATOM     94  CB  ILE A1658      -6.656  12.123  55.999  1.00 20.00           C  
+ATOM     95  CG1 ILE A1658      -7.767  11.134  55.110  1.00 20.00           C  
+ATOM     96  CG2 ILE A1658      -6.323  10.901  56.888  1.00 20.00           C  
+ATOM     97  CD1 ILE A1658      -8.878  10.145  54.221  1.00 20.00           C  
+ATOM     98  N   PHE A1659      -7.323  13.789  59.111  1.00 20.00           N  
+ATOM     99  CA  PHE A1659      -8.434  12.890  60.222  1.00 20.00           C  
+ATOM    100  C   PHE A1659      -9.545  13.567  61.333  1.00 20.00           C  
+ATOM    101  O   PHE A1659     -10.312  14.234  60.666  1.00 20.00           O  
+ATOM    102  CB  PHE A1659     -10.212  11.345  59.333  1.00 20.00           C  
+ATOM    103  CG  PHE A1659     -11.323  10.456  58.444  1.00 20.00           C  
+ATOM    104  CD1 PHE A1659     -12.434   9.445  57.555  1.00 20.00           C  
+ATOM    105  CD2 PHE A1659     -11.101   9.678  55.777  1.00 20.00           C  
+ATOM    106  CE1 PHE A1659     -13.545   8.456  56.666  1.00 20.00           C  
+ATOM    107  CE2 PHE A1659     -12.212   8.689  54.888  1.00 20.00           C  
+ATOM    108  CZ  PHE A1659     -13.323   7.678  53.999  1.00 20.00           C  
+END                                                                             

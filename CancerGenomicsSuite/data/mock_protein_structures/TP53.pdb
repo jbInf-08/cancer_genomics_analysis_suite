@@ -1,0 +1,117 @@
+HEADER    TUMOR SUPPRESSOR P53                   15-JAN-24   1TUP              
+TITLE     CRYSTAL STRUCTURE OF HUMAN P53 TUMOR SUPPRESSOR DNA-BINDING DOMAIN
+COMPND    MOL_ID: 1;                                                           
+COMPND   2 MOLECULE: CELLULAR TUMOR ANTIGEN P53;                               
+COMPND   3 CHAIN: A;                                                           
+COMPND   4 FRAGMENT: DNA-BINDING DOMAIN (RESIDUES 94-312);                     
+COMPND   5 SYNONYM: TUMOR PROTEIN P53, P53, TP53;                             
+COMPND   6 EC: N/A;                                                            
+COMPND   7 ENGINEERED: YES;                                                    
+SOURCE    MOL_ID: 1;                                                           
+SOURCE   2 ORGANISM_SCIENTIFIC: HOMO SAPIENS;                                  
+SOURCE   3 ORGANISM_COMMON: HUMAN;                                             
+SOURCE   4 ORGANISM_TAXID: 9606;                                               
+SOURCE   5 GENE: TP53;                                                         
+SOURCE   6 EXPRESSION_SYSTEM: ESCHERICHIA COLI;                                
+SOURCE   7 EXPRESSION_SYSTEM_TAXID: 562;                                       
+KEYWDS    TUMOR SUPPRESSOR, DNA-BINDING, TRANSCRIPTION FACTOR, CANCER          
+EXPDTA    X-RAY DIFFRACTION                                                    
+AUTHOR    Y.CHO,S.GORINA,P.D.JEFFREY,N.P.PAVLETICH                          
+REVDAT   1   15-JAN-24 1TUP    1       VERS                                    
+ATOM      1  N   CYS A  94      20.123  15.456  12.789  1.00 20.00           N  
+ATOM      2  CA  CYS A  94      19.234  16.123  13.456  1.00 20.00           C  
+ATOM      3  C   CYS A  94      18.123  15.234  14.567  1.00 20.00           C  
+ATOM      4  O   CYS A  94      17.456  14.123  14.234  1.00 20.00           O  
+ATOM      5  CB  CYS A  94      19.567  17.234  12.345  1.00 20.00           C  
+ATOM      6  SG  CYS A  94      20.234  18.123  11.456  1.00 20.00           S  
+ATOM      7  N   GLY A  95      18.456  15.789  15.678  1.00 20.00           N  
+ATOM      8  CA  GLY A  95      17.345  14.890  16.789  1.00 20.00           C  
+ATOM      9  C   GLY A  95      16.234  15.567  17.890  1.00 20.00           C  
+ATOM     10  O   GLY A  95      15.567  16.234  17.123  1.00 20.00           O  
+ATOM     11  N   ARG A  96      16.567  15.123  18.901  1.00 20.00           N  
+ATOM     12  CA  ARG A  96      15.456  15.789  19.012  1.00 20.00           C  
+ATOM     13  C   ARG A  96      14.345  14.890  20.123  1.00 20.00           C  
+ATOM     14  O   ARG A  96      13.678  13.789  19.456  1.00 20.00           O  
+ATOM     15  CB  ARG A  96      15.789  17.123  18.234  1.00 20.00           C  
+ATOM     16  CG  ARG A  96      16.234  18.234  17.345  1.00 20.00           C  
+ATOM     17  CD  ARG A  96      17.345  19.123  16.456  1.00 20.00           C  
+ATOM     18  NE  ARG A  96      18.456  20.234  15.567  1.00 20.00           N  
+ATOM     19  CZ  ARG A  96      19.567  21.123  14.678  1.00 20.00           C  
+ATOM     20  NH1 ARG A  96      20.234  20.456  13.789  1.00 20.00           N  
+ATOM     21  NH2 ARG A  96      20.123  22.234  14.890  1.00 20.00           N  
+ATOM     22  N   HIS A  97      14.678  15.234  21.234  1.00 20.00           N  
+ATOM     23  CA  HIS A  97      13.567  14.345  22.345  1.00 20.00           C  
+ATOM     24  C   HIS A  97      12.456  15.012  23.456  1.00 20.00           C  
+ATOM     25  O   HIS A  97      11.789  15.678  22.789  1.00 20.00           O  
+ATOM     26  CB  HIS A  97      13.890  12.890  21.456  1.00 20.00           C  
+ATOM     27  CG  HIS A  97      14.234  11.789  20.567  1.00 20.00           C  
+ATOM     28  ND1 HIS A  97      15.345  10.890  19.678  1.00 20.00           N  
+ATOM     29  CD2 HIS A  97      13.567  11.234  19.789  1.00 20.00           C  
+ATOM     30  CE1 HIS A  97      15.678  10.123  18.890  1.00 20.00           C  
+ATOM     31  NE2 HIS A  97      14.234  10.345  18.901  1.00 20.00           N  
+ATOM     32  N   LEU A  98      12.789  14.567  24.567  1.00 20.00           N  
+ATOM     33  CA  LEU A  98      11.678  15.234  25.678  1.00 20.00           C  
+ATOM     34  C   LEU A  98      10.567  14.345  26.789  1.00 20.00           C  
+ATOM     35  O   LEU A  98       9.890  13.234  26.123  1.00 20.00           O  
+ATOM     36  CB  LEU A  98      11.901  16.345  24.567  1.00 20.00           C  
+ATOM     37  CG  LEU A  98      12.234  17.456  23.456  1.00 20.00           C  
+ATOM     38  CD1 LEU A  98      13.345  18.345  22.567  1.00 20.00           C  
+ATOM     39  CD2 LEU A  98      11.567  18.234  21.678  1.00 20.00           C  
+ATOM     40  N   TRP A  99      10.890  14.789  27.890  1.00 20.00           N  
+ATOM     41  CA  TRP A  99       9.789  13.890  29.001  1.00 20.00           C  
+ATOM     42  C   TRP A  99       8.678  14.567  30.112  1.00 20.00           C  
+ATOM     43  O   TRP A  99       7.901  15.234  29.445  1.00 20.00           O  
+ATOM     44  CB  TRP A  99      10.012  12.345  28.112  1.00 20.00           C  
+ATOM     45  CG  TRP A  99      10.345  11.234  27.223  1.00 20.00           C  
+ATOM     46  CD1 TRP A  99      11.456  10.345  26.334  1.00 20.00           C  
+ATOM     47  CD2 TRP A  99       9.789  10.567  25.445  1.00 20.00           C  
+ATOM     48  NE1 TRP A  99      11.789   9.234  25.556  1.00 20.00           N  
+ATOM     49  CE2 TRP A  99      10.456   9.456  24.667  1.00 20.00           C  
+ATOM     50  CE3 TRP A  99       8.456   9.789  24.112  1.00 20.00           C  
+ATOM     51  CZ2 TRP A  99      10.789   8.345  23.778  1.00 20.00           C  
+ATOM     52  CZ3 TRP A  99       8.789   8.678  23.223  1.00 20.00           C  
+ATOM     53  CH2 TRP A  99       9.456   7.567  22.445  1.00 20.00           C  
+ATOM     54  N   PHE A 100       8.901  14.123  31.223  1.00 20.00           N  
+ATOM     55  CA  PHE A 100       7.790  15.789  32.334  1.00 20.00           C  
+ATOM     56  C   PHE A 100       6.679  14.890  33.445  1.00 20.00           C  
+ATOM     57  O   PHE A 100       5.912  13.789  32.778  1.00 20.00           O  
+ATOM     58  CB  PHE A 100       8.013  16.901  31.223  1.00 20.00           C  
+ATOM     59  CG  PHE A 100       8.346  18.012  30.334  1.00 20.00           C  
+ATOM     60  CD1 PHE A 100       9.457  19.123  29.445  1.00 20.00           C  
+ATOM     61  CD2 PHE A 100       7.790  18.345  28.667  1.00 20.00           C  
+ATOM     62  CE1 PHE A 100       9.790  20.234  28.556  1.00 20.00           C  
+ATOM     63  CE2 PHE A 100       8.123  19.456  27.778  1.00 20.00           C  
+ATOM     64  CZ  PHE A 100       8.456  20.567  26.889  1.00 20.00           C  
+ATOM     65  N   GLY A 101       6.912  15.234  34.556  1.00 20.00           N  
+ATOM     66  CA  GLY A 101       5.801  14.345  35.667  1.00 20.00           C  
+ATOM     67  C   GLY A 101       4.690  15.012  36.778  1.00 20.00           C  
+ATOM     68  O   GLY A 101       3.923  15.678  36.111  1.00 20.00           O  
+ATOM     69  N   ALA A 102       4.923  14.567  37.889  1.00 20.00           N  
+ATOM     70  CA  ALA A 102       3.812  15.234  39.000  1.00 20.00           C  
+ATOM     71  C   ALA A 102       2.701  14.345  40.111  1.00 20.00           C  
+ATOM     72  O   ALA A 102       1.934  13.234  39.444  1.00 20.00           O  
+ATOM     73  CB  ALA A 102       4.035  16.345  37.889  1.00 20.00           C  
+ATOM     74  N   VAL A 103       2.934  14.789  41.222  1.00 20.00           N  
+ATOM     75  CA  VAL A 103       1.823  13.890  42.333  1.00 20.00           C  
+ATOM     76  C   VAL A 103       0.712  14.567  43.444  1.00 20.00           C  
+ATOM     77  O   VAL A 103      -0.055  15.234  42.777  1.00 20.00           O  
+ATOM     78  CB  VAL A 103       2.046  12.345  41.222  1.00 20.00           C  
+ATOM     79  CG1 VAL A 103       2.379  11.234  40.333  1.00 20.00           C  
+ATOM     80  CG2 VAL A 103       0.712  11.567  39.555  1.00 20.00           C  
+ATOM     81  N   ILE A 104       0.945  14.123  44.555  1.00 20.00           N  
+ATOM     82  CA  ILE A 104      -0.166  15.789  45.666  1.00 20.00           C  
+ATOM     83  C   ILE A 104      -1.277  14.890  46.777  1.00 20.00           C  
+ATOM     84  O   ILE A 104      -2.044  13.789  46.110  1.00 20.00           O  
+ATOM     85  CB  ILE A 104       0.057  16.901  44.555  1.00 20.00           C  
+ATOM     86  CG1 ILE A 104       0.390  18.012  43.666  1.00 20.00           C  
+ATOM     87  CG2 ILE A 104      -1.277  17.345  42.999  1.00 20.00           C  
+ATOM     88  CD1 ILE A 104       1.501  19.123  42.777  1.00 20.00           C  
+ATOM     89  N   LEU A 105      -1.510  15.234  47.888  1.00 20.00           N  
+ATOM     90  CA  LEU A 105      -2.621  14.345  49.000  1.00 20.00           C  
+ATOM     91  C   LEU A 105      -3.732  15.012  50.111  1.00 20.00           C  
+ATOM     92  O   LEU A 105      -4.499  15.678  49.444  1.00 20.00           O  
+ATOM     93  CB  LEU A 105      -2.398  12.890  48.111  1.00 20.00           C  
+ATOM     94  CG  LEU A 105      -2.065  11.779  47.222  1.00 20.00           C  
+ATOM     95  CD1 LEU A 105      -0.954  10.890  46.333  1.00 20.00           C  
+ATOM     96  CD2 LEU A 105      -2.621  10.567  45.555  1.00 20.00           C  
+END                                                                             

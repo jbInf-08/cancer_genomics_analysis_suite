@@ -1,0 +1,229 @@
+{{- if .Values.kafka.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: kafka
+spec:
+  replicas: {{ .Values.kafka.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: kafka
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: kafka
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: kafka
+          image: "{{ .Values.kafka.image.registry }}/{{ .Values.kafka.image.repository }}:{{ .Values.kafka.image.tag }}"
+          imagePullPolicy: {{ .Values.kafka.image.pullPolicy }}
+          ports:
+            - name: kafka
+              containerPort: 9092
+              protocol: TCP
+            - name: jmx
+              containerPort: 9999
+              protocol: TCP
+          env:
+            - name: KAFKA_BROKER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "{{ include "cancer-genomics-analysis-suite.fullname" . }}-zookeeper:2181"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://{{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka:9092"
+            - name: KAFKA_LISTENERS
+              value: "PLAINTEXT://0.0.0.0:9092"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "{{ .Values.kafka.replicaCount }}"
+            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+              value: "{{ .Values.kafka.replicaCount }}"
+            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+              value: "{{ .Values.kafka.replicaCount }}"
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true"
+            - name: KAFKA_DELETE_TOPIC_ENABLE
+              value: "true"
+            - name: KAFKA_LOG_RETENTION_HOURS
+              value: "168"
+            - name: KAFKA_LOG_SEGMENT_BYTES
+              value: "1073741824"
+            - name: KAFKA_NUM_PARTITIONS
+              value: "{{ .Values.kafka.numPartitions }}"
+            - name: KAFKA_DEFAULT_REPLICATION_FACTOR
+              value: "{{ .Values.kafka.replicationFactor }}"
+            {{- if .Values.kafka.sasl.enabled }}
+            - name: KAFKA_SASL_ENABLED_MECHANISMS
+              value: "PLAIN"
+            - name: KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL
+              value: "PLAIN"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "PLAINTEXT:PLAINTEXT,SASL_PLAINTEXT:SASL_PLAINTEXT"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: "SASL_PLAINTEXT"
+            - name: KAFKA_OPTS
+              value: "-Djava.security.auth.login.config=/opt/kafka/config/kafka_server_jaas.conf"
+            {{- end }}
+            {{- with .Values.kafka.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.kafka.resources | nindent 12 }}
+          volumeMounts:
+            - name: kafka-data
+              mountPath: /var/lib/kafka/data
+            - name: kafka-config
+              mountPath: /opt/kafka/config
+            {{- if .Values.kafka.sasl.enabled }}
+            - name: kafka-jaas
+              mountPath: /opt/kafka/config/kafka_server_jaas.conf
+              subPath: kafka_server_jaas.conf
+            {{- end }}
+          livenessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      volumes:
+        - name: kafka-data
+          persistentVolumeClaim:
+            claimName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka-data
+        - name: kafka-config
+          configMap:
+            name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka-config
+        {{- if .Values.kafka.sasl.enabled }}
+        - name: kafka-jaas
+          secret:
+            secretName: {{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka-jaas
+        {{- end }}
+      {{- with .Values.kafka.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafka.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.kafka.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: kafka
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9092
+      targetPort: 9092
+      protocol: TCP
+      name: kafka
+    - port: 9999
+      targetPort: 9999
+      protocol: TCP
+      name: jmx
+  selector:
+    {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 4 }}
+    component: kafka
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka-data
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: kafka
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.kafka.persistence.size }}
+  {{- if .Values.kafka.persistence.storageClass }}
+  storageClassName: {{ .Values.kafka.persistence.storageClass }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-kafka-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: kafka
+data:
+  server.properties: |
+    # Kafka server configuration
+    broker.id=${KAFKA_BROKER_ID}
+    listeners=PLAINTEXT://0.0.0.0:9092
+    advertised.listeners=${KAFKA_ADVERTISED_LISTENERS}
+    zookeeper.connect=${KAFKA_ZOOKEEPER_CONNECT}
+    
+    # Log configuration
+    log.dirs=/var/lib/kafka/data
+    log.retention.hours=${KAFKA_LOG_RETENTION_HOURS}
+    log.segment.bytes=${KAFKA_LOG_SEGMENT_BYTES}
+    log.cleanup.policy=delete
+    
+    # Replication configuration
+    offsets.topic.replication.factor=${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
+    transaction.state.log.replication.factor=${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR}
+    transaction.state.log.min.isr=${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR}
+    
+    # Topic configuration
+    auto.create.topics.enable=${KAFKA_AUTO_CREATE_TOPICS_ENABLE}
+    delete.topic.enable=${KAFKA_DELETE_TOPIC_ENABLE}
+    num.partitions=${KAFKA_NUM_PARTITIONS}
+    default.replication.factor=${KAFKA_DEFAULT_REPLICATION_FACTOR}
+    
+    # Performance tuning
+    num.network.threads=3
+    num.io.threads=8
+    socket.send.buffer.bytes=102400
+    socket.receive.buffer.bytes=102400
+    socket.request.max.bytes=104857600
+    
+    # Log flush policy
+    log.flush.interval.messages=10000
+    log.flush.interval.ms=1000
+    
+    # Compression
+    compression.type=snappy
+    
+    # JMX
+    jmx.port=9999
+    {{- if .Values.kafka.sasl.enabled }}
+    
+    # SASL Configuration
+    sasl.enabled.mechanisms=${KAFKA_SASL_ENABLED_MECHANISMS}
+    sasl.mechanism.inter.broker.protocol=${KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL}
+    listener.security.protocol.map=${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}
+    inter.broker.listener.name=${KAFKA_INTER_BROKER_LISTENER_NAME}
+    {{- end }}
+{{- end }}

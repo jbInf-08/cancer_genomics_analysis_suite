@@ -1,0 +1,87 @@
+Cancer-related Pathways and Gene Sets
+
+=== DNA Repair Pathways ===
+BRCA1/BRCA2 Pathway
+Homologous Recombination Repair
+Non-homologous End Joining
+Base Excision Repair
+Nucleotide Excision Repair
+Mismatch Repair
+Fanconi Anemia Pathway
+
+=== Cell Cycle Control ===
+p53 Pathway
+RB Pathway
+Cyclin D1/CDK4/6
+Cyclin E/CDK2
+G1/S Checkpoint
+G2/M Checkpoint
+Spindle Assembly Checkpoint
+
+=== Apoptosis Pathways ===
+Intrinsic Apoptosis
+Extrinsic Apoptosis
+Bcl-2 Family
+Caspase Cascade
+Death Receptor Signaling
+Mitochondrial Apoptosis
+
+=== Growth Factor Signaling ===
+EGFR/ERBB Signaling
+PI3K/AKT/mTOR
+RAS/RAF/MEK/ERK
+JAK/STAT
+WNT/β-catenin
+Hedgehog Signaling
+Notch Signaling
+
+=== Angiogenesis ===
+VEGF Signaling
+Angiopoietin/Tie2
+PDGF Signaling
+FGF Signaling
+HIF-1α Pathway
+
+=== Metastasis and Invasion ===
+Epithelial-Mesenchymal Transition (EMT)
+Matrix Metalloproteinases
+Integrin Signaling
+Rho GTPases
+TGF-β Signaling
+
+=== Immune Response ===
+T Cell Activation
+B Cell Signaling
+NK Cell Activity
+Cytokine Signaling
+Interferon Response
+Immune Checkpoint
+
+=== Metabolic Pathways ===
+Glycolysis
+Oxidative Phosphorylation
+Fatty Acid Synthesis
+Glutamine Metabolism
+One-Carbon Metabolism
+Pentose Phosphate Pathway
+
+=== Epigenetic Regulation ===
+DNA Methylation
+Histone Modifications
+Chromatin Remodeling
+MicroRNA Regulation
+Long Non-coding RNA
+
+=== Stress Response ===
+Hypoxia Response
+Oxidative Stress
+Endoplasmic Reticulum Stress
+Heat Shock Response
+DNA Damage Response
+
+=== Drug Resistance ===
+ABC Transporters
+Drug Metabolism Enzymes
+Target Mutations
+Bypass Mechanisms
+Epigenetic Modifications

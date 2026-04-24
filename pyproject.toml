@@ -1,0 +1,486 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cancer-genomics-analysis-suite"
+version = "1.0.0"
+description = "A comprehensive, production-ready platform for cancer genomics analysis featuring real-time mutation detection, clinical data integration, machine learning-based outcome prediction, and multi-omics data analysis."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Cancer Genomics Analysis Suite Team", email = "support@cancer-genomics.com"}
+]
+maintainers = [
+    {name = "Cancer Genomics Analysis Suite Team", email = "support@cancer-genomics.com"}
+]
+keywords = [
+    "cancer", "genomics", "bioinformatics", "machine-learning", "mutation-detection",
+    "clinical-data", "multi-omics", "real-time-analysis", "pipeline-orchestration"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.8"
+dependencies = [
+    # Core web framework
+    "dash>=2.14.1",
+    "plotly>=5.17.0",
+    "flask>=2.3.3",
+    "flask-sqlalchemy>=3.0.5",
+    "flask-cors>=4.0.0",
+    "flask-login>=0.6.3",
+    "gunicorn>=21.2.0",
+    
+    # Database
+    "sqlalchemy>=2.0.21",
+    "psycopg2-binary>=2.9.7",
+    
+    # Background tasks
+    "celery>=5.3.4",
+    "kombu>=5.3.4",
+    "redis>=5.0.0",
+    
+    # Data processing
+    "pandas>=2.1.1",
+    "numpy>=1.24.3",
+    "scipy>=1.11.3",
+    
+    # Machine learning
+    "scikit-learn>=1.3.1",
+    "xgboost>=1.7.6",
+    
+    # Bioinformatics
+    "biopython>=1.81",
+    
+    # Visualization
+    "matplotlib>=3.7.2",
+    "seaborn>=0.12.2",
+    
+    # HTTP requests
+    "requests>=2.31.0",
+    
+    # Development
+    "python-dotenv>=1.0.0",
+    
+    # Pipeline Orchestration
+    "snakemake>=7.32.4",
+    
+    # Graph Analytics
+    "neo4j>=5.15.0",
+    "networkx>=3.2.1",
+    "py2neo>=2021.2.3",
+    
+    # Real-time Processing
+    "kafka-python>=2.0.2",
+    "confluent-kafka>=2.3.0",
+    
+    # OAuth2 Authentication
+    "authlib>=1.2.1",
+    "python-jose[cryptography]>=3.3.0",
+    "requests-oauthlib>=1.3.1",
+    
+    
+    # File handling and utilities
+    "openpyxl>=3.1.2",
+    "xlsxwriter>=3.1.9",
+    
+    # Web interface enhancements
+    "dash-bootstrap-components>=1.5.0",
+    "dash-table>=5.0.0",
+    
+    # AI and Deep Learning Dependencies
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+    "torchaudio>=2.1.0",
+    "tensorflow>=2.15.0",
+    "keras>=2.15.0",
+    
+    # Large Language Models
+    "transformers>=4.35.2",
+    "sentence-transformers>=2.2.2",
+    "openai>=1.3.5",
+    "anthropic>=0.7.8",
+    "langchain>=0.0.340",
+    "langchain-community>=0.0.1",
+    "langchain-openai>=0.0.2",
+    
+    # Deep Learning for Genomics
+    "pyro-ppl>=1.8.6",
+    "pytorch-lightning>=2.1.1",
+    "optuna>=3.4.0",
+    
+    # Computer Vision and Image Processing
+    "opencv-python>=4.8.1.78",
+    "pillow>=10.1.0",
+    "scikit-image>=0.22.0",
+    
+    # Advanced ML and Statistics
+    "lightgbm>=4.1.0",
+    "catboost>=1.2.2",
+    "shap>=0.43.0",
+    "lime>=0.2.0.1",
+    
+    # Natural Language Processing
+    "spacy>=3.7.2",
+    "nltk>=3.8.1",
+    "textblob>=0.17.1",
+    "gensim>=4.3.2",
+    
+    # Vector Databases and Embeddings
+    "chromadb>=0.4.15",
+    "faiss-cpu>=1.7.4",
+    "pinecone-client>=2.2.4",
+    
+    # Model Serving and Deployment
+    "mlflow>=2.8.1",
+    "bentoml>=1.1.7",
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0",
+    
+    # Additional Scientific Computing
+    "statsmodels>=0.14.0",
+    "pymc>=5.8.0",
+    "arviz>=0.17.0",
+    
+    # Data Processing Enhancements
+    "dask>=2023.11.0",
+    "vaex>=4.17.0",
+    "modin>=0.23.0",
+    
+    # Visualization Enhancements
+    "bokeh>=3.3.2",
+    "altair>=5.2.0",
+    "streamlit>=1.28.1",
+    
+    # API and Web Framework Enhancements
+    "pydantic>=2.5.0",
+    "httpx>=0.25.2",
+    "websockets>=12.0",
+    
+    # Monitoring and Observability
+    "tensorboard>=2.15.1",
+    
+    # Security and Authentication
+    "cryptography>=41.0.8",
+    "passlib[bcrypt]>=1.7.4",
+    
+    # Async and Concurrency
+    "aiofiles>=23.2.1",
+    "aioredis>=2.0.1",
+    
+    # Configuration and Environment
+    "pydantic-settings>=2.1.0",
+    "hydra-core>=1.3.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.2",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.1",
+    "pytest-mock>=3.12.0",
+    "hypothesis>=6.92.1",
+    "black>=23.11.0",
+    "isort>=5.12.0",
+    "mypy>=1.7.1",
+    "flake8>=6.1.0",
+    "bandit>=1.7.5",
+    "safety>=2.3.5",
+    "pre-commit>=3.5.0",
+]
+test = [
+    "pytest>=7.4.2",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.1",
+    "pytest-mock>=3.12.0",
+    "hypothesis>=6.92.1",
+    "coverage>=7.3.2",
+    "psutil>=5.9.0",
+]
+# Optional stacks (omit from default install for Windows / minimal CI)
+galaxy = [
+    "bioblend>=3.2.0",
+]
+experiment-tracking = [
+    "wandb>=0.16.0",
+    "neptune>=1.8.15",
+]
+r-integration = [
+    "rpy2>=3.5.12",
+]
+ngs = [
+    "pysam>=0.21.0",
+]
+docs = [
+    "sphinx>=7.1.2",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    "sphinx-autodoc-typehints>=1.24.0",
+]
+all = [
+    "cancer-genomics-analysis-suite[dev,test,docs,galaxy,experiment-tracking,r-integration,ngs]"
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/cancer-genomics-analysis-suite"
+Documentation = "https://cancer-genomics-analysis-suite.readthedocs.io"
+Repository = "https://github.com/your-org/cancer-genomics-analysis-suite.git"
+"Bug Tracker" = "https://github.com/your-org/cancer-genomics-analysis-suite/issues"
+"Source Code" = "https://github.com/your-org/cancer-genomics-analysis-suite"
+"Download" = "https://github.com/your-org/cancer-genomics-analysis-suite/releases"
+
+[project.scripts]
+cancer-genomics = "CancerGenomicsSuite.main_dashboard:main"
+cancer-genomics-cli = "CancerGenomicsSuite.cli_bioinformatics_tools:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["CancerGenomicsSuite*"]
+
+[tool.setuptools.package-data]
+CancerGenomicsSuite = [
+    "data/*",
+    "templates/*",
+    "static/*",
+    "*.yaml",
+    "*.yml",
+    "*.json",
+    "*.md",
+]
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["CancerGenomicsSuite"]
+known_third_party = ["pandas", "numpy", "scipy", "sklearn", "matplotlib", "seaborn", "plotly", "dash", "flask", "celery", "redis", "kafka", "neo4j", "biopython", "pysam"]
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "celery.*",
+    "kafka.*",
+    "neo4j.*",
+    "biopython.*",
+    "pysam.*",
+    "rpy2.*",
+    "matlab.*",
+    "pymol.*",
+    "bioblend.*",
+    "wandb.*",
+    "neptune.*",
+    "pinecone.*",
+    "chromadb.*",
+    "faiss.*",
+    "mlflow.*",
+    "bentoml.*",
+    "streamlit.*",
+    "bokeh.*",
+    "altair.*",
+    "dask.*",
+    "vaex.*",
+    "modin.*",
+    "hydra.*",
+    "optuna.*",
+    "pyro.*",
+    "pytorch_lightning.*",
+    "transformers.*",
+    "sentence_transformers.*",
+    "openai.*",
+    "anthropic.*",
+    "langchain.*",
+    "spacy.*",
+    "nltk.*",
+    "textblob.*",
+    "gensim.*",
+    "shap.*",
+    "lime.*",
+    "tensorboard.*",
+    "tensorflow.*",
+    "keras.*",
+    "torch.*",
+    "torchvision.*",
+    "torchaudio.*",
+    "opencv.*",
+    "PIL.*",
+    "skimage.*",
+    "statsmodels.*",
+    "pymc.*",
+    "arviz.*",
+    "pydantic.*",
+    "httpx.*",
+    "websockets.*",
+    "aiofiles.*",
+    "aioredis.*",
+    "cryptography.*",
+    "passlib.*",
+    "jose.*",
+    "authlib.*",
+    "requests_oauthlib.*",
+    "networkx.*",
+    "py2neo.*",
+    "snakemake.*",
+    "nextflow.*",
+    "gunicorn.*",
+    "flask.*",
+    "dash.*",
+    "plotly.*",
+    "seaborn.*",
+    "matplotlib.*",
+    "scipy.*",
+    "sklearn.*",
+    "xgboost.*",
+    "lightgbm.*",
+    "catboost.*",
+    "pandas.*",
+    "numpy.*",
+    "sqlalchemy.*",
+    "psycopg2.*",
+    "redis.*",
+    "kombu.*",
+    "requests.*",
+    "openpyxl.*",
+    "xlsxwriter.*",
+    "dash_bootstrap_components.*",
+    "dash_table.*",
+    "fastapi.*",
+    "uvicorn.*",
+    "pytest.*",
+    "hypothesis.*",
+    "coverage.*",
+    "bandit.*",
+    "safety.*",
+    "pre_commit.*",
+    "sphinx.*",
+    "myst_parser.*",
+    "sphinx_autodoc_typehints.*",
+    "sphinx_rtd_theme.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--tb=short",
+    "--cov=CancerGenomicsSuite",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml",
+    "--cov-fail-under=10",
+]
+testpaths = ["CancerGenomicsSuite/tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests",
+    "performance: marks tests as performance tests",
+    "security: marks tests as security tests",
+    "bioinformatics: marks tests as bioinformatics-specific tests",
+    "ml: marks tests as machine learning tests",
+    "api: marks tests as API tests",
+    "database: marks tests as database tests",
+    "celery: marks tests as celery task tests",
+    "kafka: marks tests as kafka tests",
+    "neo4j: marks tests as neo4j tests",
+    "galaxy: marks tests as galaxy integration tests",
+    "r: marks tests as R integration tests",
+    "matlab: marks tests as MATLAB integration tests",
+    "pymol: marks tests as PyMOL integration tests",
+    "critical: high-confidence smoke/regression tests for product-risk areas (run: -m critical)",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+parallel = false
+source = ["CancerGenomicsSuite"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/env/*",
+    "*/build/*",
+    "*/dist/*",
+    "*/.*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Bandit configuration
+[tool.bandit]
+exclude_dirs = ["tests", "test_*"]
+skips = ["B101", "B601"]
+
+# Safety configuration
+[tool.safety]
+output = "json"

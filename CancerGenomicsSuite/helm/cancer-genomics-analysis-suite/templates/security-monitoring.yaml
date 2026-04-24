@@ -1,0 +1,396 @@
+{{- if .Values.security.monitoring.enabled }}
+# Security Monitoring ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-security-monitor
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: security
+spec:
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: security
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: {{ .Values.security.monitoring.interval | default "30s" }}
+    scrapeTimeout: {{ .Values.security.monitoring.scrapeTimeout | default "10s" }}
+---
+# Security Monitoring PrometheusRule
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-security-rules
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: security
+spec:
+  groups:
+  - name: cancer-genomics-security
+    rules:
+    # Certificate Expiration Alerts
+    - alert: CertificateExpiringSoon
+      expr: (certmanager_certificate_expiration_timestamp_seconds - time()) / 86400 < 30
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "Certificate expiring soon"
+        description: "Certificate {{ $labels.name }} will expire in {{ $value }} days"
+    
+    - alert: CertificateExpired
+      expr: (certmanager_certificate_expiration_timestamp_seconds - time()) / 86400 < 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Certificate has expired"
+        description: "Certificate {{ $labels.name }} has expired"
+    
+    # mTLS Certificate Alerts
+    - alert: MTLSCertificateExpiringSoon
+      expr: (certmanager_certificate_expiration_timestamp_seconds{name=~".*mtls.*"} - time()) / 86400 < 7
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "mTLS certificate expiring soon"
+        description: "mTLS certificate {{ $labels.name }} will expire in {{ $value }} days"
+    
+    # Secret Access Alerts
+    - alert: SuspiciousSecretAccess
+      expr: increase(kube_secret_access_total[5m]) > 10
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Suspicious secret access detected"
+        description: "High number of secret access attempts detected for {{ $labels.secret_name }}"
+    
+    # Network Policy Violations
+    - alert: NetworkPolicyViolation
+      expr: increase(kube_network_policy_violations_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Network policy violation detected"
+        description: "Network policy violation detected: {{ $labels.violation_type }}"
+    
+    # Pod Security Policy Violations
+    - alert: PodSecurityPolicyViolation
+      expr: increase(kube_pod_security_policy_violations_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Pod security policy violation detected"
+        description: "Pod security policy violation detected: {{ $labels.violation_type }}"
+    
+    # Failed Authentication Attempts
+    - alert: HighFailedAuthAttempts
+      expr: rate(kube_auth_failed_total[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High number of failed authentication attempts"
+        description: "Rate of failed authentication attempts is {{ $value }} per second"
+    
+    # Privilege Escalation Attempts
+    - alert: PrivilegeEscalationAttempt
+      expr: increase(kube_privilege_escalation_attempts_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Privilege escalation attempt detected"
+        description: "Privilege escalation attempt detected from {{ $labels.pod_name }}"
+    
+    # Container Runtime Security
+    - alert: ContainerRuntimeViolation
+      expr: increase(kube_container_runtime_violations_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Container runtime security violation"
+        description: "Container runtime security violation detected: {{ $labels.violation_type }}"
+    
+    # Resource Quota Violations
+    - alert: ResourceQuotaViolation
+      expr: increase(kube_resource_quota_violations_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Resource quota violation detected"
+        description: "Resource quota violation detected for {{ $labels.resource_type }}"
+    
+    # Security Context Violations
+    - alert: SecurityContextViolation
+      expr: increase(kube_security_context_violations_total[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Security context violation detected"
+        description: "Security context violation detected: {{ $labels.violation_type }}"
+    
+    # WAF Blocked Requests
+    - alert: HighWAFBlockedRequests
+      expr: rate(waf_blocked_requests_total[5m]) > 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High number of WAF blocked requests"
+        description: "WAF is blocking {{ $value }} requests per second"
+    
+    # DDoS Attack Detection
+    - alert: DDoSAttackDetected
+      expr: rate(nginx_ingress_controller_requests_total[1m]) > 100
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Potential DDoS attack detected"
+        description: "High request rate detected: {{ $value }} requests per second"
+    
+    # SSL/TLS Security Issues
+    - alert: WeakSSLConfiguration
+      expr: ssl_configuration_score < 0.8
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Weak SSL/TLS configuration detected"
+        description: "SSL/TLS configuration score is {{ $value }} (should be > 0.8)"
+    
+    # Security Headers Missing
+    - alert: MissingSecurityHeaders
+      expr: security_headers_score < 0.9
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Missing security headers"
+        description: "Security headers score is {{ $value }} (should be > 0.9)"
+{{- end }}
+---
+{{- if .Values.security.compliance.enabled }}
+# Compliance Monitoring ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-compliance-monitor
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: compliance
+spec:
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: compliance
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: {{ .Values.security.compliance.interval | default "60s" }}
+    scrapeTimeout: {{ .Values.security.compliance.scrapeTimeout | default "15s" }}
+---
+# Compliance Monitoring PrometheusRule
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-compliance-rules
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: compliance
+spec:
+  groups:
+  - name: cancer-genomics-compliance
+    rules:
+    # HIPAA Compliance
+    - alert: HIPAAComplianceViolation
+      expr: hipaa_compliance_score < 0.95
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "HIPAA compliance violation detected"
+        description: "HIPAA compliance score is {{ $value }} (should be > 0.95)"
+    
+    # GDPR Compliance
+    - alert: GDPRComplianceViolation
+      expr: gdpr_compliance_score < 0.95
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "GDPR compliance violation detected"
+        description: "GDPR compliance score is {{ $value }} (should be > 0.95)"
+    
+    # SOC 2 Compliance
+    - alert: SOC2ComplianceViolation
+      expr: soc2_compliance_score < 0.95
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "SOC 2 compliance violation detected"
+        description: "SOC 2 compliance score is {{ $value }} (should be > 0.95)"
+    
+    # Data Encryption at Rest
+    - alert: DataNotEncryptedAtRest
+      expr: data_encryption_at_rest_score < 1.0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Data not encrypted at rest"
+        description: "Data encryption at rest score is {{ $value }} (should be 1.0)"
+    
+    # Data Encryption in Transit
+    - alert: DataNotEncryptedInTransit
+      expr: data_encryption_in_transit_score < 1.0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Data not encrypted in transit"
+        description: "Data encryption in transit score is {{ $value }} (should be 1.0)"
+    
+    # Access Control Compliance
+    - alert: AccessControlComplianceViolation
+      expr: access_control_compliance_score < 0.95
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Access control compliance violation"
+        description: "Access control compliance score is {{ $value }} (should be > 0.95)"
+    
+    # Audit Logging Compliance
+    - alert: AuditLoggingComplianceViolation
+      expr: audit_logging_compliance_score < 0.95
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Audit logging compliance violation"
+        description: "Audit logging compliance score is {{ $value }} (should be > 0.95)"
+    
+    # Vulnerability Scanning
+    - alert: HighVulnerabilityCount
+      expr: vulnerability_count > 10
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High number of vulnerabilities detected"
+        description: "{{ $value }} vulnerabilities detected in the system"
+    
+    - alert: CriticalVulnerabilityDetected
+      expr: critical_vulnerability_count > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Critical vulnerability detected"
+        description: "{{ $value }} critical vulnerabilities detected"
+    
+    # Security Baseline Compliance
+    - alert: SecurityBaselineViolation
+      expr: security_baseline_compliance_score < 0.9
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Security baseline compliance violation"
+        description: "Security baseline compliance score is {{ $value }} (should be > 0.9)"
+{{- end }}
+---
+{{- if .Values.security.incidentResponse.enabled }}
+# Incident Response ServiceMonitor
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-incident-response-monitor
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: incident-response
+spec:
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: incident-response
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: {{ .Values.security.incidentResponse.interval | default "30s" }}
+    scrapeTimeout: {{ .Values.security.incidentResponse.scrapeTimeout | default "10s" }}
+---
+# Incident Response PrometheusRule
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-incident-response-rules
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: incident-response
+spec:
+  groups:
+  - name: cancer-genomics-incident-response
+    rules:
+    # Security Incident Detection
+    - alert: SecurityIncidentDetected
+      expr: security_incident_count > 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Security incident detected"
+        description: "{{ $value }} security incidents detected"
+    
+    # Incident Response Time
+    - alert: SlowIncidentResponse
+      expr: incident_response_time_seconds > 300
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Slow incident response time"
+        description: "Incident response time is {{ $value }} seconds (should be < 300s)"
+    
+    # Incident Escalation
+    - alert: IncidentEscalationRequired
+      expr: incident_severity_score > 0.8
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Incident escalation required"
+        description: "High severity incident detected (score: {{ $value }})"
+    
+    # Threat Intelligence
+    - alert: ThreatIntelligenceAlert
+      expr: threat_intelligence_score > 0.7
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Threat intelligence alert"
+        description: "Threat intelligence score is {{ $value }} (threshold: 0.7)"
+    
+    # Automated Response Actions
+    - alert: AutomatedResponseTriggered
+      expr: automated_response_actions_total > 0
+      for: 0m
+      labels:
+        severity: info
+      annotations:
+        summary: "Automated response action triggered"
+        description: "{{ $value }} automated response actions have been triggered"
+{{- end }}

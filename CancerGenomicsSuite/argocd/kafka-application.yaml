@@ -1,0 +1,108 @@
+---
+# ArgoCD Application for Kafka Infrastructure
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-kafka
+  namespace: argocd
+  labels:
+    app: cancer-genomics-kafka
+    environment: production
+    component: messaging
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: cancer-genomics-project
+  
+  source:
+    repoURL: https://strimzi.io/charts/
+    chart: strimzi-kafka-operator
+    targetRevision: 0.36.1
+    helm:
+      values: |
+        replicas: 1
+        image:
+          repository: quay.io/strimzi/kafka
+          tag: 0.36.1-kafka-3.5.0
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        monitoring:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          fsGroup: 1001
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  revisionHistoryLimit: 10
+---
+# ArgoCD Application for Kafka Cluster
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-kafka-cluster
+  namespace: argocd
+  labels:
+    app: cancer-genomics-kafka-cluster
+    environment: production
+    component: messaging
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: cancer-genomics-project
+  
+  source:
+    repoURL: https://github.com/your-org/cancer-genomics-analysis-suite
+    targetRevision: HEAD
+    path: k8s/kafka
+    directory:
+      recurse: true
+      include: "*.yaml"
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  
+  revisionHistoryLimit: 10

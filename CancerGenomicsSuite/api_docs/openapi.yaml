@@ -1,0 +1,871 @@
+openapi: 3.0.3
+info:
+  title: Cancer Genomics Analysis Suite API
+  description: |
+    Comprehensive API for cancer genomics analysis, including sequence analysis, 
+    variant annotation, machine learning predictions, and automated reporting.
+    
+    ## Features
+    - BLAST sequence analysis
+    - Genomic variant annotation
+    - Machine learning predictions
+    - Automated reporting
+    - User authentication and authorization
+    - Real-time data processing
+    
+    ## Authentication
+    This API uses JWT (JSON Web Token) for authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+    
+    ## Rate Limiting
+    API requests are rate limited to prevent abuse:
+    - General endpoints: 100 requests per minute
+    - Authentication endpoints: 5 requests per minute
+    - File upload endpoints: 10 requests per minute
+    
+  version: 1.0.0
+  contact:
+    name: Cancer Genomics Analysis Suite Team
+    email: support@cancer-genomics.com
+    url: https://github.com/your-org/cancer-genomics-analysis-suite
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://cancer-genomics.com/terms
+
+servers:
+  - url: https://api.cancer-genomics.com/v1
+    description: Production server
+  - url: https://staging-api.cancer-genomics.com/v1
+    description: Staging server
+  - url: http://localhost:8050/v1
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Health
+    description: Health check and system status
+  - name: BLAST
+    description: BLAST sequence analysis
+  - name: Annotation
+    description: Genomic variant annotation
+  - name: ML
+    description: Machine learning predictions
+  - name: Reports
+    description: Automated report generation
+  - name: Data
+    description: Data management and upload
+  - name: Users
+    description: User management
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check endpoint
+      description: Returns the health status of the application
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  app_name:
+                    type: string
+                    example: Cancer Genomics Analysis Suite
+                  version:
+                    type: string
+                    example: 1.0.0
+                  environment:
+                    type: string
+                    example: production
+                  timestamp:
+                    type: string
+                    format: date-time
+                  uptime:
+                    type: number
+                    example: 3600
+                  database:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: connected
+                      response_time:
+                        type: number
+                        example: 0.05
+                  redis:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        example: connected
+                      response_time:
+                        type: number
+                        example: 0.02
+
+  /api/status:
+    get:
+      tags:
+        - Health
+      summary: API status with feature flags
+      description: Returns detailed API status including feature flags and system metrics
+      responses:
+        '200':
+          description: API status information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: operational
+                  features:
+                    type: object
+                    properties:
+                      auth_enabled:
+                        type: boolean
+                        example: true
+                      api_enabled:
+                        type: boolean
+                        example: true
+                      dashboard_enabled:
+                        type: boolean
+                        example: true
+                      reporting_enabled:
+                        type: boolean
+                        example: true
+                  metrics:
+                    type: object
+                    properties:
+                      active_users:
+                        type: integer
+                        example: 42
+                      total_requests:
+                        type: integer
+                        example: 12345
+                      average_response_time:
+                        type: number
+                        example: 0.15
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: secure_password
+                remember:
+                  type: boolean
+                  example: false
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+                  token_type:
+                    type: string
+                    example: Bearer
+                  expires_in:
+                    type: integer
+                    example: 3600
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: User registration
+      description: Register a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - confirm_password
+              properties:
+                username:
+                  type: string
+                  example: newuser
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  example: secure_password
+                confirm_password:
+                  type: string
+                  format: password
+                  example: secure_password
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User created successfully
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/profile:
+    get:
+      tags:
+        - Authentication
+      summary: Get user profile
+      description: Get current user's profile information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /blast/analyze:
+    post:
+      tags:
+        - BLAST
+      summary: Run BLAST analysis
+      description: Perform BLAST sequence analysis on provided sequences
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - sequences
+                - database
+              properties:
+                sequences:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: seq_001
+                      sequence:
+                        type: string
+                        example: ATGCGATCGATCGATCGATCG
+                      description:
+                        type: string
+                        example: Sample sequence 1
+                database:
+                  type: string
+                  enum: [cancer_genes, oncogenes, tumor_suppressors, cancer_proteins, dna_repair_genes]
+                  example: cancer_genes
+                parameters:
+                  type: object
+                  properties:
+                    evalue:
+                      type: number
+                      example: 1e-5
+                    max_target_seqs:
+                      type: integer
+                      example: 100
+                    word_size:
+                      type: integer
+                      example: 11
+      responses:
+        '200':
+          description: BLAST analysis completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    example: blast_job_12345
+                  status:
+                    type: string
+                    example: completed
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BlastResult'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /blast/jobs/{job_id}:
+    get:
+      tags:
+        - BLAST
+      summary: Get BLAST job status
+      description: Get the status and results of a BLAST analysis job
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: blast_job_12345
+      responses:
+        '200':
+          description: Job status and results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    example: blast_job_12345
+                  status:
+                    type: string
+                    enum: [pending, running, completed, failed]
+                    example: completed
+                  created_at:
+                    type: string
+                    format: date-time
+                  completed_at:
+                    type: string
+                    format: date-time
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BlastResult'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /annotation/annotate:
+    post:
+      tags:
+        - Annotation
+      summary: Annotate genomic variants
+      description: Annotate genomic variants with functional predictions and clinical significance
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - variants
+              properties:
+                variants:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Variant'
+                annotation_sources:
+                  type: array
+                  items:
+                    type: string
+                    enum: [ensembl, uniprot, clinvar, cosmic, gnomad]
+                  example: [ensembl, clinvar, cosmic]
+      responses:
+        '200':
+          description: Annotation completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    example: annotation_job_12345
+                  status:
+                    type: string
+                    example: completed
+                  annotations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Annotation'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /ml/predict:
+    post:
+      tags:
+        - ML
+      summary: Run ML prediction
+      description: Run machine learning prediction on genomic data
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model_type
+                - features
+              properties:
+                model_type:
+                  type: string
+                  enum: [cancer_classification, drug_response, survival_prediction, mutation_effect]
+                  example: cancer_classification
+                features:
+                  type: object
+                  properties:
+                    gene_expression:
+                      type: array
+                      items:
+                        type: number
+                    mutations:
+                      type: array
+                      items:
+                        type: string
+                    clinical_data:
+                      type: object
+                model_parameters:
+                  type: object
+      responses:
+        '200':
+          description: Prediction completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  prediction_id:
+                    type: string
+                    example: pred_12345
+                  predictions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Prediction'
+                  confidence_scores:
+                    type: array
+                    items:
+                      type: number
+                  model_info:
+                    type: object
+                    properties:
+                      model_name:
+                        type: string
+                      model_version:
+                        type: string
+                      accuracy:
+                        type: number
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /reports/generate:
+    post:
+      tags:
+        - Reports
+      summary: Generate analysis report
+      description: Generate automated analysis report
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - report_type
+                - data_sources
+              properties:
+                report_type:
+                  type: string
+                  enum: [analysis_summary, variant_report, expression_analysis, ml_results]
+                  example: analysis_summary
+                data_sources:
+                  type: array
+                  items:
+                    type: string
+                  example: [blast_results, annotations, predictions]
+                format:
+                  type: string
+                  enum: [pdf, html, json]
+                  example: pdf
+                template:
+                  type: string
+                  example: standard_template
+      responses:
+        '200':
+          description: Report generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                    example: report_12345
+                  download_url:
+                    type: string
+                    example: /api/reports/download/report_12345
+                  format:
+                    type: string
+                    example: pdf
+                  size:
+                    type: integer
+                    example: 1024000
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /data/upload:
+    post:
+      tags:
+        - Data
+      summary: Upload data files
+      description: Upload genomic data files for analysis
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - file_type
+              properties:
+                file:
+                  type: string
+                  format: binary
+                file_type:
+                  type: string
+                  enum: [fasta, fastq, vcf, csv, json]
+                  example: fasta
+                description:
+                  type: string
+                  example: Sample genomic data
+                metadata:
+                  type: object
+      responses:
+        '201':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file_id:
+                    type: string
+                    example: file_12345
+                  filename:
+                    type: string
+                    example: sample.fasta
+                  size:
+                    type: integer
+                    example: 1024000
+                  upload_url:
+                    type: string
+                    example: /api/data/files/file_12345
+        '400':
+          description: Invalid file or request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/login endpoint
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: user@example.com
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        created_at:
+          type: string
+          format: date-time
+        last_login:
+          type: string
+          format: date-time
+        permissions:
+          type: array
+          items:
+            type: string
+          example: [read_data, write_data, admin]
+
+    BlastResult:
+      type: object
+      properties:
+        query_id:
+          type: string
+          example: seq_001
+        subject_id:
+          type: string
+          example: TP53_gene
+        identity:
+          type: number
+          example: 95.5
+        alignment_length:
+          type: integer
+          example: 150
+        mismatches:
+          type: integer
+          example: 7
+        gap_opens:
+          type: integer
+          example: 1
+        query_start:
+          type: integer
+          example: 1
+        query_end:
+          type: integer
+          example: 150
+        subject_start:
+          type: integer
+          example: 100
+        subject_end:
+          type: integer
+          example: 249
+        evalue:
+          type: number
+          example: 1e-50
+        bit_score:
+          type: number
+          example: 200.5
+
+    Variant:
+      type: object
+      properties:
+        chromosome:
+          type: string
+          example: "17"
+        position:
+          type: integer
+          example: 7574003
+        reference:
+          type: string
+          example: "G"
+        alternate:
+          type: string
+          example: "A"
+        gene_symbol:
+          type: string
+          example: "TP53"
+        transcript_id:
+          type: string
+          example: "ENST00000269305"
+
+    Annotation:
+      type: object
+      properties:
+        variant_id:
+          type: string
+          example: "17:7574003:G>A"
+        gene_symbol:
+          type: string
+          example: "TP53"
+        consequence_type:
+          type: string
+          example: "missense_variant"
+        clinical_significance:
+          type: string
+          example: "Pathogenic"
+        functional_predictions:
+          type: object
+          properties:
+            sift_score:
+              type: number
+              example: 0.01
+            sift_prediction:
+              type: string
+              example: "deleterious"
+            polyphen2_score:
+              type: number
+              example: 0.98
+            polyphen2_prediction:
+              type: string
+              example: "probably_damaging"
+        population_frequencies:
+          type: object
+          properties:
+            gnomad_af:
+              type: number
+              example: 0.0001
+            exac_af:
+              type: number
+              example: 0.0002
+
+    Prediction:
+      type: object
+      properties:
+        sample_id:
+          type: string
+          example: "sample_001"
+        prediction:
+          type: string
+          example: "BRCA"
+        confidence:
+          type: number
+          example: 0.95
+        probabilities:
+          type: object
+          additionalProperties:
+            type: number
+          example:
+            BRCA: 0.95
+            NSCLC: 0.03
+            COAD: 0.02
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Validation error"
+        message:
+          type: string
+          example: "Invalid input parameters"
+        details:
+          type: object
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+          example: "req_12345"
+
+  examples:
+    BlastAnalysisRequest:
+      summary: BLAST analysis request
+      value:
+        sequences:
+          - id: "seq_001"
+            sequence: "ATGCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG"
+            description: "Sample sequence 1"
+        database: "cancer_genes"
+        parameters:
+          evalue: 1e-5
+          max_target_seqs: 100
+
+    AnnotationRequest:
+      summary: Variant annotation request
+      value:
+        variants:
+          - chromosome: "17"
+            position: 7574003
+            reference: "G"
+            alternate: "A"
+            gene_symbol: "TP53"
+        annotation_sources: ["ensembl", "clinvar", "cosmic"]
+
+    MLPredictionRequest:
+      summary: ML prediction request
+      value:
+        model_type: "cancer_classification"
+        features:
+          gene_expression: [8.5, 7.2, 6.8, 9.1, 5.3]
+          mutations: ["TP53:p.R175H", "BRCA1:p.R1699W"]
+          clinical_data:
+            age: 65
+            gender: "Female"

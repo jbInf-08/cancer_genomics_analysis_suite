@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} - Cancer Genomics Analysis Suite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .feature-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-dna me-2"></i>{{ app_name }}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/health">Health</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 mb-4">
+                <i class="fas fa-microscope me-3"></i>
+                Cancer Genomics Analysis Suite
+            </h1>
+            <p class="lead mb-4">
+                Advanced computational tools for cancer genomics research, 
+                multi-omics integration, and clinical outcome prediction.
+            </p>
+            <p class="mb-4">
+                Version {{ app_version }} | Environment: {{ environment }}
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/dashboard" class="btn btn-light btn-lg">
+                    <i class="fas fa-chart-line me-2"></i>Go to Dashboard
+                </a>
+                <a href="/auth/login" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="display-5 mb-3">Key Features</h2>
+                    <p class="lead text-muted">Comprehensive tools for cancer genomics research</p>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-chart-bar feature-icon"></i>
+                            <h5 class="card-title">Gene Expression Analysis</h5>
+                            <p class="card-text">
+                                Advanced normalization, differential expression analysis, 
+                                and pathway enrichment for cancer genomics data.
+                            </p>
+                            {% if features.gene_expression_analysis %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Disabled</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-dna feature-icon"></i>
+                            <h5 class="card-title">Mutation Analysis</h5>
+                            <p class="card-text">
+                                Comprehensive mutation detection, annotation, 
+                                and effect prediction for cancer variants.
+                            </p>
+                            {% if features.mutation_analysis %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Disabled</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-brain feature-icon"></i>
+                            <h5 class="card-title">Machine Learning</h5>
+                            <p class="card-text">
+                                Predictive models for clinical outcomes, 
+                                drug response, and survival analysis.
+                            </p>
+                            {% if features.machine_learning %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Disabled</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-project-diagram feature-icon"></i>
+                            <h5 class="card-title">Pathway Analysis</h5>
+                            <p class="card-text">
+                                KEGG, Reactome, and GO pathway enrichment 
+                                analysis with interactive visualizations.
+                            </p>
+                            {% if features.pathway_analysis %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Disabled</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-cube feature-icon"></i>
+                            <h5 class="card-title">Protein Structure</h5>
+                            <p class="card-text">
+                                3D protein structure visualization and 
+                                mutation impact analysis.
+                            </p>
+                            <span class="badge bg-success">Available</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card feature-card h-100 text-center p-4">
+                        <div class="card-body">
+                            <i class="fas fa-layer-group feature-icon"></i>
+                            <h5 class="card-title">Multi-Omics Integration</h5>
+                            <p class="card-text">
+                                Integrate genomics, transcriptomics, 
+                                and proteomics data for comprehensive analysis.
+                            </p>
+                            {% if features.multi_omics_integration %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Disabled</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Status Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-4">
+                    <h3>System Status</h3>
+                    <p class="text-muted">Real-time system health and feature availability</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-heartbeat text-success me-2"></i>
+                                Health Check
+                            </h5>
+                            <p class="card-text">System is operational and ready for analysis.</p>
+                            <a href="/health" class="btn btn-outline-primary btn-sm">Check Status</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-cogs text-info me-2"></i>
+                                API Status
+                            </h5>
+                            <p class="card-text">All APIs are functioning normally.</p>
+                            <a href="/api/status" class="btn btn-outline-primary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>{{ app_name }}</h5>
+                    <p class="mb-0">Advanced cancer genomics analysis platform</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        Version {{ app_version }} | 
+                        <a href="/health" class="text-light">Health Check</a> | 
+                        <a href="/api/status" class="text-light">API Status</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

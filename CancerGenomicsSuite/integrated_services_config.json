@@ -1,0 +1,41 @@
+{
+  "services": {
+    "cgas": {
+      "enabled": true,
+      "command": "python main_dashboard.py",
+      "working_directory": ".",
+      "port": 8050,
+      "health_endpoint": "/api/health",
+      "startup_timeout": 30,
+      "description": "Cancer Genomics Analysis Suite - Main dashboard and biomarker analysis"
+    },
+    "biomarker_identifier": {
+      "enabled": true,
+      "command": "docker-compose up",
+      "working_directory": "C:\\Users\\jbaut\\biomarker_identifier",
+      "port": 8000,
+      "health_endpoint": "/health",
+      "startup_timeout": 60,
+      "description": "Biomarker Identifier - Advanced ML-based biomarker analysis service"
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "interval": 30,
+    "timeout": 5,
+    "max_consecutive_failures": 3
+  },
+  "integration": {
+    "auto_discovery": true,
+    "load_balancing": "round_robin",
+    "fallback_enabled": true,
+    "cache_enabled": true,
+    "cache_ttl": 3600
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "integrated_services.log",
+    "max_size": "10MB",
+    "backup_count": 5
+  }
+}

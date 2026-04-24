@@ -1,0 +1,65 @@
+{
+  "blast_databases": {
+    "enabled": true,
+    "output_dir": "blast_databases",
+    "use_api": true,
+    "use_mock": true,
+    "databases": [
+      "cancer_genes",
+      "oncogenes",
+      "tumor_suppressors",
+      "cancer_proteins",
+      "dna_repair_genes"
+    ]
+  },
+  "mock_data": {
+    "enabled": true,
+    "output_dir": "data",
+    "num_patients": 1000,
+    "num_samples": 1200,
+    "num_genes": 20000,
+    "num_mutations": 5000,
+    "seed": 42,
+    "cancer_types": [
+      "BRCA",
+      "NSCLC",
+      "COAD",
+      "PRAD",
+      "STAD",
+      "LIHC",
+      "THCA",
+      "BLCA",
+      "HNSC",
+      "KIRC",
+      "LUSC",
+      "UCEC",
+      "CESC",
+      "SARC",
+      "DLBC",
+      "LGG",
+      "GBM",
+      "OV",
+      "SKCM",
+      "PAAD"
+    ]
+  },
+  "dependencies": {
+    "python_packages": [
+      "numpy",
+      "pandas",
+      "biopython",
+      "requests",
+      "scipy"
+    ],
+    "external_tools": [
+      "blastn",
+      "blastp",
+      "makeblastdb"
+    ]
+  },
+  "paths": {
+    "blast_databases": "blast_databases",
+    "mock_data": "data",
+    "logs": "logs"
+  }
+}

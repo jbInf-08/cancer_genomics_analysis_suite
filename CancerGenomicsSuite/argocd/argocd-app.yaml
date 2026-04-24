@@ -1,0 +1,302 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-analysis-suite
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: cancer-genomics-analysis-suite
+    app.kubernetes.io/part-of: cancer-genomics
+    app.kubernetes.io/component: application
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-options: Prune=true,CreateNamespace=true
+    argocd.argoproj.io/sync-options: ServerSideApply=true
+spec:
+  project: cancer-genomics
+  source:
+    repoURL: https://github.com/your-org/cancer-genomics-analysis-suite
+    targetRevision: HEAD
+    path: helm/cancer-genomics-analysis-suite
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-${spec.destination.namespace}.yaml
+      parameters:
+        - name: global.domain
+          value: "cancer-genomics.yourdomain.com"
+        - name: global.apiDomain
+          value: "api.cancer-genomics.yourdomain.com"
+        - name: global.cloudProvider
+          value: "aws"  # or "gcp"
+        - name: global.region
+          value: "us-west-2"  # or "us-central1"
+        - name: ingress.enabled
+          value: "true"
+        - name: monitoring.enabled
+          value: "true"
+        - name: kafka.enabled
+          value: "true"
+        - name: neo4j.enabled
+          value: "true"
+        - name: kafkaStreamProcessors.enabled
+          value: "true"
+        - name: snakemakeWorkflows.enabled
+          value: "true"
+        - name: nextflowWorkflows.enabled
+          value: "true"
+        - name: sealedSecrets.enabled
+          value: "true"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cancer-genomics
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+    - group: ""
+      kind: Service
+      jsonPointers:
+        - /spec/clusterIP
+    - group: ""
+      kind: Secret
+      jsonPointers:
+        - /data
+  info:
+    - name: "Application URL"
+      value: "https://cancer-genomics.yourdomain.com"
+    - name: "API URL"
+      value: "https://api.cancer-genomics.yourdomain.com"
+    - name: "Grafana URL"
+      value: "https://grafana.cancer-genomics.yourdomain.com"
+    - name: "Prometheus URL"
+      value: "https://prometheus.cancer-genomics.yourdomain.com"
+    - name: "ArgoCD URL"
+      value: "https://argocd.cancer-genomics.yourdomain.com"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-monitoring
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: cancer-genomics-monitoring
+    app.kubernetes.io/part-of: cancer-genomics
+    app.kubernetes.io/component: monitoring
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: Prune=true,CreateNamespace=true
+spec:
+  project: cancer-genomics
+  source:
+    repoURL: https://github.com/your-org/cancer-genomics-analysis-suite
+    targetRevision: HEAD
+    path: argocd/monitoring
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-${spec.destination.namespace}.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-kafka
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: cancer-genomics-kafka
+    app.kubernetes.io/part-of: cancer-genomics
+    app.kubernetes.io/component: kafka
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: Prune=true,CreateNamespace=true
+spec:
+  project: cancer-genomics
+  source:
+    repoURL: https://github.com/your-org/cancer-genomics-analysis-suite
+    targetRevision: HEAD
+    path: argocd/kafka
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-${spec.destination.namespace}.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-workflows
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: cancer-genomics-workflows
+    app.kubernetes.io/part-of: cancer-genomics
+    app.kubernetes.io/component: workflows
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: Prune=true,CreateNamespace=true
+spec:
+  project: cancer-genomics
+  source:
+    repoURL: https://github.com/your-org/cancer-genomics-analysis-suite
+    targetRevision: HEAD
+    path: argocd/workflows
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-${spec.destination.namespace}.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: workflows
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-security
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: cancer-genomics-security
+    app.kubernetes.io/part-of: cancer-genomics
+    app.kubernetes.io/component: security
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-options: Prune=true,CreateNamespace=true
+spec:
+  project: cancer-genomics
+  source:
+    repoURL: https://github.com/your-org/cancer-genomics-analysis-suite
+    targetRevision: HEAD
+    path: argocd/security
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-${spec.destination.namespace}.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: security
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cancer-genomics-backup
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: cancer-genomics-backup
+    app.kubernetes.io/part-of: cancer-genomics
+    app.kubernetes.io/component: backup
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+    argocd.argoproj.io/sync-options: Prune=true,CreateNamespace=true
+spec:
+  project: cancer-genomics
+  source:
+    repoURL: https://github.com/your-org/cancer-genomics-analysis-suite
+    targetRevision: HEAD
+    path: argocd/backup
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-${spec.destination.namespace}.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backup
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10

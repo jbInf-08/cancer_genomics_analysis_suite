@@ -1,0 +1,392 @@
+{{- if .Values.argoWorkflows.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.argoWorkflows.namespace }}
+  labels:
+    name: {{ .Values.argoWorkflows.namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.argoWorkflows.config.serviceAccount }}
+  namespace: {{ .Values.argoWorkflows.namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: argo-workflow-role
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/exec
+  - pods/log
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - argoproj.io
+  resources:
+  - workflows
+  - workflowtemplates
+  - cronworkflows
+  - clusterworkflowtemplates
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: argo-workflow-binding
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: argo-workflow-role
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.argoWorkflows.config.serviceAccount }}
+  namespace: {{ .Values.argoWorkflows.namespace }}
+---
+{{- if .Values.argoWorkflows.templates.blastPipeline.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: blast-pipeline
+  namespace: {{ .Values.argoWorkflows.namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  serviceAccountName: {{ .Values.argoWorkflows.config.serviceAccount }}
+  entrypoint: blast-analysis
+  arguments:
+    parameters:
+    - name: input-fasta
+      value: ""
+    - name: database-type
+      value: "nt"
+    - name: output-format
+      value: "tabular"
+  templates:
+  - name: blast-analysis
+    steps:
+    - - name: prepare-data
+        template: prepare-blast-data
+    - - name: run-blast
+        template: run-blast-search
+        arguments:
+          artifacts:
+          - name: input-data
+            from: "{{steps.prepare-data.outputs.artifacts.fasta-data}}"
+    - - name: process-results
+        template: process-blast-results
+        arguments:
+          artifacts:
+          - name: blast-results
+            from: "{{steps.run-blast.outputs.artifacts.blast-output}}"
+  - name: prepare-blast-data
+    container:
+      image: {{ .Values.argoWorkflows.templates.blastPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Preparing BLAST data..."
+        # Add data preparation logic here
+        echo "Data preparation completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.blastPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: fasta-data
+        path: /tmp/input.fasta
+  - name: run-blast-search
+    container:
+      image: {{ .Values.argoWorkflows.templates.blastPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Running BLAST search..."
+        # Add BLAST execution logic here
+        echo "BLAST search completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.blastPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: blast-output
+        path: /tmp/blast-results.txt
+  - name: process-blast-results
+    container:
+      image: {{ .Values.argoWorkflows.templates.blastPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Processing BLAST results..."
+        # Add result processing logic here
+        echo "Result processing completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.blastPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: processed-results
+        path: /tmp/processed-results.json
+{{- end }}
+---
+{{- if .Values.argoWorkflows.templates.annotationPipeline.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: annotation-pipeline
+  namespace: {{ .Values.argoWorkflows.namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  serviceAccountName: {{ .Values.argoWorkflows.config.serviceAccount }}
+  entrypoint: annotation-analysis
+  arguments:
+    parameters:
+    - name: input-variants
+      value: ""
+    - name: annotation-sources
+      value: "ensembl,clinvar,cosmic"
+  templates:
+  - name: annotation-analysis
+    steps:
+    - - name: fetch-annotations
+        template: fetch-variant-annotations
+    - - name: merge-annotations
+        template: merge-annotation-data
+        arguments:
+          artifacts:
+          - name: annotation-data
+            from: "{{steps.fetch-annotations.outputs.artifacts.annotations}}"
+  - name: fetch-variant-annotations
+    container:
+      image: {{ .Values.argoWorkflows.templates.annotationPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Fetching variant annotations..."
+        # Add annotation fetching logic here
+        echo "Annotation fetching completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.annotationPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: annotations
+        path: /tmp/annotations.json
+  - name: merge-annotation-data
+    container:
+      image: {{ .Values.argoWorkflows.templates.annotationPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Merging annotation data..."
+        # Add data merging logic here
+        echo "Data merging completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.annotationPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: merged-annotations
+        path: /tmp/merged-annotations.json
+{{- end }}
+---
+{{- if .Values.argoWorkflows.templates.mlPipeline.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: ml-pipeline
+  namespace: {{ .Values.argoWorkflows.namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  serviceAccountName: {{ .Values.argoWorkflows.config.serviceAccount }}
+  entrypoint: ml-training
+  arguments:
+    parameters:
+    - name: training-data
+      value: ""
+    - name: model-type
+      value: "random-forest"
+    - name: validation-split
+      value: "0.2"
+  templates:
+  - name: ml-training
+    steps:
+    - - name: prepare-data
+        template: prepare-training-data
+    - - name: train-model
+        template: train-ml-model
+        arguments:
+          artifacts:
+          - name: training-data
+            from: "{{steps.prepare-data.outputs.artifacts.processed-data}}"
+    - - name: validate-model
+        template: validate-model
+        arguments:
+          artifacts:
+          - name: trained-model
+            from: "{{steps.train-model.outputs.artifacts.model}}"
+  - name: prepare-training-data
+    container:
+      image: {{ .Values.argoWorkflows.templates.mlPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Preparing training data..."
+        # Add data preparation logic here
+        echo "Data preparation completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.mlPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: processed-data
+        path: /tmp/processed-data.csv
+  - name: train-ml-model
+    container:
+      image: {{ .Values.argoWorkflows.templates.mlPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Training ML model..."
+        # Add model training logic here
+        echo "Model training completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.mlPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: model
+        path: /tmp/trained-model.pkl
+  - name: validate-model
+    container:
+      image: {{ .Values.argoWorkflows.templates.mlPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Validating model..."
+        # Add model validation logic here
+        echo "Model validation completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.mlPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: validation-results
+        path: /tmp/validation-results.json
+{{- end }}
+---
+{{- if .Values.argoWorkflows.templates.reportingPipeline.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: reporting-pipeline
+  namespace: {{ .Values.argoWorkflows.namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+spec:
+  serviceAccountName: {{ .Values.argoWorkflows.config.serviceAccount }}
+  entrypoint: generate-report
+  arguments:
+    parameters:
+    - name: report-type
+      value: "comprehensive"
+    - name: output-format
+      value: "pdf"
+  templates:
+  - name: generate-report
+    steps:
+    - - name: collect-data
+        template: collect-analysis-data
+    - - name: generate-report
+        template: create-report
+        arguments:
+          artifacts:
+          - name: analysis-data
+            from: "{{steps.collect-data.outputs.artifacts.data}}"
+  - name: collect-analysis-data
+    container:
+      image: {{ .Values.argoWorkflows.templates.reportingPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Collecting analysis data..."
+        # Add data collection logic here
+        echo "Data collection completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.reportingPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: data
+        path: /tmp/analysis-data.json
+  - name: create-report
+    container:
+      image: {{ .Values.argoWorkflows.templates.reportingPipeline.image }}
+      command: [sh, -c]
+      args:
+      - |
+        echo "Generating report..."
+        # Add report generation logic here
+        echo "Report generation completed"
+      resources:
+        {{- toYaml .Values.argoWorkflows.templates.reportingPipeline.resources | nindent 8 }}
+    outputs:
+      artifacts:
+      - name: report
+        path: /tmp/generated-report.pdf
+{{- end }}
+---
+{{- if and .Values.argoWorkflows.cronWorkflows.enabled .Values.argoWorkflows.cronWorkflows.schedules }}
+{{- range .Values.argoWorkflows.cronWorkflows.schedules }}
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.argoWorkflows.namespace }}
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" $ | nindent 4 }}
+spec:
+  schedule: {{ .schedule }}
+  workflowSpec:
+    workflowTemplateRef:
+      name: {{ .workflowTemplate }}
+    serviceAccountName: {{ $.Values.argoWorkflows.config.serviceAccount }}
+{{- end }}
+{{- end }}
+{{- end }}

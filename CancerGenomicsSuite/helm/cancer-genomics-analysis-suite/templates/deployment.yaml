@@ -1,0 +1,303 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-web
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: web
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.web.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: web
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: web
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-db
+          image: postgres:15-alpine
+          command: ['sh', '-c', 'until pg_isready -h {{ include "cancer-genomics-analysis-suite.postgresql.fullname" . }} -p 5432; do echo waiting for postgres; sleep 2; done;']
+        - name: wait-for-redis
+          image: redis:7-alpine
+          command: ['sh', '-c', 'until redis-cli -h {{ include "cancer-genomics-analysis-suite.redis.fullname" . }}-master -p 6379 ping; do echo waiting for redis; sleep 2; done;']
+      containers:
+        - name: web
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8050
+              protocol: TCP
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: FLASK_ENV
+              value: {{ .Values.config.app.environment | quote }}
+            - name: DATABASE_HOST
+              value: {{ include "cancer-genomics-analysis-suite.postgresql.fullname" . | quote }}
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              value: {{ .Values.config.database.name | quote }}
+            - name: DATABASE_USER
+              value: {{ .Values.config.database.user | quote }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.postgresql.secretName" . }}
+                  key: postgres-password
+            - name: REDIS_HOST
+              value: {{ include "cancer-genomics-analysis-suite.redis.fullname" . }}-master
+            - name: REDIS_PORT
+              value: "6379"
+            - name: CELERY_BROKER_URL
+              value: {{ .Values.config.celery.broker_url | quote }}
+            - name: CELERY_RESULT_BACKEND
+              value: {{ .Values.config.celery.result_backend | quote }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.secretName" . }}
+                  key: secret-key
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.secretName" . }}
+                  key: jwt-secret-key
+            - name: LOG_LEVEL
+              value: {{ .Values.config.app.debug | ternary "DEBUG" "INFO" | quote }}
+            {{- with .Values.web.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.web.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.web.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.web.resources | nindent 12 }}
+          volumeMounts:
+            - name: uploads
+              mountPath: /app/uploads
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: uploads
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+      {{- with .Values.web.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.web.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.web.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery-worker
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: worker
+spec:
+  replicas: {{ .Values.celery.worker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: worker
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: worker
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-db
+          image: postgres:15-alpine
+          command: ['sh', '-c', 'until pg_isready -h {{ include "cancer-genomics-analysis-suite.postgresql.fullname" . }} -p 5432; do echo waiting for postgres; sleep 2; done;']
+        - name: wait-for-redis
+          image: redis:7-alpine
+          command: ['sh', '-c', 'until redis-cli -h {{ include "cancer-genomics-analysis-suite.redis.fullname" . }}-master -p 6379 ping; do echo waiting for redis; sleep 2; done;']
+      containers:
+        - name: celery-worker
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["celery", "-A", "celery_worker.celery", "worker", "--loglevel=info", "--concurrency=2"]
+          env:
+            - name: FLASK_ENV
+              value: {{ .Values.config.app.environment | quote }}
+            - name: DATABASE_HOST
+              value: {{ include "cancer-genomics-analysis-suite.postgresql.fullname" . | quote }}
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              value: {{ .Values.config.database.name | quote }}
+            - name: DATABASE_USER
+              value: {{ .Values.config.database.user | quote }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.postgresql.secretName" . }}
+                  key: postgres-password
+            - name: CELERY_BROKER_URL
+              value: {{ .Values.config.celery.broker_url | quote }}
+            - name: CELERY_RESULT_BACKEND
+              value: {{ .Values.config.celery.result_backend | quote }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.secretName" . }}
+                  key: secret-key
+            - name: LOG_LEVEL
+              value: {{ .Values.config.app.debug | ternary "DEBUG" "INFO" | quote }}
+            {{- with .Values.celery.worker.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.celery.worker.resources | nindent 12 }}
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: logs
+          emptyDir: {}
+      {{- with .Values.celery.worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.celery.worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.celery.worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-celery-beat
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+    component: scheduler
+spec:
+  replicas: {{ .Values.celery.beat.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 6 }}
+      component: scheduler
+  template:
+    metadata:
+      labels:
+        {{- include "cancer-genomics-analysis-suite.selectorLabels" . | nindent 8 }}
+        component: scheduler
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "cancer-genomics-analysis-suite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: wait-for-db
+          image: postgres:15-alpine
+          command: ['sh', '-c', 'until pg_isready -h {{ include "cancer-genomics-analysis-suite.postgresql.fullname" . }} -p 5432; do echo waiting for postgres; sleep 2; done;']
+        - name: wait-for-redis
+          image: redis:7-alpine
+          command: ['sh', '-c', 'until redis-cli -h {{ include "cancer-genomics-analysis-suite.redis.fullname" . }}-master -p 6379 ping; do echo waiting for redis; sleep 2; done;']
+      containers:
+        - name: celery-beat
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["celery", "-A", "celery_worker.celery", "beat", "--loglevel=info"]
+          env:
+            - name: FLASK_ENV
+              value: {{ .Values.config.app.environment | quote }}
+            - name: DATABASE_HOST
+              value: {{ include "cancer-genomics-analysis-suite.postgresql.fullname" . | quote }}
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              value: {{ .Values.config.database.name | quote }}
+            - name: DATABASE_USER
+              value: {{ .Values.config.database.user | quote }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.postgresql.secretName" . }}
+                  key: postgres-password
+            - name: CELERY_BROKER_URL
+              value: {{ .Values.config.celery.broker_url | quote }}
+            - name: CELERY_RESULT_BACKEND
+              value: {{ .Values.config.celery.result_backend | quote }}
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "cancer-genomics-analysis-suite.secretName" . }}
+                  key: secret-key
+            - name: LOG_LEVEL
+              value: {{ .Values.config.app.debug | ternary "DEBUG" "INFO" | quote }}
+            {{- with .Values.celery.beat.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.celery.beat.resources | nindent 12 }}
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: logs
+          emptyDir: {}
+      {{- with .Values.celery.beat.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.celery.beat.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.celery.beat.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

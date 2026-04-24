@@ -1,0 +1,189 @@
+# Staging environment values
+global:
+  cloudProvider: "aws"
+  region: "us-west-2"
+  aws:
+    eksClusterName: "cancer-genomics-staging"
+    loadBalancerType: "nlb"
+    s3Bucket: "cancer-genomics-staging-data"
+    rdsInstance: "cancer-genomics-staging-db"
+    elasticacheCluster: "cancer-genomics-staging-cache"
+
+# Staging-specific overrides
+web:
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  env:
+    - name: FLASK_ENV
+      value: "staging"
+    - name: LOG_LEVEL
+      value: "INFO"
+    - name: DEBUG
+      value: "false"
+
+celery:
+  worker:
+    replicaCount: 2
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    env:
+      - name: FLASK_ENV
+        value: "staging"
+      - name: LOG_LEVEL
+        value: "INFO"
+
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "staging-password"
+    username: "postgres"
+    password: "staging-password"
+    database: "genomics_db"
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 4Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 256Mi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  hosts:
+    - host: cancer-genomics-staging.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: cancer-genomics-staging-tls
+      hosts:
+        - cancer-genomics-staging.yourdomain.com
+
+# Staging features
+config:
+  features:
+    auth_enabled: true
+    api_enabled: true
+    dashboard_enabled: true
+    reporting_enabled: true
+    ml_enabled: true
+    blast_enabled: true
+    annotation_enabled: true
+
+# Enable monitoring in staging
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+  prometheusRule:
+    enabled: true
+
+# Enable Argo Workflows for staging
+argoWorkflows:
+  enabled: true
+  namespace: "argo-staging"
+  templates:
+    blastPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 4Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    annotationPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+    mlPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 4000m
+          memory: 8Gi
+        requests:
+          cpu: 1000m
+          memory: 2Gi
+    reportingPipeline:
+      enabled: true
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 512Mi
+  cronWorkflows:
+    enabled: true
+    schedules:
+      - name: "daily-blast-analysis"
+        schedule: "0 2 * * *"
+        workflowTemplate: "blast-pipeline"
+      - name: "weekly-ml-training"
+        schedule: "0 3 * * 0"
+        workflowTemplate: "ml-pipeline"
+
+# Staging secrets
+secrets:
+  database:
+    create: true
+    data:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "staging-password"
+      POSTGRES_DB: "genomics_db"
+  app:
+    create: true
+    data:
+      SECRET_KEY: "staging-secret-key-change-in-production"
+      JWT_SECRET_KEY: "staging-jwt-secret-key-change-in-production"
+
+# Enable autoscaling in staging
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 70

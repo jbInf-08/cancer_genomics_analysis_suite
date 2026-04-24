@@ -1,0 +1,142 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  # Application Configuration
+  APP_NAME: {{ .Values.config.app.name | quote }}
+  APP_VERSION: {{ .Values.config.app.version | quote }}
+  ENVIRONMENT: {{ .Values.config.app.environment | quote }}
+  DEBUG: {{ .Values.config.app.debug | quote }}
+  
+  # Database Configuration
+  DATABASE_HOST: {{ include "cancer-genomics-analysis-suite.postgresql.fullname" . | quote }}
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: {{ .Values.config.database.name | quote }}
+  DATABASE_USER: {{ .Values.config.database.user | quote }}
+  DATABASE_SSLMODE: {{ .Values.config.database.sslmode | quote }}
+  
+  # Redis Configuration
+  REDIS_HOST: {{ include "cancer-genomics-analysis-suite.redis.fullname" . }}-master
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  
+  # Celery Configuration
+  CELERY_BROKER_URL: {{ .Values.config.celery.broker_url | quote }}
+  CELERY_RESULT_BACKEND: {{ .Values.config.celery.result_backend | quote }}
+  CELERY_TASK_SERIALIZER: {{ .Values.config.celery.task_serializer | quote }}
+  CELERY_RESULT_SERIALIZER: {{ .Values.config.celery.result_serializer | quote }}
+  CELERY_ACCEPT_CONTENT: {{ .Values.config.celery.accept_content | toJson | quote }}
+  CELERY_TIMEZONE: {{ .Values.config.celery.timezone | quote }}
+  CELERY_ENABLE_UTC: {{ .Values.config.celery.enable_utc | quote }}
+  
+  # External APIs
+  ENSEMBL_BASE_URL: {{ .Values.config.apis.ensembl.base_url | quote }}
+  ENSEMBL_TIMEOUT: {{ .Values.config.apis.ensembl.timeout | quote }}
+  UNIPROT_BASE_URL: {{ .Values.config.apis.uniprot.base_url | quote }}
+  UNIPROT_TIMEOUT: {{ .Values.config.apis.uniprot.timeout | quote }}
+  CLINVAR_BASE_URL: {{ .Values.config.apis.clinvar.base_url | quote }}
+  CLINVAR_TIMEOUT: {{ .Values.config.apis.clinvar.timeout | quote }}
+  
+  # Feature Flags
+  AUTH_ENABLED: {{ .Values.config.features.auth_enabled | quote }}
+  API_ENABLED: {{ .Values.config.features.api_enabled | quote }}
+  DASHBOARD_ENABLED: {{ .Values.config.features.dashboard_enabled | quote }}
+  REPORTING_ENABLED: {{ .Values.config.features.reporting_enabled | quote }}
+  ML_ENABLED: {{ .Values.config.features.ml_enabled | quote }}
+  BLAST_ENABLED: {{ .Values.config.features.blast_enabled | quote }}
+  ANNOTATION_ENABLED: {{ .Values.config.features.annotation_enabled | quote }}
+  
+  # File Storage
+  UPLOAD_FOLDER: "/app/uploads"
+  MAX_CONTENT_LENGTH: "16777216"  # 16MB
+  
+  # Monitoring
+  ENABLE_METRICS: "true"
+  METRICS_PORT: "8080"
+---
+{{- if .Values.nginx.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cancer-genomics-analysis-suite.fullname" . }}-nginx-config
+  labels:
+    {{- include "cancer-genomics-analysis-suite.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+    upstream flask_app {
+        server {{ include "cancer-genomics-analysis-suite.fullname" . }}-web:8050;
+    }
+    
+    server {
+        listen 80;
+        server_name _;
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        
+        # Rate limiting
+        limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+        limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+        
+        # Main application
+        location / {
+            limit_req zone=api burst=20 nodelay;
+            proxy_pass http://flask_app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 30s;
+            proxy_read_timeout 30s;
+        }
+        
+        # Health check endpoint
+        location /health {
+            proxy_pass http://flask_app;
+            access_log off;
+        }
+        
+        # Static files
+        location /static/ {
+            proxy_pass http://flask_app;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+        
+        # API endpoints with stricter rate limiting
+        location /api/ {
+            limit_req zone=api burst=10 nodelay;
+            proxy_pass http://flask_app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Authentication endpoints
+        location /auth/login {
+            limit_req zone=login burst=3 nodelay;
+            proxy_pass http://flask_app;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Metrics endpoint
+        location /metrics {
+            proxy_pass http://flask_app:8080;
+            allow 10.0.0.0/8;
+            allow 172.16.0.0/12;
+            allow 192.168.0.0/16;
+            deny all;
+        }
+    }
+{{- end }}
