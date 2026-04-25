@@ -6,7 +6,7 @@ def test_config_import():
     print("Testing configuration package import...")
     
     try:
-        from config import settings, validate_configuration
+        from CancerGenomicsSuite.config import settings, validate_configuration
         print(f"✓ Configuration imported successfully")
         print(f"✓ App name: {settings.app_name}")
         print(f"✓ App version: {settings.app_version}")
@@ -26,7 +26,7 @@ def test_config_validation():
     print("\nTesting configuration validation...")
     
     try:
-        from config import validate_configuration
+        from CancerGenomicsSuite.config import validate_configuration
         results = validate_configuration()
         
         print(f"✓ Configuration validation completed")
@@ -60,7 +60,7 @@ def test_config_utilities():
     print("\nTesting configuration utilities...")
     
     try:
-        from config import (
+        from CancerGenomicsSuite.config import (
             get_environment, is_development, is_production, is_testing,
             get_database_url, get_redis_url, get_feature_status
         )

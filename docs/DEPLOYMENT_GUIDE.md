@@ -20,26 +20,40 @@ pip install -e .
 
 # Copy environment configuration
 cp .env.example .env
-# Edit .env with your settings
+# Edit .env with your settings (on Windows, `copy .env.example .env` in cmd or PowerShell)
 ```
 
 ### 2. Start Database Services (Docker)
 
 ```bash
 # Start PostgreSQL, Redis, and optionally Neo4j
-docker-compose -f docker/docker-compose.db.yml up -d
+docker compose -f docker/docker-compose.db.yml up -d
 
 # Initialize the database
 python scripts/setup_postgresql.py --update-env
 ```
 
-### 3. Run the Application
+### 3. Run the application
+
+**Main product UI (Dash):** with the package installed (`pip install -e .` from repo root):
 
 ```bash
-# Start the development server
-python -m CancerGenomicsSuite.app
+cancer-genomics
+```
 
-# Or run the workflow demo
+This serves the test route `GET /test` on the configured host and port (often `8050`).
+
+**Flask application factory (REST / auth / dashboard routes) without Dash:**
+
+```bash
+python CancerGenomicsSuite/run_flask_app.py
+```
+
+**Note:** `python -m CancerGenomicsSuite.app` is not a supported one-liner for running the server (the `app` package is import-oriented). Use `run_flask_app.py` instead.
+
+**Workflow example:**
+
+```bash
 python workflows/sample_analysis_workflow.py
 ```
 

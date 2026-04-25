@@ -60,7 +60,7 @@ CREATE INDEX idx_users_admin ON users(is_admin);
 ## Model Definition
 
 ```python
-from app import db
+from CancerGenomicsSuite.app import db
 from flask_login import UserMixin
 
 class User(UserMixin, db.Model):
@@ -86,7 +86,7 @@ class User(UserMixin, db.Model):
 
 #### Basic User Creation
 ```python
-from app.auth.models import User
+from CancerGenomicsSuite.app.auth.models import User
 from werkzeug.security import generate_password_hash
 
 # Create a basic user
@@ -254,7 +254,7 @@ logout_user()
 
 ### User Registration
 ```python
-from app.auth.models import User
+from CancerGenomicsSuite.app.auth.models import User
 from werkzeug.security import generate_password_hash
 
 def register_user(username, password, email=None):
@@ -290,8 +290,8 @@ def authenticate_user(username, password):
 ### Unit Tests
 ```python
 import unittest
-from app import create_app, db
-from app.auth.models import User
+from CancerGenomicsSuite.app import create_app, db
+from CancerGenomicsSuite.app.auth.models import User
 from werkzeug.security import generate_password_hash
 
 class TestUserModel(unittest.TestCase):

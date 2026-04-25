@@ -174,7 +174,7 @@ celery_app.conf.update(
 ### Health Check Task
 
 ```python
-from app.celery_config import health_check
+from CancerGenomicsSuite.app.celery_config import health_check
 
 # Run health check
 result = health_check.delay()
@@ -184,7 +184,7 @@ status = result.get()
 ### Task Status
 
 ```python
-from app.celery_config import get_task_status
+from CancerGenomicsSuite.app.celery_config import get_task_status
 
 # Get task status
 status = get_task_status('task-id-here')
@@ -193,7 +193,7 @@ status = get_task_status('task-id-here')
 ### Worker Statistics
 
 ```python
-from app.celery_config import get_worker_stats
+from CancerGenomicsSuite.app.celery_config import get_worker_stats
 
 # Get worker statistics
 stats = get_worker_stats()
@@ -202,7 +202,7 @@ stats = get_worker_stats()
 ### Queue Lengths
 
 ```python
-from app.celery_config import get_queue_lengths
+from CancerGenomicsSuite.app.celery_config import get_queue_lengths
 
 # Get queue lengths
 lengths = get_queue_lengths()

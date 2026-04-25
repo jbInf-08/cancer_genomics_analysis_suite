@@ -28,8 +28,8 @@ from datetime import datetime, timedelta
 import zipfile
 
 # Import database models and utilities
-from app.db.models import AnalysisJob, AnalysisResult, DataFile, Project, Dataset
-from app.db import db
+from ...orm.models import AnalysisJob, AnalysisResult, DataFile, Project, Dataset
+from ...orm import db
 
 logger = logging.getLogger(__name__)
 

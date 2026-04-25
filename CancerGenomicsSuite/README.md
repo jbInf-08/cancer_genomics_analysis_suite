@@ -27,6 +27,7 @@ A comprehensive, production-ready platform for cancer genomics analysis featurin
 ### Technical Features
 - **Stream Processing**: Apache Kafka for real-time data processing
 - **Pipeline Orchestration**: Snakemake and Nextflow for scalable workflow management
+- **Perl pipelines**: Workflows can invoke `.pl` scripts (see root [README: Running Perl Pipelines](../README.md#running-perl-pipelines))
 - **Container Orchestration**: Kubernetes-native deployment with Helm charts
 - **Infrastructure as Code**: Terraform for AWS/GCP infrastructure provisioning
 - **GitOps Deployment**: ArgoCD for automated, declarative deployments
@@ -109,114 +110,75 @@ graph TB
 
 ## 📋 Prerequisites
 
-### System Requirements
+### For local development
+- **Python**: 3.8+ (see `pyproject.toml` for supported versions)
+- **Git**
+
+### For Kubernetes / cloud deploy
 - **Kubernetes**: 1.28+
 - **Helm**: 3.12+
-- **kubectl**: Latest
-- **Terraform**: 1.6+
-- **Docker**: Latest
-- **Git**: Latest
+- **kubectl**
+- **Terraform** (optional, for `terraform/aws` and `terraform/gcp` in this tree)
+- **Docker** (for images and local compose)
 
 ### Cloud Provider Setup
 - **AWS**: EKS cluster, RDS, ElastiCache, S3, Secrets Manager
 - **GCP**: GKE cluster, Cloud SQL, Memorystore, Cloud Storage, Secret Manager
 
-## 🚀 Quick Start
+## 🚀 Quick start
 
-### 1. Clone the Repository
+Work from the **repository root** (`cancer_genomics_analysis_suite/`), not only this folder, so `pip install -e .` and paths resolve.
+
+### 1. Clone
 ```bash
-git clone https://github.com/your-org/cancer-genomics-analysis-suite.git
-cd cancer-genomics-analysis-suite
+git clone https://github.com/jbInf-08/cancer_genomics_analysis_suite.git
+cd cancer_genomics_analysis_suite
 ```
 
-### 2. Deploy Infrastructure
+### 2. Install
 ```bash
-# AWS
-cd terraform/aws
-terraform init
-terraform plan
-terraform apply
-
-# GCP
-cd terraform/gcp
-terraform init
-terraform plan
-terraform apply
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# Unix:   source .venv/bin/activate
+pip install -e .
+pip install -e ".[dev,test]"   # optional
+cp .env.example .env
 ```
 
-### 3. Deploy Application
+### 3. Run the main Dash app
 ```bash
-# Using ArgoCD (Recommended)
-kubectl apply -f argocd/argocd-project.yaml
-kubectl apply -f argocd/argocd-app.yaml
-
-# Using Helm (Alternative)
-helm install cancer-genomics ./helm/cancer-genomics-analysis-suite \
-  --namespace cancer-genomics \
-  --create-namespace \
-  --values ./helm/cancer-genomics-analysis-suite/values-production.yaml
+cancer-genomics
 ```
+(Often listens on port **8050**; `GET /test` returns a small JSON health payload.)
 
-### 4. Access the Application
-- **Web Interface**: https://cancer-genomics.yourdomain.com
-- **API**: https://api.cancer-genomics.yourdomain.com
-- **Grafana**: https://grafana.cancer-genomics.yourdomain.com
-- **Prometheus**: https://prometheus.cancer-genomics.yourdomain.com
-
-### 5. Using Bioinformatics Tools
+**Bioinformatics CLI** (from repo root, after `pip install -e .`):
 ```bash
-# List all available bioinformatics tools
-python cli_bioinformatics_tools.py
-
-# Use specific tools
-python cli_bioinformatics_tools.py galaxy --list-workflows
-python cli_bioinformatics_tools.py r --install-package DESeq2
-python cli_bioinformatics_tools.py pymol --fetch 1CRN
+cancer-genomics-cli --help
 ```
 
-## 📁 Project Structure
+**Alternate:** from this directory, `python cli_bioinformatics_tools.py` (adds the local tree to the path; prefer the entry point above).
 
+### 4. Optional: Terraform (paths relative to this package directory)
+```bash
+cd CancerGenomicsSuite/terraform/aws
+terraform init && terraform plan && terraform apply
 ```
-cancer-genomics-analysis-suite/
-├── CancerGenomicsSuite/          # Main application code
-│   ├── app/                      # Flask application
-│   ├── modules/                  # Feature modules
-│   │   ├── galaxy_integration/   # Galaxy workflows and tools
-│   │   ├── r_integration/        # R statistical analysis
-│   │   ├── matlab_integration/   # MATLAB numerical computing
-│   │   ├── pymol_integration/    # PyMOL molecular visualization
-│   │   ├── text_editors/         # Text editor integration
-│   │   ├── ape_editor/           # A Plasmid Editor
-│   │   ├── igv_integration/      # IGV genomic visualization
-│   │   ├── gromacs_integration/  # GROMACS molecular dynamics
-│   │   ├── wgsim_tools/          # Read simulation tools
-│   │   ├── neurosnap_integration/# Neurosnap neuroscience
-│   │   ├── tamarind_bio/         # Tamarind Bio workflows
-│   │   └── ...                   # Other existing modules
-│   ├── celery_worker/            # Background task processing
-│   ├── config/                   # Configuration management
-│   ├── tests/                    # Test suites
-│   └── cli_bioinformatics_tools.py # CLI for bioinformatics tools
-├── helm/                         # Helm charts
-│   └── cancer-genomics-analysis-suite/
-│       ├── templates/            # Kubernetes manifests
-│       ├── values.yaml           # Default values
-│       └── Chart.yaml            # Chart metadata
-├── terraform/                    # Infrastructure as Code
-│   ├── aws/                      # AWS infrastructure
-│   └── gcp/                      # GCP infrastructure
-├── argocd/                       # GitOps manifests
-│   ├── argocd-app.yaml           # Application definitions
-│   ├── argocd-project.yaml       # Project configuration
-│   └── argocd-config.yaml        # ArgoCD configuration
-├── .github/                      # CI/CD workflows
-│   └── workflows/
-│       └── ci-cd.yml             # GitHub Actions pipeline
-├── examples/                     # Usage examples
-├── scripts/                      # Utility scripts
-└── docs/                         # Documentation
-│   └── bioinformatics_tools_integration.md # Bioinformatics tools docs
+
+### 5. Optional: deploy with ArgoCD / Helm
+```bash
+kubectl apply -f CancerGenomicsSuite/argocd/argocd-project.yaml
+kubectl apply -f CancerGenomicsSuite/argocd/argocd-app.yaml
+# Or Helm — see ../docs/LOCAL_HELM_QUICKSTART.md
+helm install cgas ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite \
+  --namespace cancer-genomics --create-namespace \
+  -f ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite/values.yaml
 ```
+
+For deployed clusters, set hosts in your values/ingress; placeholders like `cancer-genomics.yourdomain.com` are only examples.
+
+## 📁 Layout
+
+Helm, Terraform, ArgoCD, and the main `tests/` tree for this app live **inside `CancerGenomicsSuite/`** in the repository. A concise map of the whole repo (including `docs/`, `data_collection/`, etc.) is in the root [PROJECT_STRUCTURE.md](../PROJECT_STRUCTURE.md).
 
 ## 🔧 Configuration
 
@@ -312,30 +274,17 @@ monitoring:
 
 ## 🧪 Testing
 
-### Test Suites
 ```bash
-# Unit tests
-pytest tests/unit/ -v
-
-# Integration tests
-pytest tests/integration/ -v
-
-# End-to-end tests
-pytest tests/e2e/ -v
-
-# Security tests
-bandit -r CancerGenomicsSuite/
-safety check
-
-# Performance tests
-pytest tests/performance/ -v
+# From repository root; pyproject.toml sets testpaths to CancerGenomicsSuite/tests
+pytest -v
+pytest CancerGenomicsSuite/tests/unit/ -v
 ```
 
-### Test Coverage
-- **Unit Tests**: 90%+ coverage
-- **Integration Tests**: Core workflows and APIs
-- **Security Tests**: Vulnerability and penetration testing
-- **Performance Tests**: Load and stress testing
+Coverage gate and philosophy: [../docs/testing_confidence.md](../docs/testing_confidence.md). Static security scans (not pytest):
+```bash
+bandit -r CancerGenomicsSuite
+safety check
+```
 
 ## 🚀 Deployment
 
@@ -372,21 +321,13 @@ pytest tests/performance/ -v
 
 ## 🤝 Contributing
 
-### Development Setup
+See the root [CONTRIBUTING.md](../CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md).
+
 ```bash
-# Clone repository
-git clone https://github.com/your-org/cancer-genomics-analysis-suite.git
-cd cancer-genomics-analysis-suite
-
-# Install dependencies
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-
-# Set up pre-commit hooks
+cd cancer_genomics_analysis_suite
+pip install -e ".[dev,test]"
 pre-commit install
-
-# Run tests
-pytest tests/ -v
+pytest
 ```
 
 ### Contribution Guidelines
@@ -405,13 +346,12 @@ pytest tests/ -v
 
 ## 📚 Documentation
 
-### Additional Resources
-- [Deployment Guide](DEPLOYMENT_GUIDE.md)
-- [API Documentation](docs/api.md)
-- [User Guide](docs/user-guide.md)
-- [Developer Guide](docs/developer-guide.md)
-- [Troubleshooting Guide](docs/troubleshooting.md)
-- [Bioinformatics Tools Integration](docs/bioinformatics_tools_integration.md)
+- [In-repo deployment guide](DEPLOYMENT_GUIDE.md)
+- [../docs/DEPLOYMENT_GUIDE.md](../docs/DEPLOYMENT_GUIDE.md) — dev, compose, k8s operations
+- [../docs/LOCAL_HELM_QUICKSTART.md](../docs/LOCAL_HELM_QUICKSTART.md) — local Helm
+- [api_docs/README.md](api_docs/README.md) — API / OpenAPI assets
+- [docs/bioinformatics_tools_integration.md](docs/bioinformatics_tools_integration.md)
+- [../README.md](../README.md) — product overview
 
 ### External Documentation
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
@@ -422,10 +362,8 @@ pytest tests/ -v
 ## 🆘 Support
 
 ### Getting Help
-- **GitHub Issues**: Bug reports and feature requests
-- **GitHub Discussions**: Questions and community support
-- **Documentation**: Comprehensive guides and references
-- **Email Support**: support@cancer-genomics.com
+- **Repository:** [jbInf-08/cancer_genomics_analysis_suite](https://github.com/jbInf-08/cancer_genomics_analysis_suite)
+- **Author email (root README):** see [../README.md](../README.md#support) for the current contact
 
 ### Community
 - **Slack**: #cancer-genomics channel

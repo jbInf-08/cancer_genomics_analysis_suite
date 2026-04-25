@@ -12,8 +12,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import BadRequest, Unauthorized, Forbidden
 
 # Import app components
-from app import db
-from app.auth.models import User
+from .. import db
+from .models import User
 
 # Import auth functions and utilities
 try:

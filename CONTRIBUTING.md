@@ -31,11 +31,13 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
 
 ### Development Setup
 
-1. **Fork and Clone the Repository**
+1. **Fork and clone the repository**
    ```bash
-   git clone https://github.com/your-username/cancer-genomics-analysis-suite.git
-   cd cancer-genomics-analysis-suite
+   git clone https://github.com/<your-username>/cancer_genomics_analysis_suite.git
+   cd cancer_genomics_analysis_suite
    ```
+
+   The upstream project is <https://github.com/jbInf-08/cancer_genomics_analysis_suite> if you are not forking.
 
 2. **Create a Virtual Environment**
    ```bash
@@ -57,9 +59,10 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
    pre-commit install
    ```
 
-5. **Configure Environment**
+5. **Configure environment**
    ```bash
-   cp environment.template .env
+   cp .env.example .env
+   # Or: cp CancerGenomicsSuite/environment.template .env
    # Edit .env with your configuration
    ```
 
@@ -307,10 +310,12 @@ def test_security_vulnerability():
     pass
 ```
 
-### Running Tests
+### Running tests
+
+Tests live in **`CancerGenomicsSuite/tests/`**; `pyproject.toml` sets `testpaths` so you can run `pytest` from the repository root.
 
 ```bash
-# Run all tests
+# Run all tests (default includes coverage; see pyproject.toml)
 pytest
 
 # Run specific test categories
@@ -324,12 +329,14 @@ pytest --cov=CancerGenomicsSuite --cov-report=html
 # Run tests in parallel
 pytest -n auto
 
-# Run specific test file
-pytest tests/unit/test_mutation_analysis.py
+# Run a specific file (example path; adjust to a file that exists)
+pytest CancerGenomicsSuite/tests/unit/test_plugin_registry.py
 
-# Run specific test function
-pytest tests/unit/test_mutation_analysis.py::TestMutationAnalyzer::test_analyze_mutations_success
+# Run a specific test
+pytest CancerGenomicsSuite/tests/unit/test_plugin_registry.py -k "test_"
 ```
+
+There is no top-level `tests/` package; do not use paths like `tests/unit/...` unless you create that layout.
 
 ## Documentation
 

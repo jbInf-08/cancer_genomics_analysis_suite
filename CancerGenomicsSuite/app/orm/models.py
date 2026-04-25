@@ -32,7 +32,7 @@ from sqlalchemy import Index, CheckConstraint
 from sqlalchemy.exc import SQLAlchemyError
 
 # Import db from the main app module
-from app import db
+from .. import db
 
 # Configure logging
 logger = logging.getLogger(__name__)

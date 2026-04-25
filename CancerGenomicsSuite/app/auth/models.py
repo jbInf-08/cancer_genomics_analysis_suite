@@ -9,7 +9,7 @@ from flask_login import UserMixin
 from datetime import datetime
 
 # Import db from the main app module
-from app import db
+from .. import db
 
 class User(UserMixin, db.Model):
     """User model for authentication."""

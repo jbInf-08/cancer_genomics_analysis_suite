@@ -7,14 +7,9 @@ to ensure everything works properly.
 """
 
 import sys
-import os
 import pandas as pd
 import numpy as np
 import logging
-from pathlib import Path
-
-# Add the current directory to the path
-sys.path.append(str(Path(__file__).parent))
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -26,7 +21,7 @@ def test_imports():
     print("🧪 Testing imports...")
     
     try:
-        from integrations import (
+        from CancerGenomicsSuite.integrations import (
             UnifiedBiomarkerInterface,
             BiomarkerAnalysisOptions,
             discover_biomarkers_compatible,
@@ -45,7 +40,7 @@ def test_configuration():
     print("\n🧪 Testing configuration...")
     
     try:
-        from integrations import get_config
+        from CancerGenomicsSuite.integrations import get_config
         config = get_config()
         print(f"✅ Configuration loaded: {type(config).__name__}")
         print(f"   Biomarker Identifier URL: {config.biomarker_identifier.url}")
@@ -61,7 +56,7 @@ def test_compatibility_manager():
     print("\n🧪 Testing compatibility manager...")
     
     try:
-        from integrations import get_compatibility_manager
+        from CancerGenomicsSuite.integrations import get_compatibility_manager
         manager = get_compatibility_manager()
         
         available_services = manager.get_available_services()
@@ -79,7 +74,10 @@ def test_unified_interface():
     print("\n🧪 Testing unified interface...")
     
     try:
-        from integrations import UnifiedBiomarkerInterface, BiomarkerAnalysisOptions
+        from CancerGenomicsSuite.integrations import (
+            UnifiedBiomarkerInterface,
+            BiomarkerAnalysisOptions,
+        )
         
         # Create interface
         interface = UnifiedBiomarkerInterface()
@@ -102,8 +100,8 @@ def test_unified_interface():
         return False
 
 
-def test_data_creation():
-    """Test creating sample data."""
+def create_sample_biomarker_data():
+    """Create sample data for biomarker discovery (not a pytest test)."""
     print("\n🧪 Testing data creation...")
     
     try:
@@ -128,8 +126,8 @@ def test_data_creation():
         return None, None
 
 
-def test_biomarker_discovery(data, labels):
-    """Test biomarker discovery with sample data."""
+def run_biomarker_discovery(data, labels):
+    """Run biomarker discovery with sample data (not a pytest test)."""
     print("\n🧪 Testing biomarker discovery...")
     
     if data is None or labels is None:
@@ -137,8 +135,8 @@ def test_biomarker_discovery(data, labels):
         return False
     
     try:
-        from integrations import discover_biomarkers_compatible
-        
+        from CancerGenomicsSuite.integrations import discover_biomarkers_compatible
+
         # Test biomarker discovery
         biomarkers = discover_biomarkers_compatible(data, labels)
         print(f"✅ Biomarker discovery completed")
@@ -161,8 +159,8 @@ def test_service_status():
     print("\n🧪 Testing service status...")
     
     try:
-        from integrations import UnifiedBiomarkerInterface
-        
+        from CancerGenomicsSuite.integrations import UnifiedBiomarkerInterface
+
         interface = UnifiedBiomarkerInterface()
         status = interface.get_service_status()
         
@@ -192,8 +190,8 @@ def test_error_handling():
     print("\n🧪 Testing error handling...")
     
     try:
-        from integrations import discover_biomarkers_compatible
-        
+        from CancerGenomicsSuite.integrations import discover_biomarkers_compatible
+
         # Test with empty data
         try:
             biomarkers = discover_biomarkers_compatible(pd.DataFrame(), [])
@@ -242,10 +240,10 @@ def run_all_tests():
             print(f"❌ {test_name} failed with exception: {e}")
             results.append((test_name, False))
     
-    # Test data creation and biomarker discovery
-    data, labels = test_data_creation()
+    # Sample data creation and biomarker discovery
+    data, labels = create_sample_biomarker_data()
     if data is not None and labels is not None:
-        biomarker_result = test_biomarker_discovery(data, labels)
+        biomarker_result = run_biomarker_discovery(data, labels)
         results.append(("Biomarker Discovery Test", biomarker_result))
     
     # Summary

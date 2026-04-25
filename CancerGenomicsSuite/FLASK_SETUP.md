@@ -50,7 +50,7 @@ app/
 ├── dashboard/           # Dashboard module
 │   ├── layouts.py       # Dashboard layouts
 │   └── routes.py        # Dashboard routes
-└── db/                  # Database module
+└── orm/                 # ORM/database module
     ├── models.py        # Main database models
     └── schema.sql       # Database schema
 ```
@@ -62,7 +62,7 @@ app/
 The `create_app()` function in `app/__init__.py` creates and configures the Flask application:
 
 ```python
-from app import create_app
+from CancerGenomicsSuite.app import create_app
 
 app = create_app()
 ```
@@ -89,7 +89,7 @@ app = create_app()
 
 ## Configuration
 
-The application uses the settings from `config/settings.py` which supports:
+The application uses the settings from `CancerGenomicsSuite/config/settings.py` which supports:
 
 - Environment-based configuration
 - Pydantic validation (if available)
@@ -101,7 +101,7 @@ The application uses the settings from `config/settings.py` which supports:
 The application automatically:
 
 - Creates database tables on startup
-- Runs migrations from `app/db/migrations/`
+- Runs migrations from `app/orm/migrations/`
 - Initializes the database connection
 
 ## Error Handling

@@ -39,29 +39,24 @@ This guide provides comprehensive instructions for installing the Cancer Genomic
 
 ## Installation Methods
 
-### Method 1: PyPI Installation (Recommended)
+### Method 1: PyPI (when published)
 
-The easiest way to install the Cancer Genomics Analysis Suite is using pip:
+The project is defined in `pyproject.toml` as `cancer-genomics-analysis-suite`. If a matching release is published to PyPI, you can use:
 
 ```bash
-# Install the latest version
-pip install cancer-genomics-analysis-suite
-
-# Install with optional dependencies
 pip install cancer-genomics-analysis-suite[dev,test,docs]
-
-# Install specific version
-pip install cancer-genomics-analysis-suite==1.0.0
 ```
 
-### Method 2: Source Installation
+**Recommended for day-to-day work:** install **from a clone** (Method 2) so paths and the latest tree match the documentation in this repo.
+
+### Method 2: Source installation (recommended)
 
 For development or custom configurations:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/cancer-genomics-analysis-suite.git
-cd cancer-genomics-analysis-suite
+git clone https://github.com/jbInf-08/cancer_genomics_analysis_suite.git
+cd cancer_genomics_analysis_suite
 
 # Create virtual environment
 python -m venv venv
@@ -74,38 +69,21 @@ pip install -e .
 pip install -e ".[dev,test,docs]"
 ```
 
-### Method 3: Docker Installation
+### Method 3: Docker
 
-For containerized deployment:
+There is no single mandatory image name in this repo. Build and run from your own registry, or use compose files under `docker/` and `CancerGenomicsSuite/` (see [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)) for local stacks (e.g. database services).
 
-```bash
-# Pull the official image
-docker pull ghcr.io/your-org/cancer-genomics-analysis-suite:latest
+### Method 4: Kubernetes (Helm from this repository)
 
-# Run the container
-docker run -d \
-  --name cancer-genomics \
-  -p 8080:8080 \
-  -v $(pwd)/data:/app/data \
-  ghcr.io/your-org/cancer-genomics-analysis-suite:latest
-```
-
-### Method 4: Kubernetes Installation
-
-For production deployment:
+The Helm chart ships in-tree at `CancerGenomicsSuite/helm/cancer-genomics-analysis-suite/`. From the **repository root**:
 
 ```bash
-# Add Helm repository
-helm repo add cancer-genomics https://your-org.github.io/cancer-genomics-analysis-suite
-helm repo update
-
-# Install with default values
-helm install cancer-genomics cancer-genomics/cancer-genomics-analysis-suite
-
-# Install with custom values
-helm install cancer-genomics cancer-genomics/cancer-genomics-analysis-suite \
-  --values values-production.yaml
+helm install cancer-genomics ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite \
+  --namespace cancer-genomics --create-namespace \
+  -f ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite/values.yaml
 ```
+
+See [LOCAL_HELM_QUICKSTART.md](LOCAL_HELM_QUICKSTART.md) and [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for details. ArgoCD manifests are under `CancerGenomicsSuite/argocd/`.
 
 ## Platform-Specific Instructions
 
@@ -167,9 +145,13 @@ pip install pywin32
 
 ## Configuration
 
-### Environment Variables
+For local development, copy the root **`.env.example`** to **`.env`** in the repository root, or start from [CancerGenomicsSuite/environment.template](../CancerGenomicsSuite/environment.template) (advanced: [CancerGenomicsSuite/environment.advanced.template](../CancerGenomicsSuite/environment.advanced.template)).
 
-Create a `.env` file in your project directory:
+The snippets below are illustrative; the canonical variable names and defaults are in `.env.example` and `CancerGenomicsSuite/config/`.
+
+### Environment variables
+
+Set values in **`.env`** (or the environment) as needed, for example:
 
 ```bash
 # Database Configuration
@@ -198,11 +180,11 @@ PROMETHEUS_ENDPOINT=http://localhost:9090
 GRAFANA_ENDPOINT=http://localhost:3000
 ```
 
-### Configuration Files
+### Optional YAML configuration
 
-Create configuration files for different environments:
+If you use YAML for environments, you can mirror patterns like the following; the app primarily uses [CancerGenomicsSuite/config/settings.py](../CancerGenomicsSuite/config/settings.py) and environment variables.
 
-#### Development Configuration (`config/development.yaml`)
+#### Development configuration (example: `config/development.yaml`)
 
 ```yaml
 app:
@@ -257,22 +239,22 @@ security:
 
 ## Verification
 
-### Basic Verification
-
-Test the installation:
+### Basic checks
 
 ```bash
-# Check version
-cancer-genomics --version
+# After pip install -e . — package version
+python -c "import CancerGenomicsSuite; print(CancerGenomicsSuite.__version__)"
 
-# Run basic health check
-cancer-genomics health-check
+# With the dashboard running (default port often 8050) — test route
+curl -s http://127.0.0.1:8050/test
 
-# Test CLI tools
+# Bioinformatics CLI
 cancer-genomics-cli --help
 ```
 
-### Python Verification
+Start the main Dash app with: **`cancer-genomics`** (see `pyproject.toml` console scripts), or from the `CancerGenomicsSuite` directory: `python main_dashboard.py`. For the Flask app factory only, use: `python CancerGenomicsSuite/run_flask_app.py`.
+
+### Python verification
 
 ```python
 # Test Python import
@@ -285,17 +267,14 @@ analyzer = MutationAnalyzer()
 print("MutationAnalyzer imported successfully")
 ```
 
-### Docker Verification
+### Docker verification
+
+If you use a container, adjust name and port to your compose or run command, then e.g.:
 
 ```bash
-# Check container status
-docker ps | grep cancer-genomics
-
-# Check logs
-docker logs cancer-genomics
-
-# Test API endpoint
-curl http://localhost:8080/health
+docker ps
+docker logs <container>
+curl http://localhost:<port>/test   # Dash test route, if exposed
 ```
 
 ### Kubernetes Verification
@@ -429,9 +408,8 @@ sudo iptables -L
 If you encounter issues not covered in this guide:
 
 1. **Check the logs**: Look at application logs for error messages
-2. **Search issues**: Check [GitHub Issues](https://github.com/your-org/cancer-genomics-analysis-suite/issues)
-3. **Community support**: Ask questions in [GitHub Discussions](https://github.com/your-org/cancer-genomics-analysis-suite/discussions)
-4. **Documentation**: Refer to the [troubleshooting guide](reference/troubleshooting.md)
+2. **Search issues:** [cancer_genomics_analysis_suite on GitHub](https://github.com/jbInf-08/cancer_genomics_analysis_suite/issues)
+3. **Documentation:** [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) and the root [README.md](../README.md)
 
 ### Support Channels
 
@@ -442,4 +420,4 @@ If you encounter issues not covered in this guide:
 
 ---
 
-**Next Steps**: After installation, proceed to the [Quick Start Guide](quick_start.md) to begin using the system.
+**Next steps:** [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md), [LOCAL_HELM_QUICKSTART.md](LOCAL_HELM_QUICKSTART.md), and the root [README.md](../README.md).

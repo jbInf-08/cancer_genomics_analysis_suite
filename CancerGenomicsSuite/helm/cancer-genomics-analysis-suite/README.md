@@ -9,15 +9,18 @@ This Helm chart deploys the Cancer Genomics Analysis Suite on a Kubernetes clust
 - PostgreSQL 12+ (or use the included PostgreSQL chart)
 - Redis 6+ (or use the included Redis chart)
 
-## Installing the Chart
+## Installing the chart
 
-To install the chart with the release name `cancer-genomics`:
+Install from a clone of the **repository root**; the chart path is `CancerGenomicsSuite/helm/cancer-genomics-analysis-suite/`. You may need Bitnami or other subcharts depending on your `values.yaml` (e.g. `helm repo add bitnami https://charts.bitnami.com/bitnami` and `helm repo update` before `helm install` if the chart requires them).
 
 ```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
-helm install cancer-genomics ./helm/cancer-genomics-analysis-suite
+cd /path/to/cancer_genomics_analysis_suite
+helm install cancer-genomics ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite \
+  --namespace cancer-genomics --create-namespace \
+  -f ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite/values.yaml
 ```
+
+For a focused local run, see [docs/LOCAL_HELM_QUICKSTART.md](../../../docs/LOCAL_HELM_QUICKSTART.md) in the repository root.
 
 ## Uninstalling the Chart
 

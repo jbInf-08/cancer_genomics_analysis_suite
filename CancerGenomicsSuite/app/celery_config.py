@@ -24,7 +24,7 @@ from kombu import Queue, Exchange
 from kombu.common import Broadcast
 
 # Import settings
-from config.settings import settings
+from CancerGenomicsSuite.config.settings import settings
 
 # Configure logging
 logger = logging.getLogger(__name__)

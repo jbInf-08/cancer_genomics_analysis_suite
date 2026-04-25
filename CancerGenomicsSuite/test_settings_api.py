@@ -6,7 +6,7 @@ def test_api_tokens():
     print("Testing API token configuration...")
     
     try:
-        from config import settings
+        from CancerGenomicsSuite.config import settings
         
         # Test basic API configuration
         print(f"✓ COSMIC API Token: {'Set' if settings.external_apis.cosmic_api_token else 'Not set'}")
@@ -30,7 +30,7 @@ def test_simple_config_compatibility():
     print("\nTesting simple configuration compatibility...")
     
     try:
-        from config import settings
+        from CancerGenomicsSuite.config import settings
         
         # Test original Config class attributes
         if hasattr(settings, 'APP_NAME'):

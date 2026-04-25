@@ -360,7 +360,7 @@ if __name__ == '__main__':
 The authentication routes are automatically registered when the Flask app is created:
 
 ```python
-from app import create_app
+from CancerGenomicsSuite.app import create_app
 
 app = create_app()
 # Authentication routes are now available at /auth/*

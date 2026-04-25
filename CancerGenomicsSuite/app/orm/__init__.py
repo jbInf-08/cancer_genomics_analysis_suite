@@ -21,8 +21,8 @@ Models:
 - User: User authentication and profile management (from auth package)
 
 Usage:
-    from app.db import db, AnalysisJob, DataFile, AnalysisResult
-    from app.db.utils import create_tables, run_migrations
+    from CancerGenomicsSuite.app.orm import db, AnalysisJob, DataFile, AnalysisResult
+    from CancerGenomicsSuite.app.orm.utils import create_tables, run_migrations
 """
 
 import logging
@@ -32,7 +32,7 @@ from datetime import datetime
 import json
 
 # Import the database instance from the main app
-from app import db
+from .. import db
 
 # Import all database models
 from .models import (
@@ -103,7 +103,7 @@ def get_package_info() -> Dict[str, Any]:
         Dict containing package information
     """
     return {
-        'name': 'app.db',
+        'name': 'CancerGenomicsSuite.app.orm',
         'version': __version__,
         'description': 'Database package for Cancer Genomics Analysis Suite',
         'models': [

@@ -31,7 +31,7 @@ This document outlines the comprehensive updates made to the Cancer Genomics Ana
 ### 2. Database Schema Updates
 
 #### Updated Files:
-- `app/db/schema.sql` - Comprehensive database schema
+- `app/orm/schema.sql` - Comprehensive database schema
 - `migrations/V1_initial_schema.py` - Alembic migration script
 
 #### New Tables:

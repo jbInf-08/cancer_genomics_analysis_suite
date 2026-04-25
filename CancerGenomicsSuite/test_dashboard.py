@@ -6,16 +6,19 @@ This script tests the dashboard without requiring all dependencies to be install
 
 import sys
 import os
+from pathlib import Path
 
-# Add the current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+_ROOT = Path(__file__).resolve().parent
 
 def test_plugin_registry():
     """Test the plugin registry functionality."""
     print("Testing plugin registry...")
     
     try:
-        from plugin_registry import get_registered_plugins, get_plugins_by_category
+        from CancerGenomicsSuite.plugin_registry import (
+            get_registered_plugins,
+            get_plugins_by_category,
+        )
         plugins = get_registered_plugins()
         print(f"✓ Plugin registry loaded successfully")
         print(f"✓ Found {len(plugins)} plugins")
@@ -38,7 +41,7 @@ def test_settings():
     print("\nTesting settings...")
     
     try:
-        from config.settings import settings
+        from CancerGenomicsSuite.config.settings import settings
         print(f"✓ Settings loaded successfully")
         print(f"✓ App name: {settings.app_name}")
         print(f"✓ Host: {settings.host}")
@@ -108,7 +111,7 @@ def test_dashboard_import():
         })()
         
         # Now try to import the dashboard
-        from main_dashboard import app, server, plugins
+        from CancerGenomicsSuite.main_dashboard import app, server, plugins
         print(f"✓ Dashboard imported successfully")
         print(f"✓ Flask server created")
         print(f"✓ Dash app created")
@@ -135,7 +138,7 @@ def test_static_files():
     
     all_exist = True
     for file_path in static_files:
-        if os.path.exists(file_path):
+        if (_ROOT / file_path).exists():
             print(f"✓ {file_path} exists")
         else:
             print(f"✗ {file_path} missing")

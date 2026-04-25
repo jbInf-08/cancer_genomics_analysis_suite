@@ -28,8 +28,8 @@ from Bio.SeqUtils import GC, molecular_weight
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
 # Import database models and utilities
-from app.db.models import DataFile
-from app.db import db
+from ...orm.models import DataFile
+from ...orm import db
 
 logger = logging.getLogger(__name__)
 

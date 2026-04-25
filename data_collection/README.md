@@ -1,12 +1,12 @@
-# Comprehensive Data Collection System
+# Comprehensive data collection system
 
-This directory contains a comprehensive data collection system for gathering biomarker data from **ALL** major biomedical data sources. The system includes individual collectors for each data source, a master orchestrator, and comprehensive testing and validation tools.
+This directory contains data collection scripts and orchestration for gathering biomarker-related data from many public and licensed biomedical sources. The layout is a **flat set of per-source collectors** (plus a shared base class), not a single deployed service.
 
 ## 🎯 Overview
 
-The data collection system provides:
+The data collection system provides (counts are approximate; see `*_collector.py` in this directory):
 
-- **127 Individual Data Collectors** for every major biomedical data source
+- **Dozens of per-source collector modules** (100+ `*_collector.py` files, including `base_collector.py` as the shared base class)
 - **Master Orchestrator** for coordinated data collection
 - **Comprehensive Testing Suite** for validation
 - **Configuration Management** for flexible data collection
