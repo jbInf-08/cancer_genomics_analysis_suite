@@ -236,12 +236,12 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/cancer-genomics-analysis-suite"
-Documentation = "https://cancer-genomics-analysis-suite.readthedocs.io"
-Repository = "https://github.com/your-org/cancer-genomics-analysis-suite.git"
-"Bug Tracker" = "https://github.com/your-org/cancer-genomics-analysis-suite/issues"
-"Source Code" = "https://github.com/your-org/cancer-genomics-analysis-suite"
-"Download" = "https://github.com/your-org/cancer-genomics-analysis-suite/releases"
+Homepage = "https://github.com/jbInf-08/cancer_genomics_analysis_suite"
+Documentation = "https://github.com/jbInf-08/cancer_genomics_analysis_suite/blob/main/docs/README.md"
+Repository = "https://github.com/jbInf-08/cancer_genomics_analysis_suite.git"
+"Bug Tracker" = "https://github.com/jbInf-08/cancer_genomics_analysis_suite/issues"
+"Source Code" = "https://github.com/jbInf-08/cancer_genomics_analysis_suite"
+"Download" = "https://github.com/jbInf-08/cancer_genomics_analysis_suite/releases"
 
 [project.scripts]
 cancer-genomics = "CancerGenomicsSuite.main_dashboard:main"

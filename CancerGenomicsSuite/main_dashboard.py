@@ -1,5 +1,12 @@
 import os
+import sys
 from pathlib import Path
+
+# Ensure the package subdir is on sys.path (imports use `config`, `plugin_registry`, etc.)
+_CGS_ROOT = Path(__file__).resolve().parent
+if str(_CGS_ROOT) not in sys.path:
+    sys.path.insert(0, str(_CGS_ROOT))
+
 from flask import Flask, jsonify
 import dash
 from dash import dcc, html
@@ -330,7 +337,8 @@ for plugin_name, plugin in plugins.items():
             print(f"ERROR: Failed to register callbacks for plugin {plugin_name}: {e}")
             print(traceback.format_exc())
 
-if __name__ == "__main__":
+def main():
+    """Entry point for the `cancer-genomics` console script (see pyproject.toml)."""
     print(f"DEBUG: Starting Dash server on {settings.host}:{settings.port}")
     print(f"DEBUG: Plugins loaded: {list(plugins.keys()) if plugins else 'None'}")
     print(f"DEBUG: Settings object: {settings}")
@@ -347,3 +355,7 @@ if __name__ == "__main__":
         print(f"ERROR: Failed to start server: {e}")
         print(traceback.format_exc())
         raise
+
+
+if __name__ == "__main__":
+    main()

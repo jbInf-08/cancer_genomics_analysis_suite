@@ -25,7 +25,7 @@ from sqlalchemy import text, inspect
 from sqlalchemy.exc import SQLAlchemyError
 
 # Import database instance and models
-from app import db
+from .. import db
 from .models import AnalysisJob, DataFile, AnalysisResult
 
 # Configure logging

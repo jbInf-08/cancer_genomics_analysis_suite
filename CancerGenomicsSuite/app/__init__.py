@@ -25,7 +25,7 @@ from flask_login import LoginManager
 from werkzeug.exceptions import HTTPException
 
 # Import configuration
-from config.settings import settings
+from CancerGenomicsSuite.config.settings import settings
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -122,8 +122,8 @@ def register_blueprints(app):
     """Register application blueprints."""
     
     # Import blueprints
-    from app.auth.routes import auth_bp
-    from app.dashboard.routes import dashboard_bp
+    from .auth.routes import auth_bp
+    from .dashboard.routes import dashboard_bp
     
     # Register blueprints with URL prefixes
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -153,7 +153,7 @@ def register_blueprints(app):
         celery_status = 'unavailable'
         if CELERY_AVAILABLE:
             try:
-                from app.celery_config import get_worker_stats
+                from .celery_config import get_worker_stats
                 stats = get_worker_stats()
                 celery_status = 'operational' if not stats.get('error') else 'error'
             except Exception as e:
@@ -186,7 +186,7 @@ def register_blueprints(app):
             }), 503
         
         try:
-            from app.celery_config import get_worker_stats, get_queue_lengths, health_check
+            from .celery_config import get_worker_stats, get_queue_lengths, health_check
             
             # Get health check result
             health_result = health_check.delay()
@@ -337,11 +337,11 @@ def initialize_database(app):
     with app.app_context():
         try:
             # Import all models to ensure they are registered
-            from app.db.models import GeneExpression, MutationRecord, AnalysisJob, DataFile, AnalysisResult, Project, Dataset
-            from app.auth.models import User
+            from .orm.models import GeneExpression, MutationRecord, AnalysisJob, DataFile, AnalysisResult, Project, Dataset
+            from .auth.models import User
             
             # Create all tables
-            from app.db.utils import create_tables
+            from .orm.utils import create_tables
             create_tables()
             logger.info("Database tables created successfully")
             
@@ -356,7 +356,7 @@ def initialize_database(app):
 def run_migrations(app):
     """Run database migrations if available."""
     
-    migrations_dir = Path(app.root_path) / 'db' / 'migrations'
+    migrations_dir = Path(app.root_path) / 'orm' / 'migrations'
     
     if migrations_dir.exists():
         try:
@@ -387,7 +387,7 @@ def run_migrations(app):
 @login_manager.user_loader
 def load_user(user_id):
     """Load user for Flask-Login."""
-    from app.auth.models import User
+    from .auth.models import User
     return User.query.get(int(user_id))
 
 
@@ -423,7 +423,7 @@ def register_template_context_processors(app):
 
 # Import Celery configuration
 try:
-    from app.celery_config import celery_app
+    from .celery_config import celery_app
     CELERY_AVAILABLE = True
 except ImportError:
     CELERY_AVAILABLE = False

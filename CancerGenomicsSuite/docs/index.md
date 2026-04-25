@@ -1,6 +1,10 @@
-# Cancer Genomics Analysis Suite
+# Cancer Genomics Analysis Suite (in-package doc index)
 
-A comprehensive, cloud-native platform for real-time cancer genomics analysis, featuring advanced bioinformatics pipelines, machine learning models, and interactive visualizations.
+**Authoritative project docs** live in the repository root: [../../README.md](../../README.md), [../../docs/README.md](../../docs/README.md), and [../../docs/installation.md](../../docs/installation.md). The sections below are a **high-level capability overview**; commands and repository paths may be abbreviated.
+
+---
+
+A cloud-oriented platform for cancer genomics analysis, with bioinformatics pipelines, machine learning, and interactive visualizations.
 
 ## 🧬 Overview
 
@@ -26,8 +30,8 @@ The Cancer Genomics Analysis Suite is designed to process, analyze, and visualiz
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/cancer-genomics-analysis-suite.git
-   cd cancer-genomics-analysis-suite
+   git clone https://github.com/jbInf-08/cancer_genomics_analysis_suite.git
+   cd cancer_genomics_analysis_suite
    ```
 
 2. **Install dependencies**

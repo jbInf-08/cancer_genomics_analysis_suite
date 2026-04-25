@@ -11,7 +11,7 @@ import logging
 from datetime import datetime
 
 # Import the celery app from the main configuration
-from app.celery_config import celery_app
+from CancerGenomicsSuite.app.celery_config import celery_app
 
 logger = logging.getLogger(__name__)
 

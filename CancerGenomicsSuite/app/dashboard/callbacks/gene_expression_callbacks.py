@@ -22,8 +22,8 @@ from typing import Dict, List, Any, Optional
 import logging
 
 # Import database models and utilities
-from app.db.models import GeneExpression, DataFile
-from app.db import db
+from ...orm.models import GeneExpression, DataFile
+from ...orm import db
 
 logger = logging.getLogger(__name__)
 

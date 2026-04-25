@@ -70,15 +70,17 @@ pip install -r CancerGenomicsSuite/requirements.txt
 ```
 
 ### 3. Deploy Infrastructure
+Terraform for AWS and GCP lives under the application tree:
+
 ```bash
 # AWS
-cd terraform/aws
+cd CancerGenomicsSuite/terraform/aws
 terraform init
 terraform plan
 terraform apply
 
 # GCP
-cd terraform/gcp
+cd CancerGenomicsSuite/terraform/gcp
 terraform init
 terraform plan
 terraform apply
@@ -86,24 +88,33 @@ terraform apply
 
 ### 4. Deploy Application
 ```bash
-# Using ArgoCD (Recommended)
+# Using ArgoCD (GitOps; manifests are under the application tree)
 kubectl apply -f CancerGenomicsSuite/argocd/argocd-project.yaml
 kubectl apply -f CancerGenomicsSuite/argocd/argocd-app.yaml
 
-# Using Helm (Alternative)
+# Using Helm (from repository root; alternative to ArgoCD)
 helm install cancer-genomics ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite \
   --namespace cancer-genomics \
   --create-namespace \
   --values ./CancerGenomicsSuite/helm/cancer-genomics-analysis-suite/values-production.yaml
 ```
 
-### 5. Access the Application
+### 5. Local development (Dash dashboard)
+After `pip install -e .` and copying `.env.example` to `.env` (or using `CancerGenomicsSuite/environment.template`), start the main dashboard (default port from `PORT` / config, often **8050**):
+
+```bash
+cancer-genomics
+```
+
+**REST app factory (optional):** `python CancerGenomicsSuite/run_flask_app.py` (uses `CancerGenomicsSuite.app.create_app`).
+
+### 6. Access the Application
 - **Web Interface**: https://cancer-genomics.yourdomain.com
 - **API**: https://api.cancer-genomics.yourdomain.com
 - **Grafana**: https://grafana.cancer-genomics.yourdomain.com
 - **Prometheus**: https://prometheus.cancer-genomics.yourdomain.com
 
-### 6. Using Bioinformatics Tools
+### 7. Using Bioinformatics Tools
 ```bash
 # List all available bioinformatics tools
 cancer-genomics-cli
@@ -150,50 +161,28 @@ workflow_id = executor.execute_workflow(
 
 ```
 cancer_genomics_analysis_suite/
-├── CancerGenomicsSuite/          # Main application code
-│   ├── app/                      # Flask application
-│   ├── modules/                  # Feature modules
-│   │   ├── galaxy_integration/   # Galaxy workflows and tools
-│   │   ├── r_integration/        # R statistical analysis
-│   │   ├── matlab_integration/   # MATLAB numerical computing
-│   │   ├── pymol_integration/    # PyMOL molecular visualization
-│   │   ├── text_editors/         # Text editor integration
-│   │   ├── ape_editor/           # A Plasmid Editor
-│   │   ├── igv_integration/      # IGV genomic visualization
-│   │   ├── gromacs_integration/  # GROMACS molecular dynamics
-│   │   ├── wgsim_tools/          # Read simulation tools
-│   │   ├── neurosnap_integration/# Neurosnap neuroscience
-│   │   ├── tamarind_bio/         # Tamarind Bio workflows
-│   │   └── ...                   # Other existing modules
-│   ├── celery_worker/            # Background task processing
-│   ├── config/                   # Configuration management
-│   ├── tests/                    # Test suites
-│   │   ├── unit/                 # Unit tests
-│   │   ├── integration/          # Integration tests (app factory, routes)
-│   │   ├── e2e/                  # End-to-end checks (in-process client)
-│   │   ├── performance/          # Lightweight timing smoke tests
-│   │   └── security/             # Config hygiene (use bandit/safety separately too)
-│   └── cli_bioinformatics_tools.py # CLI for bioinformatics tools
-├── helm/                         # Helm charts
-│   └── cancer-genomics-analysis-suite/
-│       ├── templates/            # Kubernetes manifests
-│       ├── values.yaml           # Default values
-│       └── Chart.yaml            # Chart metadata
-├── terraform/                    # Infrastructure as Code
-│   ├── aws/                      # AWS infrastructure
-│   └── gcp/                      # GCP infrastructure
-├── argocd/                       # GitOps manifests
-│   ├── argocd-app.yaml           # Application definitions
-│   ├── argocd-project.yaml       # Project configuration
-│   └── argocd-config.yaml        # ArgoCD configuration
-├── .github/                      # CI/CD workflows
-│   └── workflows/
-│       └── ci-cd.yml             # GitHub Actions pipeline
-├── examples/                     # Usage examples
-├── scripts/                      # Utility scripts
-└── docs/                         # Documentation
-│   └── bioinformatics_tools_integration.md # Bioinformatics tools docs
+├── CancerGenomicsSuite/         # Installed package: Dash app, modules, k8s, Helm, Terraform, tests
+│   ├── app/                    # Flask app factory (REST/auth/dashboard)
+│   ├── main_dashboard.py        # `cancer-genomics` — Dash + plugin modules
+│   ├── modules/                # Analysis & tool integrations
+│   ├── k8s/                    # Optional raw K8s manifests; Helm is primary for deploy
+│   ├── helm/cancer-genomics-analysis-suite/
+│   ├── argocd/
+│   ├── terraform/              # aws/ and gcp/
+│   ├── tests/                  # Pytest; options in root pyproject.toml
+│   ├── requirements.txt
+│   ├── api_docs/               # OpenAPI / API notes
+│   └── ...                     # see PROJECT_STRUCTURE.md
+├── data_collection/            # ETL-style collectors
+├── docker/                    # e.g. docker-compose.db.yml
+├── docs/                      # Installation, deployment, testing, helm quickstart
+├── scripts/                   # setup_postgresql.py, etc.
+├── workflows/                 # e.g. sample_analysis_workflow.py
+├── .github/workflows/         # ci.yml, cd.yml, security.yml, ci-cd-pipeline.yml
+├── pyproject.toml, .env.example, README.md
 ```
+
+Long-form layout and file naming: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
 
 ## 🔧 Configuration
 
@@ -305,13 +294,17 @@ pytest CancerGenomicsSuite/tests/ -v
 ## 📚 Documentation
 
 ### Additional Resources
-- [Deployment Guide](CancerGenomicsSuite/DEPLOYMENT_GUIDE.md)
-- [API Documentation](CancerGenomicsSuite/api_docs/README.md)
-- [User Guide](docs/user-guide.md)
-- [Developer Guide](docs/developer_guide.md)
-- [Troubleshooting Guide](docs/troubleshooting.md)
-- [Bioinformatics Tools Integration](CancerGenomicsSuite/docs/bioinformatics_tools_integration.md)
-- [Testing for confidence](docs/testing_confidence.md)
+- [Project structure (detailed)](PROJECT_STRUCTURE.md)
+- [Installation](docs/installation.md)
+- [docs index](docs/README.md) — lists **existing** top-level guides under `docs/`
+- [Deployment (overview)](docs/DEPLOYMENT_GUIDE.md) and [Helm in-cluster details](CancerGenomicsSuite/DEPLOYMENT_GUIDE.md)
+- [Local Kubernetes / Helm quickstart](docs/LOCAL_HELM_QUICKSTART.md)
+- [API / OpenAPI notes](CancerGenomicsSuite/api_docs/README.md)
+- [Bioinformatics tools (suite)](CancerGenomicsSuite/docs/bioinformatics_tools_integration.md)
+- [Testing strategy](docs/testing_confidence.md)
+- [GROMACS / Ensembl (MD + REST)](docs/MD_GROMACS_AND_ENSEMBL.md)
+- [Data collection](data_collection/README.md)
+- [Contributing](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## 🆘 Support
 

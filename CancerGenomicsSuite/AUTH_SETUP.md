@@ -161,7 +161,7 @@ GET /auth/api/auth/status
 ### Python Integration
 
 ```python
-from app.auth import (
+from CancerGenomicsSuite.app.auth import (
     authenticate_user, create_user, require_permission, 
     require_admin, has_permission
 )
@@ -196,7 +196,7 @@ def admin_only_function():
 
 ```python
 from flask import Blueprint
-from app.auth import require_permission, require_admin
+from CancerGenomicsSuite.app.auth import require_permission, require_admin
 
 bp = Blueprint('protected', __name__)
 
@@ -227,7 +227,7 @@ def run_analysis():
 ### Password Validation
 
 ```python
-from app.auth import validate_password
+from CancerGenomicsSuite.app.auth import validate_password
 
 result = validate_password('MySecure123!')
 if result['valid']:
@@ -327,7 +327,7 @@ CREATE TABLE users (
 
 ```python
 import pytest
-from app.auth import authenticate_user, create_user, validate_password
+from CancerGenomicsSuite.app.auth import authenticate_user, create_user, validate_password
 
 def test_password_validation():
     result = validate_password('Weak123')

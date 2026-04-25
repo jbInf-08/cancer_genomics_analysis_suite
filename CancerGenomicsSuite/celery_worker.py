@@ -17,12 +17,13 @@ import sys
 import logging
 from pathlib import Path
 
-# Add the project root to Python path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
+# Repo root on path so `CancerGenomicsSuite` resolves when not installed editable
+_repo_root = Path(__file__).resolve().parent.parent
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
 
 # Import the configured Celery app
-from app.celery_config import celery_app as celery
+from CancerGenomicsSuite.app.celery_config import celery_app as celery
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

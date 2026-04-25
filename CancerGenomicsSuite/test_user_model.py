@@ -7,14 +7,9 @@ for the Cancer Genomics Analysis Suite.
 """
 
 import sys
-from pathlib import Path
 
-# Add the project root to Python path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
-
-from app import create_app, db
-from app.auth.models import User
+from CancerGenomicsSuite.app import create_app, db
+from CancerGenomicsSuite.app.auth.models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 
 def test_user_model():
