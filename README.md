@@ -1,5 +1,16 @@
 # Cancer Genomics Analysis Suite
 
+[![CI](https://github.com/jbInf-08/cancer_genomics_analysis_suite/actions/workflows/ci.yml/badge.svg)](https://github.com/jbInf-08/cancer_genomics_analysis_suite/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+## Golden path
+
+```bash
+pip install -e .
+pytest CancerGenomicsSuite/tests/unit -v
+cancer-genomics
+```
+
 A comprehensive, production-ready platform for cancer genomics analysis featuring real-time mutation detection, clinical data integration, machine learning-based outcome prediction, and multi-omics data analysis.
 
 ## Features
