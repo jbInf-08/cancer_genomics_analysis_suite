@@ -2,7 +2,7 @@
 
 A comprehensive, production-ready platform for cancer genomics analysis featuring real-time mutation detection, clinical data integration, machine learning-based outcome prediction, and multi-omics data analysis.
 
-## 🚀 Features
+## Features
 
 ### Core Capabilities
 - **Real-time Mutation Detection**: Live streaming mutation analysis with instant alerts
@@ -37,7 +37,7 @@ A comprehensive, production-ready platform for cancer genomics analysis featurin
 - **CLI Support**: Command-line interfaces for all integrated tools
 - **Plugin System**: Modular architecture for easy extension
 
-## 📋 Prerequisites
+## Prerequisites
 
 ### System Requirements
 - **Python**: 3.8+
@@ -52,7 +52,7 @@ A comprehensive, production-ready platform for cancer genomics analysis featurin
 - **AWS**: EKS cluster, RDS, ElastiCache, S3, Secrets Manager
 - **GCP**: GKE cluster, Cloud SQL, Memorystore, Cloud Storage, Secret Manager
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone the Repository
 ```bash
@@ -157,7 +157,7 @@ workflow_id = executor.execute_workflow(
 - **SATurn**: Provide a `workflow_file` (script path) and `saturn_args` in `config`.
 - **SeqAnt**: Register the SeqAnt script; executor infers interpreter from extension/shebang. Pass `seqant_args` and `seqant_env`.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 cancer_genomics_analysis_suite/
@@ -184,7 +184,7 @@ cancer_genomics_analysis_suite/
 
 Long-form layout and file naming: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 ```bash
@@ -208,7 +208,7 @@ UNIPROT_API_KEY=your-key
 CLINVAR_API_KEY=your-key
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Test Suites
 ```bash
@@ -245,7 +245,7 @@ During `pytest`, a session autouse fixture sets **`CGAS_TEST_UPLOAD_FOLDER`** to
 pytest CancerGenomicsSuite/tests/ -m critical -v --no-cov
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Environments
 - **Development**: Single-node cluster for development
@@ -265,7 +265,7 @@ pytest CancerGenomicsSuite/tests/ -m critical -v --no-cov
 - **ML Pipeline**: 100+ samples/hour
 - **API Response Time**: <100ms (95th percentile)
 
-## 🤝 Contributing
+## Contributing
 
 ### Development Setup
 ```bash
@@ -291,7 +291,7 @@ pytest CancerGenomicsSuite/tests/ -v
 5. Ensure all tests pass
 6. Submit a pull request
 
-## 📚 Documentation
+## Documentation
 
 ### Additional Resources
 - [Project structure (detailed)](PROJECT_STRUCTURE.md)
@@ -306,7 +306,7 @@ pytest CancerGenomicsSuite/tests/ -v
 - [Data collection](data_collection/README.md)
 - [Contributing](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md)
 
-## 🆘 Support
+## Support
 
 ### Getting Help
 - **GitHub Issues**: Bug reports and feature requests
@@ -314,11 +314,11 @@ pytest CancerGenomicsSuite/tests/ -v
 - **Documentation**: Comprehensive guides and references
 - **Email Support**: jbautista0055@gmail.com
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Contributors**: All the amazing developers who contributed to this project
 - **Open Source**: Built on top of excellent open-source tools and libraries
@@ -327,4 +327,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ for the cancer genomics community**
+
