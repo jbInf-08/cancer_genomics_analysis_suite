@@ -11,7 +11,7 @@ pytest CancerGenomicsSuite/tests/unit -v
 cancer-genomics
 ```
 
-Benchmark evidence and reproducibility details: [docs/BENCHMARKS.md](docs/BENCHMARKS.md).
+Benchmark harness (no baseline numbers in-repo yet): [docs/BENCHMARKS_HARNESS.md](docs/BENCHMARKS_HARNESS.md).
 
 A comprehensive, production-ready platform for cancer genomics analysis featuring real-time mutation detection, clinical data integration, machine learning-based outcome prediction, and multi-omics data analysis.
 
@@ -24,18 +24,25 @@ A comprehensive, production-ready platform for cancer genomics analysis featurin
 - **Multi-omics Analysis**: Integrated analysis of genomics, transcriptomics, and proteomics data
 - **Graph Database Analytics**: Neo4j-powered knowledge graph for complex relationship analysis
 
-### Bioinformatics Tools Integration
-- **Galaxy Integration**: Access Galaxy workflows, tools, and data analysis capabilities
-- **R Integration**: Comprehensive statistical analysis with R packages (DESeq2, limma, ggplot2)
-- **MATLAB Integration**: Numerical computing, signal processing, and optimization
-- **PyMOL Integration**: Molecular visualization and structure analysis
-- **Text Editors**: Support for nano, vim, emacs, notepad++, and other editors
-- **A Plasmid Editor (APE)**: Plasmid design, analysis, and visualization
-- **IGV Integration**: Genomic data visualization and analysis
-- **GROMACS Integration**: Molecular dynamics simulations
-- **WGSIM Tools**: Read simulation and variant calling (wgsim, dwgsim)
-- **Neurosnap Integration**: Neuroscience data analysis
-- **Tamarind Bio**: Bioinformatics workflow execution
+### Bioinformatics tool adapters (what is actually in the repo)
+
+The suite ships **Python client modules** under `CancerGenomicsSuite/modules/`. “**In repo**” means the import path and client class exist; “**External runtime**” means you must provide the third-party tool, service, or license (CI does not assert every binary is present). This table replaces a long feature list that read like 40+ full product integrations.
+
+| Name | In-repo package | Notes |
+|------|------------------|--------|
+| Galaxy | `galaxy_integration/` | **In repo** — API-oriented client; needs a Galaxy URL + API key. |
+| R / Bioconductor | `r_integration/` | **In repo** — optional `rpy2` extra; R installation required at runtime. |
+| MATLAB | `matlab_integration/` | **In repo** — uses MATLAB Engine for Python when installed; **license** + MATLAB required. |
+| PyMOL | `pymol_integration/` | **In repo** — **External runtime**: PyMOL must be on `PATH` / importable. |
+| Text editors | `text_editors/` | **In repo** — spawns system editors; behavior depends on host OS. |
+| APE | `ape_editor/` | **In repo** — client/glue; APE install where applicable. |
+| IGV | `igv_integration/` | **In repo** — integration helpers; IGV is a **separate** desktop app. |
+| GROMACS | `gromacs_integration/` | **In repo** — CLI wrapper; **GROMACS binary** must be installed to run MD. |
+| WGSIM / dwgsim | `wgsim_tools/` | **In repo** — CLI wrapper when tools are installed. |
+| Neurosnap | `neurosnap_integration/` | **In repo** — locates `neurosnap` on `PATH` if present. |
+| Tamarind Bio | `tamarind_bio/` | **In repo** — locates `tamarind` on `PATH` if present. |
+
+Details and API surface area: [CancerGenomicsSuite/docs/bioinformatics_tools_integration.md](CancerGenomicsSuite/docs/bioinformatics_tools_integration.md).
 
 ### Technical Features
 - **Stream Processing**: Apache Kafka for real-time data processing
@@ -46,7 +53,7 @@ A comprehensive, production-ready platform for cancer genomics analysis featurin
 - **GitOps Deployment**: ArgoCD for automated, declarative deployments
 - **Comprehensive Monitoring**: Prometheus, Grafana, and custom alerting rules
 - **Security**: TLS encryption, RBAC, network policies, and secrets management
-- **Bioinformatics Tools**: Integrated access to 11+ popular bioinformatics tools
+- **Bioinformatics Tools**: Pluggable client modules for external tools and services (see table above; not all run in a stock laptop install)
 - **CLI Support**: Command-line interfaces for all integrated tools
 - **Plugin System**: Modular architecture for easy extension
 
