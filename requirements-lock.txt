@@ -1,0 +1,4 @@
+# Lock-style snapshot entrypoint for deterministic rebuilds in CI/dev.
+# Keep this synced with the pinned package set in pyproject.toml and
+# CancerGenomicsSuite/requirements.txt.
+-r CancerGenomicsSuite/requirements.txt
