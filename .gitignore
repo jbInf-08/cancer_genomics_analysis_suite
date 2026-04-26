@@ -420,6 +420,8 @@ downloads/
 uploads/
 cache/
 .cache/
+data/workflow_output/
+data/demo_output/
 
 # Bioinformatics tools specific
 galaxy_data/

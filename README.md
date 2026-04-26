@@ -178,13 +178,21 @@ cancer_genomics_analysis_suite/
 ├── docs/                      # Installation, deployment, testing, helm quickstart
 ├── scripts/                   # setup_postgresql.py, etc.
 ├── workflows/                 # e.g. sample_analysis_workflow.py
-├── .github/workflows/         # ci.yml, cd.yml, security.yml, ci-cd-pipeline.yml
+├── .github/workflows/         # ci.yml, cd.yml, security.yml
 ├── pyproject.toml, .env.example, README.md
 ```
 
 Long-form layout and file naming: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
 
 ## Configuration
+
+### Mutation module boundaries
+
+- `mutation_analysis`: core mutation-centric analytics and descriptive/statistical workflows.
+- `mutation_effect_predictor`: impact/effect estimation logic (functional effect scoring and model-assisted interpretation).
+- `mutation_predictor`: predictive tasks that classify/forecast mutation-related outcomes.
+
+When adding new mutation functionality, place code by concern above and avoid creating additional sibling modules with overlapping responsibilities.
 
 ### Environment Variables
 ```bash

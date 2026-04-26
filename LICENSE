@@ -19,34 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-ADDITIONAL TERMS FOR CANCER GENOMICS ANALYSIS SUITE:
-
-1. RESEARCH USE: This software is intended for research and educational purposes
-   in cancer genomics and bioinformatics. Users are encouraged to cite this
-   software in any publications or research outputs.
-
-2. MEDICAL DISCLAIMER: This software is not intended for clinical diagnosis,
-   treatment, or medical decision-making. Any results obtained from this
-   software should be validated through appropriate clinical and laboratory
-   procedures before use in patient care.
-
-3. DATA PRIVACY: Users are responsible for ensuring compliance with all
-   applicable data protection regulations (including HIPAA, GDPR, etc.) when
-   processing patient or personal genomic data.
-
-4. CITATION: If you use this software in your research, please cite:
-   "Cancer Genomics Analysis Suite" [version] - [URL/DOI when available]
-
-5. CONTRIBUTIONS: Contributions to this project are welcome. By contributing,
-   you agree that your contributions will be licensed under the same MIT
-   License terms.
-
-6. THIRD-PARTY DEPENDENCIES: This software includes dependencies on various
-   third-party libraries. Please refer to the requirements.txt file for a
-   complete list. Each dependency has its own license terms that must be
-   respected.
-
-For questions about licensing or usage, please contact the project maintainers.
