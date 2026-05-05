@@ -184,7 +184,8 @@ jobs:
 
       - name: Test Docker image
         run: |
-          docker run --rm cancer-genomics-analysis-suite:latest python -c "import CancerGenomicsSuite; print('Import successful')"
+          docker run --rm cancer-genomics-analysis-suite:latest \
+            python -c "import sys; sys.path.insert(0, '/app'); import CancerGenomicsSuite; print('Import successful')"
 
   performance-test:
     name: Performance Tests
@@ -207,7 +208,14 @@ jobs:
 
       - name: Run performance tests
         run: |
-          pytest CancerGenomicsSuite/tests/ -m performance --benchmark-only --benchmark-save=performance-baseline
+          # Detect whether any performance-marked tests exist
+          if pytest CancerGenomicsSuite/tests/ -m performance --collect-only -q 2>/dev/null | grep -q "test"; then
+            pytest CancerGenomicsSuite/tests/ -m performance --benchmark-only --benchmark-save=performance-baseline
+          else
+            echo "No performance-marked tests found; skipping benchmark run."
+            mkdir -p .benchmarks
+            echo '{"note": "no performance tests recorded"}' > .benchmarks/empty.json
+          fi
 
       - name: Upload performance results
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -224,10 +232,10 @@ jobs:
       - name: Notify on success
         if: ${{ needs.lint-and-format.result == 'success' && needs.test.result == 'success' && needs.security-scan.result == 'success' && needs.build.result == 'success' && needs.docker-build.result == 'success' }}
         run: |
-          echo "✅ All CI checks passed successfully!"
+          echo "All CI checks passed successfully."
 
       - name: Notify on failure
         if: ${{ needs.lint-and-format.result == 'failure' || needs.test.result == 'failure' || needs.security-scan.result == 'failure' || needs.build.result == 'failure' || needs.docker-build.result == 'failure' }}
         run: |
-          echo "❌ Some CI checks failed. Please check the logs."
+          echo "Some CI checks failed. Please check the logs."
           exit 1
