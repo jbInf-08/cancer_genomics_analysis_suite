@@ -109,12 +109,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run TruffleHog OSS
+      - name: Run TruffleHog OSS (PR diff scan)
+        if: github.event_name == 'pull_request'
         uses: trufflesecurity/trufflehog@a05cf0859455b5b16317ee22d809887a4043cdf0 # v3.90.2
         with:
           path: ./
-          base: main
-          head: HEAD
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+          extra_args: --debug --only-verified
+
+      - name: Run TruffleHog OSS (full scan)
+        if: github.event_name != 'pull_request'
+        uses: trufflesecurity/trufflehog@a05cf0859455b5b16317ee22d809887a4043cdf0 # v3.90.2
+        with:
+          path: ./
           extra_args: --debug --only-verified
 
   license-scan:
@@ -193,6 +201,9 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        continue-on-error: true
+        with:
+          pattern: '*-report*'
 
       - name: Generate security summary
         run: |
