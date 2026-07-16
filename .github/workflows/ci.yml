@@ -67,27 +67,23 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11"]
-        test-type: ["unit"]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.11
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
       - name: Cache pip dependencies
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt', '**/pyproject.toml') }}
+          key: ${{ runner.os }}-pip-3.11-${{ hashFiles('**/requirements.txt', '**/pyproject.toml') }}
           restore-keys: |
-            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ runner.os }}-pip-3.11-
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
@@ -96,27 +92,21 @@ jobs:
           pip install -e ".[dev,test]"
 
       - name: Run unit tests
-        if: matrix.test-type == 'unit'
         run: |
           pytest CancerGenomicsSuite/tests/ -m unit --cov=CancerGenomicsSuite --cov-report=xml --cov-report=html --junitxml=test-results-unit.xml || true
-
-      - name: Run integration tests
-        if: matrix.test-type == 'integration'
-        run: |
-          pytest CancerGenomicsSuite/tests/ -m integration --cov=CancerGenomicsSuite --cov-report=xml --cov-report=html --junitxml=test-results-integration.xml
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
         with:
           file: ./coverage.xml
-          flags: ${{ matrix.test-type }}
-          name: coverage-${{ matrix.python-version }}-${{ matrix.test-type }}
+          flags: unit
+          name: coverage-3.11-unit
 
       - name: Upload test results
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
-          name: test-results-${{ matrix.python-version }}-${{ matrix.test-type }}
+          name: test-results-3.11-unit
           path: |
             test-results-*.xml
             htmlcov/
