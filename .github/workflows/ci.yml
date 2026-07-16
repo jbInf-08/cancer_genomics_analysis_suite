@@ -159,6 +159,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
+      # Dockerfile pulls in torch/tensorflow/transformers/opencv etc.; the
+      # runner's default free space plus a mode=max layer cache has been
+      # enough to hit "no space left on device" mid-build.
+      - name: Free up runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          docker image prune -af
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
@@ -171,7 +179,7 @@ jobs:
           load: true
           tags: cancer-genomics-analysis-suite:latest
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=min
 
       - name: Test Docker image
         run: |
