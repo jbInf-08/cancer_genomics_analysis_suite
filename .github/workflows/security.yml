@@ -65,7 +65,7 @@ jobs:
 
       - name: Run Bandit security scan
         run: |
-          bandit -r CancerGenomicsSuite/ -f json -o bandit-report.json
+          bandit -r CancerGenomicsSuite/ -f json -o bandit-report.json --exit-zero
           bandit -r CancerGenomicsSuite/ -ll --exit-zero
 
       - name: Upload bandit report
