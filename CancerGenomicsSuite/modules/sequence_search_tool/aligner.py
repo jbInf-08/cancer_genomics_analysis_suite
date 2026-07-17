@@ -19,7 +19,7 @@ import time
 
 from Bio import pairwise2
 from Bio.Seq import Seq
-from Bio.SeqUtils import GC
+from Bio.SeqUtils import gc_fraction
 from Bio.Align import substitution_matrices
 from Bio.pairwise2 import format_alignment
 
@@ -104,7 +104,7 @@ class SequenceAligner:
                 'description': description,
                 'length': len(clean_sequence),
                 'type': self._detect_sequence_type(clean_sequence),
-                'gc_content': GC(clean_sequence) if self._detect_sequence_type(clean_sequence) == 'DNA' else None
+                'gc_content': gc_fraction(clean_sequence, ambiguous="ignore") * 100 if self._detect_sequence_type(clean_sequence) == 'DNA' else None
             }
             
             self.logger.info(f"Added sequence {sequence_id} to database ({len(clean_sequence)} bp)")
@@ -479,10 +479,12 @@ class SequenceAligner:
         # GC content comparison (for DNA sequences)
         gc_comparison = {}
         if seq1_data['type'] == 'DNA' and seq2_data['type'] == 'DNA':
+            seq1_gc = gc_fraction(seq1, ambiguous="ignore") * 100
+            seq2_gc = gc_fraction(seq2, ambiguous="ignore") * 100
             gc_comparison = {
-                'seq1_gc': GC(seq1),
-                'seq2_gc': GC(seq2),
-                'gc_difference': abs(GC(seq1) - GC(seq2))
+                'seq1_gc': seq1_gc,
+                'seq2_gc': seq2_gc,
+                'gc_difference': abs(seq1_gc - seq2_gc)
             }
         
         return {
