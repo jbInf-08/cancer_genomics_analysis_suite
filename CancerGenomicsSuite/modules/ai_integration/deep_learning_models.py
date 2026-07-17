@@ -38,7 +38,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 # Bioinformatics
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.SeqUtils import molecular_weight, GC
+from Bio.SeqUtils import molecular_weight, gc_fraction
 
 logger = logging.getLogger(__name__)
 
@@ -477,7 +477,7 @@ class MutationEffectPredictor:
                 seq.count('T') / len(seq),
                 seq.count('G') / len(seq),
                 seq.count('C') / len(seq),
-                GC(seq) / 100
+                gc_fraction(seq, ambiguous="ignore")
             ])
         
         # Mutation type features

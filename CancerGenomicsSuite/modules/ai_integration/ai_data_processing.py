@@ -49,7 +49,7 @@ from statsmodels.tsa.arima.model import ARIMA
 # Bioinformatics
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.SeqUtils import molecular_weight, GC
+from Bio.SeqUtils import molecular_weight
 
 # Visualization
 import matplotlib.pyplot as plt

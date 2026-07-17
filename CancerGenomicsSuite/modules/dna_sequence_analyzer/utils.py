@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.SeqUtils import GC, molecular_weight
+from Bio.SeqUtils import gc_fraction, molecular_weight
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 from Bio.Data import CodonTable
 import matplotlib.pyplot as plt
@@ -123,7 +123,7 @@ class DNAUtils:
         nucleotide_counts = Counter(sequence)
         
         # GC content
-        gc_content = GC(sequence)
+        gc_content = gc_fraction(sequence, ambiguous="ignore") * 100
         
         # Molecular weight
         try:
@@ -541,7 +541,7 @@ class DNAUtils:
             
             for i in range(0, len(sequence) - window_size + 1, window_size // 2):
                 window_seq = sequence[i:i+window_size]
-                gc_content = GC(window_seq)
+                gc_content = gc_fraction(window_seq, ambiguous="ignore") * 100
                 gc_content_window.append(gc_content)
                 positions.append(i + window_size // 2)
             

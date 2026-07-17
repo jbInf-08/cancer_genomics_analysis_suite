@@ -24,7 +24,7 @@ import logging
 import re
 from Bio import SeqIO
 from Bio.Seq import Seq
-from Bio.SeqUtils import GC, molecular_weight
+from Bio.SeqUtils import gc_fraction, molecular_weight
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
 # Import database models and utilities
@@ -358,7 +358,7 @@ def analyze_dna_sequence(sequence: str) -> Dict[str, Any]:
     
     return {
         'length': len(sequence),
-        'gc_content': GC(seq),
+        'gc_content': gc_fraction(seq, ambiguous="ignore") * 100,
         'molecular_weight': molecular_weight(seq, seq_type='DNA'),
         'base_composition': {
             'A': sequence.count('A'),
@@ -383,7 +383,7 @@ def analyze_rna_sequence(sequence: str) -> Dict[str, Any]:
     
     return {
         'length': len(sequence),
-        'gc_content': GC(seq),
+        'gc_content': gc_fraction(seq, ambiguous="ignore") * 100,
         'molecular_weight': molecular_weight(seq, seq_type='RNA'),
         'base_composition': {
             'A': sequence.count('A'),

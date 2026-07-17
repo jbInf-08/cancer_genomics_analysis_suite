@@ -78,6 +78,7 @@ bioblend==3.2.0
 # File handling and utilities
 openpyxl==3.1.2
 xlsxwriter==3.1.9
+reportlab==4.0.9
 
 # Web interface enhancements
 dash-bootstrap-components==1.5.0
