@@ -227,7 +227,10 @@ jobs:
 
       - name: Run performance tests
         run: |
-          pytest CancerGenomicsSuite/tests/ -m performance --benchmark-only --benchmark-save=performance-baseline
+          # --no-cov overrides the --cov-fail-under=10 in pyproject's addopts:
+          # a benchmark run only selects the perf-marked tests, so its coverage
+          # is ~6% and would fail the global gate even though nothing is wrong.
+          pytest CancerGenomicsSuite/tests/ -m performance --no-cov --benchmark-only --benchmark-save=performance-baseline
 
       - name: Upload performance results
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

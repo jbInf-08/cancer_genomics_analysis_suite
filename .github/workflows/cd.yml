@@ -21,6 +21,14 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+# The default GITHUB_TOKEN can't push to GHCR; packages: write is required for
+# the docker build-push steps. contents: write is for deploy-production's
+# create-release step. Declaring any permissions drops unset scopes to none,
+# so contents must be listed explicitly to keep checkout working.
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   deploy-staging:
     name: Deploy to Staging
