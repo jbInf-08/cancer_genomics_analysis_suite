@@ -504,7 +504,7 @@ class ENCODEDownloader:
     def _verify_md5(self, file_path: Path, expected_md5: str) -> bool:
         """Verify MD5 checksum of downloaded file."""
         try:
-            hash_md5 = hashlib.md5()
+            hash_md5 = hashlib.md5(usedforsecurity=False)
             with open(file_path, "rb") as f:
                 for chunk in iter(lambda: f.read(4096), b""):
                     hash_md5.update(chunk)

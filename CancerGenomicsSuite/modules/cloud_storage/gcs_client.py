@@ -6,7 +6,7 @@ import os
 from google.cloud import storage
 from google.cloud.exceptions import NotFound, GoogleCloudError
 from typing import List, Optional, Union, BinaryIO
-from datetime import datetime
+from datetime import datetime, timedelta
 from .base_storage import BaseStorageClient, StorageObject, UploadResult
 
 

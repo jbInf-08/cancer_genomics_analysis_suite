@@ -28,7 +28,15 @@ from datetime import datetime, timedelta
 import zipfile
 
 # Import database models and utilities
-from ...orm.models import AnalysisJob, AnalysisResult, DataFile, Project, Dataset
+from ...orm.models import (
+    AnalysisJob,
+    AnalysisResult,
+    DataFile,
+    Dataset,
+    GeneExpression,
+    MutationRecord,
+    Project,
+)
 from ...orm import db
 
 logger = logging.getLogger(__name__)

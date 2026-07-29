@@ -145,8 +145,8 @@ def get_config() -> IntegrationConfig:
 
 def update_config(config_dict: Dict[str, Any]) -> IntegrationConfig:
     """Update configuration with new values."""
-    global DEFAULT_CONFIG
-    
+    # No `global` needed: this only mutates attributes on DEFAULT_CONFIG, it
+    # never rebinds the name.
     # Update biomarker_identifier config
     if 'biomarker_identifier' in config_dict:
         bi_config = config_dict['biomarker_identifier']

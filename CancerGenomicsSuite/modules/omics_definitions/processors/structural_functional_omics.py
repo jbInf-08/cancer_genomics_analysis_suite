@@ -14,7 +14,7 @@ import json
 import warnings
 warnings.filterwarnings('ignore')
 
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 from sklearn.decomposition import PCA, FastICA
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from sklearn.metrics import silhouette_score

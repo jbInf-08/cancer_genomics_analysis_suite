@@ -20,6 +20,7 @@ from sklearn.ensemble import (
     GradientBoostingClassifier, GradientBoostingRegressor,
     VotingClassifier, VotingRegressor, StackingClassifier, StackingRegressor
 )
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import (
     train_test_split, cross_val_score, GridSearchCV, 
     RandomizedSearchCV, StratifiedKFold, KFold

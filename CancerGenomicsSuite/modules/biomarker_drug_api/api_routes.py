@@ -16,15 +16,15 @@ import traceback
 # Import our analysis modules
 from ..biomarker_discovery.biomarker_analyzer import (
     BiomarkerAnalyzer, StatisticalBiomarkerDiscovery, MLBiomarkerDiscovery,
-    BiomarkerDiscoveryConfig
+    BiomarkerDiscoveryConfig, BiomarkerResult
 )
 from ..drug_discovery.drug_analyzer import (
     DrugAnalyzer, DrugRepurposingAnalyzer, DrugTargetIdentifier,
-    DrugDiscoveryConfig
+    DrugDiscoveryConfig, DrugResult
 )
 from ..drug_biomarker_integration.drug_biomarker_analyzer import (
     DrugBiomarkerAnalyzer, PharmacogenomicsIntegrator, PersonalizedMedicineEngine,
-    DrugBiomarkerConfig
+    DrugBiomarkerConfig, DrugBiomarkerInteraction
 )
 
 logger = logging.getLogger(__name__)
@@ -660,7 +660,7 @@ def create_clinical_api() -> Blueprint:
                     'risk_level': risk_level,
                     'risk_score': risk_score,
                     'risk_factors': risk_factors,
-                    'recommendations': self._generate_risk_recommendations(risk_level, risk_factors)
+                    'recommendations': _generate_risk_recommendations(risk_level, risk_factors)
                 },
                 'timestamp': datetime.now().isoformat()
             })
@@ -669,7 +669,7 @@ def create_clinical_api() -> Blueprint:
             logger.error(f"Error in risk assessment: {e}")
             return jsonify({'error': str(e)}), 500
     
-    def _generate_risk_recommendations(self, risk_level: str, risk_factors: List[str]) -> List[str]:
+    def _generate_risk_recommendations(risk_level: str, risk_factors: List[str]) -> List[str]:
         """Generate risk-based recommendations."""
         recommendations = []
         

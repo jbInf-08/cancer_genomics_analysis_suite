@@ -135,8 +135,11 @@ class TextEditorClient:
                 # Terminal-based editors
                 subprocess.Popen(cmd)
             else:
-                # GUI editors
-                subprocess.Popen(cmd, shell=True)
+                # GUI editors. No shell: cmd is already an argument list and
+                # editor_path comes from shutil.which(), so it is a resolved
+                # executable path. Passing a list with shell=True also does not
+                # do what it looks like on POSIX -- only cmd[0] would run.
+                subprocess.Popen(cmd)
             
             return {
                 'success': True,

@@ -159,7 +159,7 @@ class ClinVarSync:
     def _get_cache_key(self, endpoint: str, params: Dict[str, Any]) -> str:
         """Generate cache key for request."""
         cache_data = f"{endpoint}:{json.dumps(params, sort_keys=True)}"
-        return hashlib.md5(cache_data.encode()).hexdigest()
+        return hashlib.md5(cache_data.encode(), usedforsecurity=False).hexdigest()
     
     def _get_cached_response(self, cache_key: str) -> Optional[str]:
         """Get cached XML response if available."""

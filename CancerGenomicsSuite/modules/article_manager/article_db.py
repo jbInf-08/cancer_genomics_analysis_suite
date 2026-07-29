@@ -71,7 +71,7 @@ class ArticleMetadata:
     def get_hash(self) -> str:
         """Get unique hash for article."""
         content = f"{self.title}{self.doi}{self.pmid}{self.url}"
-        return hashlib.md5(content.encode()).hexdigest()
+        return hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()
 
 
 class ArticleDatabaseManager:

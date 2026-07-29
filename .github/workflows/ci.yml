@@ -41,25 +41,48 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install black isort flake8 mypy bandit safety
+          # Pinned: these were unpinned, so a new release of any of them changed
+          # the result of a check without this repo changing. That matters most
+          # for black, whose formatting differs between majors.
+          pip install black==23.11.0 isort==5.13.2 flake8==7.3.0 mypy==1.20.2 \
+                      bandit==1.8.6 safety==3.6.2
           pip install -e ".[dev,test]"
 
-      - name: Run Black (code formatting)
+      # BLOCKING. These are the flake8 classes that indicate real defects rather
+      # than style: E9 syntax/indentation errors, F63 bad comparisons, F7
+      # misplaced statements and F82 undefined names. Undefined names are
+      # guaranteed NameErrors at runtime, and there were 17 of them behind the
+      # `|| true` that used to cover this step.
+      - name: Run Flake8 (errors -- blocking)
+        run: flake8 CancerGenomicsSuite/ --select=E9,F63,F7,F82 --count
+
+      # ADVISORY, and genuinely so -- not a check dressed up as one. The tree
+      # currently carries ~30k style findings (mostly W293 trailing whitespace
+      # and E501 long lines) and 278 files that black would reformat. Gating on
+      # any of that today would just block every pull request, and clearing it
+      # is a formatting sweep that should land on its own rather than riding
+      # along with unrelated changes. The step names say "advisory" so a green
+      # tick here is not mistaken for a clean tree.
+      - name: Run Flake8 (style -- advisory)
+        run: flake8 CancerGenomicsSuite/ --count || true
+
+      - name: Run Black (advisory)
         run: black --check --diff CancerGenomicsSuite/ || true
 
-      - name: Run isort (import sorting)
+      - name: Run isort (advisory)
         run: isort --check-only --diff CancerGenomicsSuite/ || true
 
-      - name: Run Flake8 (linting)
-        run: flake8 CancerGenomicsSuite/ || true
-
-      - name: Run MyPy (type checking)
+      - name: Run MyPy (advisory)
         run: mypy CancerGenomicsSuite/ || true
 
+      # BLOCKING at high severity. Anything bandit rates high is worth stopping
+      # for; the report is still written for the artifact upload either way.
       - name: Run Bandit (security linting)
-        run: bandit -r CancerGenomicsSuite/ -f json -o bandit-report.json || true
+        run: |
+          bandit -r CancerGenomicsSuite/ -f json -o bandit-report.json || true
+          bandit -r CancerGenomicsSuite/ -lll
 
-      - name: Run Safety (dependency vulnerability check)
+      - name: Run Safety (dependency vulnerability check -- advisory)
         run: safety check --json --output safety-report.json || true
 
       - name: Upload security reports
@@ -105,14 +128,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev,test]"
 
+      # BLOCKING. This was `|| true`, which made the whole job incapable of
+      # failing: the suite passes today (189 passed, 6 skipped), so every green
+      # tick was accurate by luck rather than by check, and the next broken test
+      # would have gone unreported.
       - name: Run unit tests
         run: |
-          pytest CancerGenomicsSuite/tests/ -m unit --cov=CancerGenomicsSuite --cov-report=xml --cov-report=html --junitxml=test-results-unit.xml || true
+          pytest CancerGenomicsSuite/tests/ -m unit --cov=CancerGenomicsSuite --cov-report=xml --cov-report=html --junitxml=test-results-unit.xml
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
+        # Runs even when the tests above fail so partial coverage is still
+        # visible; `file` is not a valid input for v5, which warned on every run.
+        if: always()
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           flags: unit
           name: coverage-3.11-unit
 
@@ -132,8 +162,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
-      - name: Run Trivy vulnerability scanner
-        run: echo "Security scan baseline check completed."
+      # This step was named "Run Trivy vulnerability scanner" but its body was
+      # `echo "Security scan baseline check completed."`. It ran no scanner at
+      # all and could not fail, so the "Security Scan" check reported green
+      # regardless of the tree. It now actually scans the dependency manifests.
+      #
+      # Run via the official image rather than trivy-action, matching the choice
+      # already made and documented in security.yml: the action's v0.33.x line
+      # has intermittently failed to bootstrap its own binary.
+      #
+      # --exit-code 0 for now, as security.yml also does. This has never run, so
+      # the finding count is unknown; turning it into a gate should follow a
+      # first run that establishes the baseline rather than being asserted here.
+      - name: Run Trivy vulnerability scanner (filesystem, advisory)
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            aquasec/trivy:0.58.1 fs /workspace \
+            --scanners vuln \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 0 \
+            --format table
 
   build:
     name: Build Package
