@@ -178,7 +178,7 @@ class ScopusClient:
     def _get_cache_key(self, endpoint: str, params: Dict[str, Any]) -> str:
         """Generate cache key for request."""
         cache_data = f"{endpoint}:{json.dumps(params, sort_keys=True)}"
-        return hashlib.md5(cache_data.encode(), usedforsecurity=False).hexdigest()
+        return hashlib.sha256(cache_data.encode()).hexdigest()
     
     def _get_cached_response(self, cache_key: str) -> Optional[Dict[str, Any]]:
         """Get cached response if available."""

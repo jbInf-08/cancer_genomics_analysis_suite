@@ -158,8 +158,13 @@ class ClinVarSync:
     
     def _get_cache_key(self, endpoint: str, params: Dict[str, Any]) -> str:
         """Generate cache key for request."""
-        cache_data = f"{endpoint}:{json.dumps(params, sort_keys=True)}"
-        return hashlib.md5(cache_data.encode(), usedforsecurity=False).hexdigest()
+        # api_key is dropped before hashing: _make_request adds it to params, so
+        # it would otherwise become part of the cache identity. It does not
+        # change the response body, and a credential should not be fed through
+        # the hash or influence which cache file is read.
+        key_params = {k: v for k, v in params.items() if k != "api_key"}
+        cache_data = f"{endpoint}:{json.dumps(key_params, sort_keys=True)}"
+        return hashlib.sha256(cache_data.encode()).hexdigest()
     
     def _get_cached_response(self, cache_key: str) -> Optional[str]:
         """Get cached XML response if available."""
