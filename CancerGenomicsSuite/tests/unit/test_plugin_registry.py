@@ -49,13 +49,18 @@ def test_reload_plugin_missing_from_sys_modules():
 
 def test_reload_plugin_success():
     with patch("importlib.reload", return_value=None) as mock_reload:
-        assert plugin_registry.reload_plugin("CancerGenomicsSuite.plugin_registry") is True
+        assert (
+            plugin_registry.reload_plugin("CancerGenomicsSuite.plugin_registry") is True
+        )
         mock_reload.assert_called_once()
 
 
 def test_reload_plugin_reload_error():
     with patch("importlib.reload", side_effect=RuntimeError("reload failed")):
-        assert plugin_registry.reload_plugin("CancerGenomicsSuite.plugin_registry") is False
+        assert (
+            plugin_registry.reload_plugin("CancerGenomicsSuite.plugin_registry")
+            is False
+        )
 
 
 def test_get_registered_plugins_import_error():

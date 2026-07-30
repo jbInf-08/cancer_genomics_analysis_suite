@@ -5,12 +5,12 @@ HDOCK Pipeline Manager
 Executes HDOCK docking jobs via hdock CLI; tracks runs and outputs.
 """
 
-import os
 import logging
+import os
 import subprocess
-from typing import Dict, List, Optional, Any
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,9 @@ class HDOCKManager:
             self.job_history.append(job_info)
             del self.active_jobs[job_name]
 
-            logger.info("HDOCK job %s finished with status %s", job_name, job_info["status"])
+            logger.info(
+                "HDOCK job %s finished with status %s", job_name, job_info["status"]
+            )
             return job_info
 
         except Exception as exc:
@@ -129,9 +131,9 @@ class HDOCKManager:
                     {
                         "path": str(path.relative_to(exec_dir)),
                         "size": path.stat().st_size,
-                        "modified": datetime.fromtimestamp(path.stat().st_mtime).isoformat(),
+                        "modified": datetime.fromtimestamp(
+                            path.stat().st_mtime
+                        ).isoformat(),
                     }
                 )
         return {"execution_directory": str(exec_dir), "files": files}
-
-

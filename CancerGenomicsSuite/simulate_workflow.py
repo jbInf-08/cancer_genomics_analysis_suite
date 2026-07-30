@@ -18,22 +18,18 @@ Options:
     --help                Show this help message
 """
 
-import time
-import random
 import argparse
 import json
 import os
-from pathlib import Path
+import random
+import time
 from datetime import datetime
-from typing import Dict, List, Optional, Any
-import pandas as pd
-import numpy as np
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-from workflow_workbench import (
-    WorkflowEngine,
-    WorkflowSimulator,
-    WorkflowStep,
-)
+import numpy as np
+import pandas as pd
+from workflow_workbench import WorkflowEngine, WorkflowSimulator, WorkflowStep
 
 
 class CancerGenomicsWorkflowSimulator:

@@ -46,9 +46,7 @@ def test_create_bar_line_scatter_heatmap(reporter_empty_templates):
     r = reporter_empty_templates
     bar = r.create_bar_chart({"categories": ["a"], "values": [1]}, "B")
     assert isinstance(bar, go.Figure)
-    line = r.create_line_chart(
-        {"series": {"s": {"x": [0, 1], "y": [2, 3]}}}, "L"
-    )
+    line = r.create_line_chart({"series": {"s": {"x": [0, 1], "y": [2, 3]}}}, "L")
     assert isinstance(line, go.Figure)
     sc = r.create_scatter_plot({"x": [1], "y": [2]}, "S")
     assert isinstance(sc, go.Figure)
@@ -104,8 +102,16 @@ def test_create_analysis_report_end_to_end(tmp_path, reporter_empty_templates):
             "summary": "Sum",
             "tables": [{"title": "T1", "data": df}],
             "charts": [
-                {"type": "bar", "title": "B", "data": {"categories": ["x"], "values": [1]}},
-                {"type": "line", "title": "L", "data": {"series": {"m": {"x": [0], "y": [1]}}}},
+                {
+                    "type": "bar",
+                    "title": "B",
+                    "data": {"categories": ["x"], "values": [1]},
+                },
+                {
+                    "type": "line",
+                    "title": "L",
+                    "data": {"series": {"m": {"x": [0], "y": [1]}}},
+                },
                 {"type": "scatter", "title": "S", "data": {"x": [0], "y": [1]}},
                 {"type": "heatmap", "title": "H", "data": df},
                 {"type": "unknown", "title": "X", "data": {}},

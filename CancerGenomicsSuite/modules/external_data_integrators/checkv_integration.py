@@ -52,4 +52,3 @@ def extract_completeness_contamination(rows) -> Tuple[list, list]:
         except (TypeError, ValueError):
             continue
     return completeness, contamination
-

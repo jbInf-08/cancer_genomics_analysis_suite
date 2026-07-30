@@ -5,12 +5,12 @@ Seurat Pipeline Manager
 Executes R scripts (e.g., Seurat workflows) using Rscript and tracks status.
 """
 
-import os
 import logging
+import os
 import subprocess
-from typing import Dict, List, Optional, Any
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,9 @@ class SeuratManager:
         pipeline_name: Optional[str] = None,
     ) -> Dict[str, Any]:
         script_path = str(script_path)
-        pipeline_name = pipeline_name or Path(script_path).stem + "_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+        pipeline_name = pipeline_name or Path(
+            script_path
+        ).stem + "_" + datetime.now().strftime("%Y%m%d_%H%M%S")
 
         exec_dir = self.work_dir / pipeline_name
         exec_dir.mkdir(parents=True, exist_ok=True)
@@ -80,11 +82,17 @@ class SeuratManager:
             self.pipeline_history.append(pipeline_info)
             del self.active_pipelines[pipeline_name]
 
-            logger.info("Seurat/R pipeline %s finished with status %s", pipeline_name, pipeline_info["status"])
+            logger.info(
+                "Seurat/R pipeline %s finished with status %s",
+                pipeline_name,
+                pipeline_info["status"],
+            )
             return pipeline_info
 
         except Exception as exc:
-            logger.error("Failed to execute Seurat/R pipeline %s: %s", pipeline_name, exc)
+            logger.error(
+                "Failed to execute Seurat/R pipeline %s: %s", pipeline_name, exc
+            )
             if pipeline_name in self.active_pipelines:
                 self.active_pipelines[pipeline_name].update(
                     {"end_time": datetime.now(), "status": "error", "error": str(exc)}
@@ -135,9 +143,9 @@ class SeuratManager:
                     {
                         "path": str(path.relative_to(exec_dir)),
                         "size": path.stat().st_size,
-                        "modified": datetime.fromtimestamp(path.stat().st_mtime).isoformat(),
+                        "modified": datetime.fromtimestamp(
+                            path.stat().st_mtime
+                        ).isoformat(),
                     }
                 )
         return {"execution_directory": str(exec_dir), "files": files}
-
-

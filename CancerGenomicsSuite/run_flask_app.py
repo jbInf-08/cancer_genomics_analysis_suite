@@ -26,17 +26,18 @@ sys.path.insert(0, str(project_root))
 from app import create_app
 from config.settings import settings
 
+
 def main():
     """Main function to run the Flask application."""
-    
+
     # Create Flask application
     app = create_app()
-    
+
     # Get configuration from settings
     host = settings.host
     port = settings.port
     debug = settings.dash_debug_mode
-    
+
     print(f"Starting {settings.app_name} v{settings.app_version}")
     print(f"Environment: {settings.flask_env}")
     print(f"Debug mode: {debug}")
@@ -44,20 +45,16 @@ def main():
     print(f"Port: {port}")
     print(f"Database: {settings.get_database_url()}")
     print("-" * 50)
-    
+
     # Run the application
     try:
-        app.run(
-            host=host,
-            port=port,
-            debug=debug,
-            threaded=True
-        )
+        app.run(host=host, port=port, debug=debug, threaded=True)
     except KeyboardInterrupt:
         print("\nShutting down Flask application...")
     except Exception as e:
         print(f"Error running Flask application: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

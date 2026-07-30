@@ -12,13 +12,10 @@ Components:
 - ProteinUtils: Utility functions for protein manipulation and analysis
 """
 
-from .viewer import ProteinViewer
 from .protein_dash import ProteinDashboard
+from .viewer import ProteinViewer
 
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite Team"
 
-__all__ = [
-    "ProteinViewer",
-    "ProteinDashboard"
-]
+__all__ = ["ProteinViewer", "ProteinDashboard"]

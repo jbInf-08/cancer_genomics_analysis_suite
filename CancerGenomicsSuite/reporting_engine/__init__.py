@@ -11,15 +11,11 @@ Components:
 - TemplateUtils: Provides template management and formatting utilities
 """
 
-from .pdf_builder import PDFBuilder
 from .html_reporter import HTMLReporter
+from .pdf_builder import PDFBuilder
 from .template_utils import TemplateUtils
 
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite Team"
 
-__all__ = [
-    "PDFBuilder",
-    "HTMLReporter", 
-    "TemplateUtils"
-]
+__all__ = ["PDFBuilder", "HTMLReporter", "TemplateUtils"]

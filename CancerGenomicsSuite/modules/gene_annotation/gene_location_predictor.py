@@ -62,7 +62,9 @@ def build_vep_vcf_variant_line(
             url="",
             message="VEP requires non-empty reference and alternate alleles (VCF-style).",
         )
-    if any(b not in _ALLOWED_VEP_DNA for b in r) or any(b not in _ALLOWED_VEP_DNA for b in a):
+    if any(b not in _ALLOWED_VEP_DNA for b in r) or any(
+        b not in _ALLOWED_VEP_DNA for b in a
+    ):
         return None, build_ensembl_error_payload(
             kind="invalid_allele",
             status_code=None,
@@ -327,13 +329,7 @@ class GeneLocationPredictor:
         """
         ra = (ref_allele or "").strip().upper()
         aa = (alt_allele or "").strip().upper()
-        if (
-            len(ra) == 1
-            and len(aa) == 1
-            and ra in "ACGT"
-            and aa in "ACGT"
-            and ra != aa
-        ):
+        if len(ra) == 1 and len(aa) == 1 and ra in "ACGT" and aa in "ACGT" and ra != aa:
             return self.predict_vep_region_allele(
                 chromosome,
                 int(position_one_based),
@@ -347,7 +343,9 @@ class GeneLocationPredictor:
         )
         if verr:
             return [verr]
-        return self.predict_vep_region_post([line], reference_genome=reference_genome, minimal=True)
+        return self.predict_vep_region_post(
+            [line], reference_genome=reference_genome, minimal=True
+        )
 
     def predict_vep_region_allele(
         self,

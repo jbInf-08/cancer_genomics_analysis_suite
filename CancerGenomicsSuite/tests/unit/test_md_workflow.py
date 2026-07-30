@@ -18,9 +18,7 @@ def test_md_workflow_requires_input():
     assert "Provide one of" in (r.get("error") or "")
 
 
-@patch(
-    "CancerGenomicsSuite.modules.pipeline_orchestration.md_workflow.GROMACSClient"
-)
+@patch("CancerGenomicsSuite.modules.pipeline_orchestration.md_workflow.GROMACSClient")
 def test_md_workflow_respects_gromacs_unavailable(mock_client_cls, tmp_path):
     client = MagicMock()
     client.is_available.return_value = False
@@ -42,7 +40,9 @@ def test_workflow_executor_md_history(tmp_path):
         history_persist_path=str(hist),
     )
     with patch.object(MolecularDynamicsWorkflow, "run", return_value={"success": True}):
-        r = ex.run_molecular_dynamics_workflow({"pdb_id": "1CRN"}, workflow_name="md_unit")
+        r = ex.run_molecular_dynamics_workflow(
+            {"pdb_id": "1CRN"}, workflow_name="md_unit"
+        )
     assert r["success"] is True
     assert any(w.get("name") == "md_unit" for w in ex.workflow_history)
     assert hist.is_file()

@@ -53,13 +53,21 @@ def poll_md_async_result(
                         "Check PYTHONPATH and celery_worker package.",
                         className="error-message",
                     ),
-                    html.P(["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]),
+                    html.P(
+                        [
+                            "Task id: ",
+                            html.Code(task_id, style={"wordBreak": "break-all"}),
+                        ]
+                    ),
                 ]
             ),
             True,
         )
 
-    if started_monotonic is not None and (time.monotonic() - started_monotonic) > max_poll_seconds:
+    if (
+        started_monotonic is not None
+        and (time.monotonic() - started_monotonic) > max_poll_seconds
+    ):
         return (
             html.Div(
                 [
@@ -68,7 +76,12 @@ def poll_md_async_result(
                         "The worker may still be running — check Flower or worker logs.",
                         className="error-message",
                     ),
-                    html.P(["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]),
+                    html.P(
+                        [
+                            "Task id: ",
+                            html.Code(task_id, style={"wordBreak": "break-all"}),
+                        ]
+                    ),
                     html.P(f"Workflow: {workflow_name}", style={"fontSize": "0.95em"}),
                 ]
             ),
@@ -81,8 +94,16 @@ def poll_md_async_result(
         return (
             html.Div(
                 [
-                    html.P(f"Celery AsyncResult unavailable: {e}", className="error-message"),
-                    html.P(["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]),
+                    html.P(
+                        f"Celery AsyncResult unavailable: {e}",
+                        className="error-message",
+                    ),
+                    html.P(
+                        [
+                            "Task id: ",
+                            html.Code(task_id, style={"wordBreak": "break-all"}),
+                        ]
+                    ),
                 ]
             ),
             True,
@@ -106,7 +127,9 @@ def poll_md_async_result(
         body = [
             html.P([html.Strong("Celery task in progress")]),
             html.P(["State: ", html.Code(state)]),
-            html.P(["Meta: ", html.Code(str(meta)[:800], style={"wordBreak": "break-all"})]),
+            html.P(
+                ["Meta: ", html.Code(str(meta)[:800], style={"wordBreak": "break-all"})]
+            ),
             html.P(["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]),
             html.P(f"Workflow: {workflow_name}", style={"fontSize": "0.95em"}),
             html.P(f"Worker status: {status}", style={"fontSize": "0.9em"}),
@@ -125,13 +148,21 @@ def poll_md_async_result(
                             f"Task reported success but the result could not be read: {e}",
                             className="error-message",
                         ),
-                        html.P(["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]),
+                        html.P(
+                            [
+                                "Task id: ",
+                                html.Code(task_id, style={"wordBreak": "break-all"}),
+                            ]
+                        ),
                     ]
                 ),
                 True,
             )
         if not isinstance(result, dict):
-            result = {"success": False, "error": f"Unexpected result type: {type(result).__name__}"}
+            result = {
+                "success": False,
+                "error": f"Unexpected result type: {type(result).__name__}",
+            }
         return (
             md_workflow_result_to_div(result, workflow_name, structured_error_to_dash),
             True,
@@ -148,7 +179,12 @@ def poll_md_async_result(
             html.Div(
                 [
                     html.P([html.Strong("Celery task failed"), f" ({state})"]),
-                    html.P(["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]),
+                    html.P(
+                        [
+                            "Task id: ",
+                            html.Code(task_id, style={"wordBreak": "break-all"}),
+                        ]
+                    ),
                     html.P(err, className="error-message"),
                     html.Pre(tb, className="export-data") if tb else html.Div(),
                 ]
@@ -161,7 +197,9 @@ def poll_md_async_result(
         html.Div(
             [
                 html.P([html.Strong("Celery task finished"), f" — state {state}"]),
-                html.P(["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]),
+                html.P(
+                    ["Task id: ", html.Code(task_id, style={"wordBreak": "break-all"})]
+                ),
                 html.Pre(str(info)[:2000], className="export-data"),
             ]
         ),

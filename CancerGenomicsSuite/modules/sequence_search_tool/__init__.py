@@ -17,7 +17,4 @@ from .search_dash import SearchDashboard
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite Team"
 
-__all__ = [
-    "SequenceAligner",
-    "SearchDashboard"
-]
+__all__ = ["SequenceAligner", "SearchDashboard"]

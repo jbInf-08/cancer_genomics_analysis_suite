@@ -13,11 +13,11 @@ import pytest
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from CancerGenomicsSuite.modules.external_databases.drug_databases import DrugBankClient
 from CancerGenomicsSuite.modules.biomarker_discovery.biomarker_analyzer import (
     BiomarkerAnalyzer,
     BiomarkerDiscoveryConfig,
 )
+from CancerGenomicsSuite.modules.external_databases.drug_databases import DrugBankClient
 
 
 class TestDrugBankClient:

@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 
 import requests
 
-
 SCOPUS_API_KEY = os.getenv("SCOPUS_API_KEY")
 
 
@@ -25,4 +24,3 @@ def search_scopus(query: str, count: int = 10) -> List[Dict[str, Any]]:
     response.raise_for_status()
     data = response.json()
     return data.get("search-results", {}).get("entry", [])
-

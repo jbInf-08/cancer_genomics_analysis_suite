@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Quick test script to verify the server is responding."""
 import time
+
 import requests
 
 # Wait for server to start
@@ -35,4 +36,3 @@ except requests.exceptions.RequestException as e:
     print(f"ERROR: Error accessing test route: {e}")
 
 print("\nTest complete!")
-

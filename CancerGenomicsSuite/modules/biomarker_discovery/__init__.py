@@ -12,14 +12,13 @@ This module provides comprehensive biomarker discovery capabilities including:
 
 from .biomarker_analyzer import (
     BiomarkerAnalyzer,
-    StatisticalBiomarkerDiscovery,
+    BiomarkerValidator,
     MLBiomarkerDiscovery,
-    BiomarkerValidator
+    StatisticalBiomarkerDiscovery,
 )
-
 from .biomarker_dashboard import (
     BiomarkerDiscoveryDashboard,
-    BiomarkerVisualizationEngine
+    BiomarkerVisualizationEngine,
 )
 
 __version__ = "1.0.0"
@@ -28,11 +27,10 @@ __author__ = "Cancer Genomics Analysis Suite Team"
 __all__ = [
     # Core Analysis
     "BiomarkerAnalyzer",
-    "StatisticalBiomarkerDiscovery", 
+    "StatisticalBiomarkerDiscovery",
     "MLBiomarkerDiscovery",
     "BiomarkerValidator",
-    
     # Dashboard
     "BiomarkerDiscoveryDashboard",
-    "BiomarkerVisualizationEngine"
+    "BiomarkerVisualizationEngine",
 ]

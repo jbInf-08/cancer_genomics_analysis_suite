@@ -21,17 +21,13 @@ Functions:
     create_mutation_effect_dashboard: Create dashboard instance
 """
 
+from .mutation_dash import MutationEffectDashboard, create_mutation_effect_dashboard
 from .predictor import (
-    MutationEffectPredictor,
     Mutation,
+    MutationEffectPredictor,
     PredictionResult,
     create_sample_mutations,
-    create_sample_predictor
-)
-
-from .mutation_dash import (
-    MutationEffectDashboard,
-    create_mutation_effect_dashboard
+    create_sample_predictor,
 )
 
 __version__ = "1.0.0"
@@ -46,7 +42,7 @@ __all__ = [
     "MutationEffectDashboard",
     "create_sample_mutations",
     "create_sample_predictor",
-    "create_mutation_effect_dashboard"
+    "create_mutation_effect_dashboard",
 ]
 
 # Module description
@@ -130,47 +126,58 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
+
 # Module initialization
 def _initialize_module():
     """Initialize the mutation effect predictor module."""
     logger.info("Initializing Mutation Effect Predictor module")
-    
+
     # Check for required dependencies
     try:
+        import dash
         import numpy
         import pandas
-        import dash
         import plotly
         import requests
+
         logger.info("All required dependencies found")
     except ImportError as e:
         logger.warning(f"Missing dependency: {e}")
         logger.warning("Some features may not be available")
-    
+
     # Log available predictors
     available_predictors = [
-        "SIFT", "PolyPhen-2", "CADD", "REVEL", "ClinVar", 
-        "Conservation", "Structural"
+        "SIFT",
+        "PolyPhen-2",
+        "CADD",
+        "REVEL",
+        "ClinVar",
+        "Conservation",
+        "Structural",
     ]
-    
+
     logger.info(f"Available predictors: {', '.join(available_predictors)}")
-    
+
     # Log supported mutation types
     supported_types = ["SNP", "insertion", "deletion", "indel", "complex"]
     logger.info(f"Supported mutation types: {', '.join(supported_types)}")
-    
+
     # Log prediction classes
     prediction_classes = [
-        "pathogenic", "likely_pathogenic", "uncertain_significance",
-        "likely_benign", "benign"
+        "pathogenic",
+        "likely_pathogenic",
+        "uncertain_significance",
+        "likely_benign",
+        "benign",
     ]
     logger.info(f"Prediction classes: {', '.join(prediction_classes)}")
+
 
 # Run initialization
 _initialize_module()
@@ -188,13 +195,15 @@ CADD_THRESHOLD = 15.0  # > 15 is likely deleterious
 REVEL_THRESHOLD = 0.5  # > 0.5 is likely pathogenic
 
 # Export constants
-__all__.extend([
-    "DEFAULT_PREDICTORS",
-    "DEFAULT_DASHBOARD_PORT",
-    "MAX_BATCH_SIZE", 
-    "CACHE_SIZE_LIMIT",
-    "SIFT_THRESHOLD",
-    "POLYPHEN2_THRESHOLD",
-    "CADD_THRESHOLD",
-    "REVEL_THRESHOLD"
-])
+__all__.extend(
+    [
+        "DEFAULT_PREDICTORS",
+        "DEFAULT_DASHBOARD_PORT",
+        "MAX_BATCH_SIZE",
+        "CACHE_SIZE_LIMIT",
+        "SIFT_THRESHOLD",
+        "POLYPHEN2_THRESHOLD",
+        "CADD_THRESHOLD",
+        "REVEL_THRESHOLD",
+    ]
+)

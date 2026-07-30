@@ -10,5 +10,3 @@ def test_search_scopus_returns_entries():
         mget.return_value.raise_for_status.return_value = None
         entries = search_scopus("TP53", count=1)
         assert entries == fake["search-results"]["entry"]
-
-

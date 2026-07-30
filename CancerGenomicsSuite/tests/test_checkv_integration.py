@@ -1,7 +1,11 @@
 import os
 from unittest import mock
 
-from modules.external_data_integrators.checkv_integration import run_checkv, parse_quality_summary, extract_completeness_contamination
+from modules.external_data_integrators.checkv_integration import (
+    extract_completeness_contamination,
+    parse_quality_summary,
+    run_checkv,
+)
 
 
 def test_run_checkv_constructs_summary_path(tmp_path):
@@ -28,5 +32,3 @@ def test_parse_quality_summary_and_extract(tmp_path):
     comp, cont = extract_completeness_contamination(rows)
     assert comp == [90.5, 75.0]
     assert cont == [1.2, 0.5]
-
-

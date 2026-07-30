@@ -5,12 +5,12 @@ SeqAnt Pipeline Manager
 Executes SeqAnt scripts (Python/Perl shebang) by invoking interpreter or script directly.
 """
 
-import os
 import logging
+import os
 import subprocess
-from typing import Dict, List, Optional, Any
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,9 @@ class SeqAntManager:
         job_name: Optional[str] = None,
     ) -> Dict[str, Any]:
         script_path = str(script_path)
-        job_name = job_name or Path(script_path).stem + "_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+        job_name = job_name or Path(script_path).stem + "_" + datetime.now().strftime(
+            "%Y%m%d_%H%M%S"
+        )
         exec_dir = self.work_dir / job_name
         exec_dir.mkdir(parents=True, exist_ok=True)
 
@@ -101,7 +103,9 @@ class SeqAntManager:
             self.job_history.append(job_info)
             del self.active_jobs[job_name]
 
-            logger.info("SeqAnt job %s finished with status %s", job_name, job_info["status"])
+            logger.info(
+                "SeqAnt job %s finished with status %s", job_name, job_info["status"]
+            )
             return job_info
 
         except Exception as exc:
@@ -150,9 +154,9 @@ class SeqAntManager:
                     {
                         "path": str(path.relative_to(exec_dir)),
                         "size": path.stat().st_size,
-                        "modified": datetime.fromtimestamp(path.stat().st_mtime).isoformat(),
+                        "modified": datetime.fromtimestamp(
+                            path.stat().st_mtime
+                        ).isoformat(),
                     }
                 )
         return {"execution_directory": str(exec_dir), "files": files}
-
-

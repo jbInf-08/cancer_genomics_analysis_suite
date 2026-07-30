@@ -10,21 +10,21 @@ Components:
 - ThemeManager: Manages visualization themes and styling
 """
 
-from .plots import PlotManager, PlotType, PlotConfig
 from .dashboards import DashboardBuilder, DashboardLayout, DashboardWidget
-from .themes import ThemeManager, VisualizationTheme, ColorPalette
+from .plots import PlotConfig, PlotManager, PlotType
+from .themes import ColorPalette, ThemeManager, VisualizationTheme
 
 __all__ = [
-    'PlotManager',
-    'PlotType',
-    'PlotConfig',
-    'DashboardBuilder',
-    'DashboardLayout',
-    'DashboardWidget',
-    'ThemeManager',
-    'VisualizationTheme',
-    'ColorPalette'
+    "PlotManager",
+    "PlotType",
+    "PlotConfig",
+    "DashboardBuilder",
+    "DashboardLayout",
+    "DashboardWidget",
+    "ThemeManager",
+    "VisualizationTheme",
+    "ColorPalette",
 ]
 
-__version__ = '1.0.0'
-__author__ = 'Cancer Genomics Analysis Suite'
+__version__ = "1.0.0"
+__author__ = "Cancer Genomics Analysis Suite"

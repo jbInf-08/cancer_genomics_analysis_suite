@@ -18,8 +18,4 @@ from .utils import DNAUtils
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite Team"
 
-__all__ = [
-    "DNAAnalyzer",
-    "DNADashboard", 
-    "DNAUtils"
-]
+__all__ = ["DNAAnalyzer", "DNADashboard", "DNAUtils"]

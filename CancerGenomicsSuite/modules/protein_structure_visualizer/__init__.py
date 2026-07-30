@@ -24,19 +24,18 @@ Functions:
     create_protein_structure_dashboard: Create dashboard instance
 """
 
+from .structure_dash import (
+    ProteinStructureDashboard,
+    create_protein_structure_dashboard,
+)
 from .visualizer import (
-    ProteinStructureVisualizer,
-    ProteinStructure,
     Atom,
+    ProteinStructure,
+    ProteinStructureVisualizer,
     Residue,
     StructuralFeature,
     create_sample_protein_structure,
-    create_sample_visualizer
-)
-
-from .structure_dash import (
-    ProteinStructureDashboard,
-    create_protein_structure_dashboard
+    create_sample_visualizer,
 )
 
 __version__ = "1.0.0"
@@ -53,7 +52,7 @@ __all__ = [
     "ProteinStructureDashboard",
     "create_sample_protein_structure",
     "create_sample_visualizer",
-    "create_protein_structure_dashboard"
+    "create_protein_structure_dashboard",
 ]
 
 # Module description
@@ -163,46 +162,53 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
+
 # Module initialization
 def _initialize_module():
     """Initialize the protein structure visualizer module."""
     logger.info("Initializing Protein Structure Visualizer module")
-    
+
     # Check for required dependencies
     try:
+        import dash
         import numpy
         import pandas
         import plotly
-        import dash
+
         logger.info("All required dependencies found")
     except ImportError as e:
         logger.warning(f"Missing dependency: {e}")
         logger.warning("Some features may not be available")
-    
+
     # Log supported file formats
     supported_formats = ["pdb", "cif", "mmcif"]
     logger.info(f"Supported file formats: {', '.join(supported_formats)}")
-    
+
     # Log visualization representations
     representations = ["cartoon", "stick", "sphere", "surface", "ribbon"]
     logger.info(f"Visualization representations: {', '.join(representations)}")
-    
+
     # Log color schemes
     color_schemes = ["chain", "secondary", "residue", "bfactor", "hydrophobicity"]
     logger.info(f"Color schemes: {', '.join(color_schemes)}")
-    
+
     # Log analysis capabilities
     analysis_capabilities = [
-        "distance_calculation", "nearby_residues", "secondary_structure",
-        "structural_features", "chain_statistics", "geometric_analysis"
+        "distance_calculation",
+        "nearby_residues",
+        "secondary_structure",
+        "structural_features",
+        "chain_statistics",
+        "geometric_analysis",
     ]
     logger.info(f"Analysis capabilities: {', '.join(analysis_capabilities)}")
+
 
 # Run initialization
 _initialize_module()
@@ -223,14 +229,16 @@ DEFAULT_CONFIDENCE_THRESHOLD = 0.5
 DEFAULT_FEATURE_TYPES = ["domain", "binding_site", "active_site", "secondary_structure"]
 
 # Export constants
-__all__.extend([
-    "DEFAULT_DASHBOARD_PORT",
-    "DEFAULT_DISTANCE_CUTOFF",
-    "DEFAULT_REPRESENTATION",
-    "DEFAULT_COLOR_SCHEME",
-    "DEFAULT_ATOM_SIZE",
-    "DEFAULT_BOND_WIDTH",
-    "DEFAULT_SURFACE_OPACITY",
-    "DEFAULT_CONFIDENCE_THRESHOLD",
-    "DEFAULT_FEATURE_TYPES"
-])
+__all__.extend(
+    [
+        "DEFAULT_DASHBOARD_PORT",
+        "DEFAULT_DISTANCE_CUTOFF",
+        "DEFAULT_REPRESENTATION",
+        "DEFAULT_COLOR_SCHEME",
+        "DEFAULT_ATOM_SIZE",
+        "DEFAULT_BOND_WIDTH",
+        "DEFAULT_SURFACE_OPACITY",
+        "DEFAULT_CONFIDENCE_THRESHOLD",
+        "DEFAULT_FEATURE_TYPES",
+    ]
+)

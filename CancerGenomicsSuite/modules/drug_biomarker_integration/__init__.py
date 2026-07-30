@@ -12,23 +12,23 @@ This module provides comprehensive integration between drug discovery and biomar
 
 from .drug_biomarker_analyzer import (
     DrugBiomarkerAnalyzer,
+    PersonalizedMedicineEngine,
     PharmacogenomicsIntegrator,
-    PersonalizedMedicineEngine
 )
-
 from .drug_response_prediction import (
-    DrugResponsePredictor,
     BiomarkerBasedPredictor,
-    MultiOmicsPredictor
+    DrugResponsePredictor,
+    MultiOmicsPredictor,
 )
 
 # Import optional modules if they exist
 try:
     from .clinical_decision_support import (
         ClinicalDecisionSupport,
+        RiskAssessmentEngine,
         TreatmentRecommendationEngine,
-        RiskAssessmentEngine
     )
+
     _CLINICAL_DECISION_AVAILABLE = True
 except ImportError:
     _CLINICAL_DECISION_AVAILABLE = False
@@ -39,8 +39,9 @@ except ImportError:
 try:
     from .integration_dashboard import (
         DrugBiomarkerDashboard,
-        IntegrationVisualizationEngine
+        IntegrationVisualizationEngine,
     )
+
     _DASHBOARD_AVAILABLE = True
 except ImportError:
     _DASHBOARD_AVAILABLE = False
@@ -55,23 +56,21 @@ __all__ = [
     "DrugBiomarkerAnalyzer",
     "PharmacogenomicsIntegrator",
     "PersonalizedMedicineEngine",
-    
     # Drug Response Prediction
     "DrugResponsePredictor",
     "BiomarkerBasedPredictor",
-    "MultiOmicsPredictor"
+    "MultiOmicsPredictor",
 ]
 
 # Add optional modules to __all__ if they're available
 if _CLINICAL_DECISION_AVAILABLE:
-    __all__.extend([
-        "ClinicalDecisionSupport",
-        "TreatmentRecommendationEngine",
-        "RiskAssessmentEngine"
-    ])
+    __all__.extend(
+        [
+            "ClinicalDecisionSupport",
+            "TreatmentRecommendationEngine",
+            "RiskAssessmentEngine",
+        ]
+    )
 
 if _DASHBOARD_AVAILABLE:
-    __all__.extend([
-        "DrugBiomarkerDashboard",
-        "IntegrationVisualizationEngine"
-    ])
+    __all__.extend(["DrugBiomarkerDashboard", "IntegrationVisualizationEngine"])

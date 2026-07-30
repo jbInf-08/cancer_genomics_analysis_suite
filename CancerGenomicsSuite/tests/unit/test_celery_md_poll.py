@@ -1,8 +1,7 @@
 """Tests for optional Celery MD result polling."""
 
-from unittest.mock import MagicMock, patch
-
 import time
+from unittest.mock import MagicMock, patch
 
 from CancerGenomicsSuite.modules.pipeline_orchestration.celery_md_poll import (
     poll_md_async_result,

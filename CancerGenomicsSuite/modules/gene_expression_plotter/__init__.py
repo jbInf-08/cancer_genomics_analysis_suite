@@ -12,13 +12,10 @@ Components:
 - ExpressionUtils: Utility functions for expression data manipulation
 """
 
-from .plotter import GeneExpressionPlotter
 from .expression_dash import ExpressionDashboard
+from .plotter import GeneExpressionPlotter
 
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite Team"
 
-__all__ = [
-    "GeneExpressionPlotter",
-    "ExpressionDashboard"
-]
+__all__ = ["GeneExpressionPlotter", "ExpressionDashboard"]
