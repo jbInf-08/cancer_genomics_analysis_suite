@@ -18,6 +18,7 @@ Features:
 import logging
 import os
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
@@ -35,6 +36,26 @@ cors = CORS()
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+
+def _redact_url(url: str | None) -> str | None:
+    """Strip any credentials from a connection URL before it leaves the process.
+
+    Broker and result-backend URLs commonly embed a password
+    (``redis://:secret@host``, ``amqp://user:pass@host``). Returning them from
+    an HTTP endpoint hands those out; only the scheme, host and path are useful
+    for a status page anyway.
+    """
+    if not url:
+        return url
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return "<unparseable>"
+    if not parts.netloc or "@" not in parts.netloc:
+        return url
+    host = parts.netloc.rsplit("@", 1)[1]
+    return urlunsplit((parts.scheme, host, parts.path, "", ""))
 
 
 def create_app(config_class=None):
@@ -165,7 +186,9 @@ def register_blueprints(app):
                 stats = get_worker_stats()
                 celery_status = "operational" if not stats.get("error") else "error"
             except Exception as e:
-                celery_status = f"error: {str(e)}"
+                # Detail to the log; the caller gets a state, not the message.
+                logger.warning("Celery worker stats unavailable: %s", e, exc_info=True)
+                celery_status = "error"
 
         return jsonify(
             {
@@ -229,14 +252,28 @@ def register_blueprints(app):
                     "health_check": health_data,
                     "worker_stats": worker_stats,
                     "queue_lengths": queue_lengths,
-                    "broker_url": settings.celery.broker_url,
-                    "result_backend": settings.celery.result_backend,
+                    # Redacted: broker and backend URLs routinely carry
+                    # credentials (redis://:password@host, amqp://user:pass@...)
+                    # and this route has no authentication on it.
+                    "broker": _redact_url(settings.celery.broker_url),
+                    "result_backend": _redact_url(settings.celery.result_backend),
                 }
             )
 
         except Exception as e:
-            logger.error(f"Celery status check failed: {e}")
-            return jsonify({"status": "error", "message": str(e)}), 500
+            # The detail goes to the log, not to the caller: this route is
+            # unauthenticated and the exception text can carry stack frames,
+            # hostnames and connection strings.
+            logger.error("Celery status check failed: %s", e, exc_info=True)
+            return (
+                jsonify(
+                    {
+                        "status": "error",
+                        "message": "Celery status could not be determined.",
+                    }
+                ),
+                500,
+            )
 
     logger.info("Application blueprints registered successfully")
 
