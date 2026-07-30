@@ -256,8 +256,9 @@ def health_check():
             "worker_count": len(celery_app.control.inspect().active()),
         }
     except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return {"status": "unhealthy", "error": str(e)}
+        # Served by the unauthenticated /api/celery/status route.
+        logger.error("Health check failed: %s", e, exc_info=True)
+        return {"status": "unhealthy", "error": "health check failed"}
 
 
 # Utility Functions
@@ -272,8 +273,12 @@ def get_task_status(task_id):
             "info": result.info,
         }
     except Exception as e:
-        logger.error(f"Error getting task status for {task_id}: {e}")
-        return {"task_id": task_id, "status": "UNKNOWN", "error": str(e)}
+        logger.error("Error getting task status for %s: %s", task_id, e, exc_info=True)
+        return {
+            "task_id": task_id,
+            "status": "UNKNOWN",
+            "error": "task status unavailable",
+        }
 
 
 def get_worker_stats():
@@ -288,8 +293,12 @@ def get_worker_stats():
             "registered": inspect.registered(),
         }
     except Exception as e:
-        logger.error(f"Error getting worker stats: {e}")
-        return {"error": str(e)}
+        # The message is logged, not returned: this value is served verbatim by
+        # the unauthenticated /api/celery/status route, so exception text from a
+        # broker connection would reach an external caller. The "error" key is
+        # kept because callers branch on its presence.
+        logger.error("Error getting worker stats: %s", e, exc_info=True)
+        return {"error": "worker stats unavailable"}
 
 
 def purge_all_queues():
@@ -328,8 +337,10 @@ def get_queue_lengths():
 
         return queue_lengths
     except Exception as e:
-        logger.error(f"Error getting queue lengths: {e}")
-        return {"error": str(e)}
+        # Same reasoning as get_worker_stats: this is served to an
+        # unauthenticated caller.
+        logger.error("Error getting queue lengths: %s", e, exc_info=True)
+        return {"error": "queue lengths unavailable"}
 
 
 # Configuration Validation
