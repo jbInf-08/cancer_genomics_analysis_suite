@@ -10,15 +10,11 @@ Components:
 - AlertMonitor: Monitors system health and triggers alerts
 """
 
-from .email_digest import EmailDigest
-from .delivery_queue import DeliveryQueue
 from .alert_monitor import AlertMonitor
+from .delivery_queue import DeliveryQueue
+from .email_digest import EmailDigest
 
-__all__ = [
-    'EmailDigest',
-    'DeliveryQueue', 
-    'AlertMonitor'
-]
+__all__ = ["EmailDigest", "DeliveryQueue", "AlertMonitor"]
 
-__version__ = '1.0.0'
-__author__ = 'Cancer Genomics Analysis Suite'
+__version__ = "1.0.0"
+__author__ = "Cancer Genomics Analysis Suite"

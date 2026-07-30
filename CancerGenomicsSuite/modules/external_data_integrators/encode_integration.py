@@ -1,8 +1,11 @@
-import requests
 from typing import Any, Dict, List
 
+import requests
 
-def query_encode(term: str, assay: str = "ChIP-seq", limit: int = 5) -> List[Dict[str, Any]]:
+
+def query_encode(
+    term: str, assay: str = "ChIP-seq", limit: int = 5
+) -> List[Dict[str, Any]]:
     """Query ENCODE for datasets.
 
     Docs: https://www.encodeproject.org/help/rest-api/
@@ -29,4 +32,3 @@ def fetch_file_metadata(file_accession: str) -> Dict[str, Any]:
     response = requests.get(url, headers=headers, timeout=60)
     response.raise_for_status()
     return response.json()
-

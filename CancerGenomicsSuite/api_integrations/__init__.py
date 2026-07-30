@@ -29,19 +29,14 @@ Each integration module provides:
 - Progress tracking and logging
 """
 
-from .cosmic_fetcher import COSMICFetcher
 from .clinvar_sync import ClinVarSync
+from .cosmic_fetcher import COSMICFetcher
 from .encode_downloader import ENCODEDownloader
 from .scopus_client import ScopusClient
 
-__all__ = [
-    'COSMICFetcher',
-    'ClinVarSync', 
-    'ENCODEDownloader',
-    'ScopusClient'
-]
+__all__ = ["COSMICFetcher", "ClinVarSync", "ENCODEDownloader", "ScopusClient"]
 
 # Version information
-__version__ = '1.0.0'
-__author__ = 'Cancer Genomics Analysis Suite Team'
-__description__ = 'API integrations for external genomics databases and services'
+__version__ = "1.0.0"
+__author__ = "Cancer Genomics Analysis Suite Team"
+__description__ = "API integrations for external genomics databases and services"

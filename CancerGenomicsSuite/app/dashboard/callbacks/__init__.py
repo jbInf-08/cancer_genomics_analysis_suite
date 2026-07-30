@@ -20,19 +20,16 @@ Each callback module should follow these conventions:
 
 from .gene_expression_callbacks import *
 from .mutation_effect_callbacks import *
-from .sequence_search_callbacks import *
 from .reporting_callbacks import *
+from .sequence_search_callbacks import *
 
 __all__ = [
     # Gene expression callbacks
-    'register_gene_expression_callbacks',
-    
+    "register_gene_expression_callbacks",
     # Mutation effect callbacks
-    'register_mutation_effect_callbacks',
-    
+    "register_mutation_effect_callbacks",
     # Sequence search callbacks
-    'register_sequence_search_callbacks',
-    
+    "register_sequence_search_callbacks",
     # Reporting callbacks
-    'register_reporting_callbacks',
+    "register_reporting_callbacks",
 ]

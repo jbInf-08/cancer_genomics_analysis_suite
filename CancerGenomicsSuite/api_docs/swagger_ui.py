@@ -6,112 +6,128 @@ This module provides Swagger UI integration for the Flask application,
 allowing interactive API documentation and testing.
 """
 
-import os
 import json
-import yaml
-from flask import Blueprint, render_template, jsonify, request, current_app
+import os
 from pathlib import Path
 
+import yaml
+from flask import Blueprint, current_app, jsonify, render_template, request
+
 # Create blueprint for API documentation
-api_docs_bp = Blueprint('api_docs', __name__, url_prefix='/api/docs')
+api_docs_bp = Blueprint("api_docs", __name__, url_prefix="/api/docs")
+
 
 def load_openapi_spec():
     """Load OpenAPI specification from YAML file."""
     try:
         # Get the path to the OpenAPI spec file
-        spec_path = Path(__file__).parent / 'openapi.yaml'
-        
+        spec_path = Path(__file__).parent / "openapi.yaml"
+
         if not spec_path.exists():
             current_app.logger.error(f"OpenAPI spec file not found: {spec_path}")
             return None
-        
+
         # Load YAML file
-        with open(spec_path, 'r', encoding='utf-8') as f:
+        with open(spec_path, "r", encoding="utf-8") as f:
             spec = yaml.safe_load(f)
-        
+
         # Update server URLs based on current environment
-        if current_app.config.get('ENVIRONMENT') == 'development':
-            spec['servers'] = [
+        if current_app.config.get("ENVIRONMENT") == "development":
+            spec["servers"] = [
                 {
-                    'url': f'http://localhost:{current_app.config.get("PORT", 8050)}',
-                    'description': 'Development server'
+                    "url": f'http://localhost:{current_app.config.get("PORT", 8050)}',
+                    "description": "Development server",
                 }
             ]
-        elif current_app.config.get('ENVIRONMENT') == 'staging':
-            spec['servers'] = [
+        elif current_app.config.get("ENVIRONMENT") == "staging":
+            spec["servers"] = [
                 {
-                    'url': 'https://staging-api.cancer-genomics.com/v1',
-                    'description': 'Staging server'
+                    "url": "https://staging-api.cancer-genomics.com/v1",
+                    "description": "Staging server",
                 }
             ]
         else:
-            spec['servers'] = [
+            spec["servers"] = [
                 {
-                    'url': 'https://api.cancer-genomics.com/v1',
-                    'description': 'Production server'
+                    "url": "https://api.cancer-genomics.com/v1",
+                    "description": "Production server",
                 }
             ]
-        
+
         return spec
-    
+
     except Exception as e:
         current_app.logger.error(f"Error loading OpenAPI spec: {e}")
         return None
 
-@api_docs_bp.route('/')
+
+@api_docs_bp.route("/")
 def swagger_ui():
     """Serve Swagger UI interface."""
-    return render_template('swagger_ui.html')
+    return render_template("swagger_ui.html")
 
-@api_docs_bp.route('/openapi.json')
+
+@api_docs_bp.route("/openapi.json")
 def openapi_json():
     """Serve OpenAPI specification as JSON."""
     spec = load_openapi_spec()
     if spec is None:
-        return jsonify({'error': 'OpenAPI specification not found'}), 404
-    
+        return jsonify({"error": "OpenAPI specification not found"}), 404
+
     return jsonify(spec)
 
-@api_docs_bp.route('/openapi.yaml')
+
+@api_docs_bp.route("/openapi.yaml")
 def openapi_yaml():
     """Serve OpenAPI specification as YAML."""
     try:
-        spec_path = Path(__file__).parent / 'openapi.yaml'
-        
+        spec_path = Path(__file__).parent / "openapi.yaml"
+
         if not spec_path.exists():
-            return jsonify({'error': 'OpenAPI specification not found'}), 404
-        
-        with open(spec_path, 'r', encoding='utf-8') as f:
+            return jsonify({"error": "OpenAPI specification not found"}), 404
+
+        with open(spec_path, "r", encoding="utf-8") as f:
             content = f.read()
-        
-        return content, 200, {'Content-Type': 'application/x-yaml'}
-    
+
+        return content, 200, {"Content-Type": "application/x-yaml"}
+
     except Exception as e:
         current_app.logger.error(f"Error serving OpenAPI YAML: {e}")
-        return jsonify({'error': 'Error loading OpenAPI specification'}), 500
+        return jsonify({"error": "Error loading OpenAPI specification"}), 500
 
-@api_docs_bp.route('/health')
+
+@api_docs_bp.route("/health")
 def docs_health():
     """Health check for API documentation service."""
     spec = load_openapi_spec()
-    return jsonify({
-        'status': 'healthy' if spec is not None else 'unhealthy',
-        'openapi_version': spec.get('openapi', 'unknown') if spec else 'unknown',
-        'api_version': spec.get('info', {}).get('version', 'unknown') if spec else 'unknown'
-    })
+    return jsonify(
+        {
+            "status": "healthy" if spec is not None else "unhealthy",
+            "openapi_version": spec.get("openapi", "unknown") if spec else "unknown",
+            "api_version": spec.get("info", {}).get("version", "unknown")
+            if spec
+            else "unknown",
+        }
+    )
+
 
 def register_api_docs(app):
     """Register API documentation blueprint with Flask app."""
     app.register_blueprint(api_docs_bp)
-    
+
     # Add CORS headers for API documentation
     @app.after_request
     def after_request(response):
-        if request.endpoint and request.endpoint.startswith('api_docs'):
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-            response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        if request.endpoint and request.endpoint.startswith("api_docs"):
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers[
+                "Access-Control-Allow-Methods"
+            ] = "GET, POST, PUT, DELETE, OPTIONS"
+            response.headers[
+                "Access-Control-Allow-Headers"
+            ] = "Content-Type, Authorization"
         return response
+
 
 # Swagger UI HTML template
 SWAGGER_UI_TEMPLATE = """
@@ -219,18 +235,20 @@ SWAGGER_UI_TEMPLATE = """
 </html>
 """
 
+
 # Create templates directory if it doesn't exist
 def create_swagger_template(app):
     """Create Swagger UI template file."""
     templates_dir = Path(app.template_folder)
     templates_dir.mkdir(exist_ok=True)
-    
-    template_file = templates_dir / 'swagger_ui.html'
-    with open(template_file, 'w', encoding='utf-8') as f:
+
+    template_file = templates_dir / "swagger_ui.html"
+    with open(template_file, "w", encoding="utf-8") as f:
         f.write(SWAGGER_UI_TEMPLATE)
 
+
 # API Documentation Routes
-@api_docs_bp.route('/examples')
+@api_docs_bp.route("/examples")
 def api_examples():
     """Provide API usage examples."""
     examples = {
@@ -238,14 +256,12 @@ def api_examples():
             "login": {
                 "url": "/auth/login",
                 "method": "POST",
-                "headers": {
-                    "Content-Type": "application/json"
-                },
+                "headers": {"Content-Type": "application/json"},
                 "body": {
                     "username": "user@example.com",
                     "password": "secure_password",
-                    "remember": False
-                }
+                    "remember": False,
+                },
             }
         },
         "blast_analysis": {
@@ -254,22 +270,19 @@ def api_examples():
                 "method": "POST",
                 "headers": {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer <your-jwt-token>"
+                    "Authorization": "Bearer <your-jwt-token>",
                 },
                 "body": {
                     "sequences": [
                         {
                             "id": "seq_001",
                             "sequence": "ATGCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG",
-                            "description": "Sample sequence 1"
+                            "description": "Sample sequence 1",
                         }
                     ],
                     "database": "cancer_genes",
-                    "parameters": {
-                        "evalue": 1e-5,
-                        "max_target_seqs": 100
-                    }
-                }
+                    "parameters": {"evalue": 1e-5, "max_target_seqs": 100},
+                },
             }
         },
         "variant_annotation": {
@@ -278,7 +291,7 @@ def api_examples():
                 "method": "POST",
                 "headers": {
                     "Content-Type": "application/json",
-                    "Authorization": "Bearer <your-jwt-token>"
+                    "Authorization": "Bearer <your-jwt-token>",
                 },
                 "body": {
                     "variants": [
@@ -287,29 +300,34 @@ def api_examples():
                             "position": 7574003,
                             "reference": "G",
                             "alternate": "A",
-                            "gene_symbol": "TP53"
+                            "gene_symbol": "TP53",
                         }
                     ],
-                    "annotation_sources": ["ensembl", "clinvar", "cosmic"]
-                }
+                    "annotation_sources": ["ensembl", "clinvar", "cosmic"],
+                },
             }
-        }
+        },
     }
-    
+
     return jsonify(examples)
 
-@api_docs_bp.route('/status')
+
+@api_docs_bp.route("/status")
 def api_status():
     """Get API documentation status."""
     spec = load_openapi_spec()
-    
+
     status = {
         "documentation_available": spec is not None,
-        "openapi_version": spec.get('openapi', 'unknown') if spec else 'unknown',
-        "api_title": spec.get('info', {}).get('title', 'unknown') if spec else 'unknown',
-        "api_version": spec.get('info', {}).get('version', 'unknown') if spec else 'unknown',
-        "endpoints_count": len(spec.get('paths', {})) if spec else 0,
-        "tags": [tag.get('name', '') for tag in spec.get('tags', [])] if spec else []
+        "openapi_version": spec.get("openapi", "unknown") if spec else "unknown",
+        "api_title": spec.get("info", {}).get("title", "unknown")
+        if spec
+        else "unknown",
+        "api_version": spec.get("info", {}).get("version", "unknown")
+        if spec
+        else "unknown",
+        "endpoints_count": len(spec.get("paths", {})) if spec else 0,
+        "tags": [tag.get("name", "") for tag in spec.get("tags", [])] if spec else [],
     }
-    
+
     return jsonify(status)

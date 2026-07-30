@@ -6,12 +6,12 @@ Provides minimal execution and monitoring support for Perl-based pipeline script
 to integrate with the existing workflow execution framework.
 """
 
-import os
 import logging
+import os
 import subprocess
-from typing import Dict, List, Optional, Any
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,9 @@ class PerlManager:
             Execution info dict including name and process metadata
         """
         script_path = str(script_path)
-        pipeline_name = pipeline_name or Path(script_path).stem + "_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+        pipeline_name = pipeline_name or Path(
+            script_path
+        ).stem + "_" + datetime.now().strftime("%Y%m%d_%H%M%S")
 
         exec_dir = self.work_dir / pipeline_name
         exec_dir.mkdir(parents=True, exist_ok=True)
@@ -167,9 +169,9 @@ class PerlManager:
                     {
                         "path": str(path.relative_to(exec_dir)),
                         "size": path.stat().st_size,
-                        "modified": datetime.fromtimestamp(path.stat().st_mtime).isoformat(),
+                        "modified": datetime.fromtimestamp(
+                            path.stat().st_mtime
+                        ).isoformat(),
                     }
                 )
         return {"execution_directory": str(exec_dir), "files": files}
-
-

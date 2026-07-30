@@ -9,7 +9,9 @@ import pytest
 def sim(tmp_path):
     from CancerGenomicsSuite.simulate_workflow import CancerGenomicsWorkflowSimulator
 
-    return CancerGenomicsWorkflowSimulator(output_dir=str(tmp_path / "wf"), verbose=False)
+    return CancerGenomicsWorkflowSimulator(
+        output_dir=str(tmp_path / "wf"), verbose=False
+    )
 
 
 @patch("time.sleep", lambda *a, **k: None)

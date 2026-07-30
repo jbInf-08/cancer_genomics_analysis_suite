@@ -13,8 +13,14 @@ def structured_error_to_dash(err: Dict[str, Any]) -> html.Div:
     parts: List[Any] = [html.P(msg)]
     ra = err.get("retry_after_seconds")
     if ra is not None:
-        parts.append(html.P(f"Retry after: {ra} s (from Retry-After header when provided)."))
-    code = err.get("error_code") if err.get("error_code") is not None else err.get("http_status")
+        parts.append(
+            html.P(f"Retry after: {ra} s (from Retry-After header when provided).")
+        )
+    code = (
+        err.get("error_code")
+        if err.get("error_code") is not None
+        else err.get("http_status")
+    )
     if code is not None:
         parts.append(html.P(f"HTTP / status: {code}"))
     kind = err.get("error_kind")

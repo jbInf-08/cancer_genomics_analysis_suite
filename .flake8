@@ -1,0 +1,25 @@
+[flake8]
+# Match black, which pyproject.toml sets to 88. Without this flake8 uses its
+# own 79-character default, so black's output was itself producing thousands of
+# E501s -- the two tools were formatting to different targets.
+max-line-length = 88
+
+# Both are black-incompatible by design and black's own documentation
+# recommends disabling them:
+#   E203 whitespace before ':'   -- black puts it there in slices
+#   W503 line break before binary operator -- black prefers breaking before
+extend-ignore = E203, W503
+
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    build,
+    dist,
+    *.egg-info,
+    node_modules
+
+# Generated migrations are not hand-maintained.
+per-file-ignores =
+    __init__.py:F401

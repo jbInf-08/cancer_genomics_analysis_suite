@@ -17,7 +17,9 @@ def test_normalize_chromosome():
 
 
 def test_region_to_ensembl_string():
-    assert region_to_ensembl_string("chr17", 43000000, 43100000) == "17:43000001-43100000"
+    assert (
+        region_to_ensembl_string("chr17", 43000000, 43100000) == "17:43000001-43100000"
+    )
 
 
 def test_build_vep_vcf_variant_line_snv():
@@ -95,7 +97,9 @@ def test_predict_genes_in_region_parses_genes(mock_http):
     mock_http.return_value = (mock_resp, None)
 
     g = GeneLocationPredictor()
-    out = g.predict_genes_in_region("chr17", 43090000, 43095000, reference_genome="hg38")
+    out = g.predict_genes_in_region(
+        "chr17", 43090000, 43095000, reference_genome="hg38"
+    )
     assert len(out) == 1
     assert out[0]["symbol"] == "BRCA1"
     assert out[0]["gene_id"] == "ENSG00000012048"
@@ -106,7 +110,9 @@ def test_predict_genes_in_region_parses_genes(mock_http):
 def test_predict_genes_at_position():
     g = GeneLocationPredictor()
     with patch.object(g, "predict_genes_in_region", return_value=[]) as m:
-        g.predict_genes_at_position("chr1", 1000000, flank=5000, reference_genome="hg38")
+        g.predict_genes_at_position(
+            "chr1", 1000000, flank=5000, reference_genome="hg38"
+        )
     m.assert_called_once()
     args, kwargs = m.call_args
     assert args[0] == "chr1"

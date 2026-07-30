@@ -20,76 +20,70 @@ Components:
 - workflow_dispatcher: Workflow orchestration and job management
 """
 
-from .illumina_pipeline import (
-    IlluminaPipeline,
-    IlluminaQualityControl,
-    IlluminaAlignment,
-    IlluminaVariantCalling,
-    IlluminaExpressionAnalysis
-)
-
-from .ion_torrent_pipeline import (
-    IonTorrentPipeline,
-    IonTorrentQualityControl,
-    IonTorrentAlignment,
-    IonTorrentVariantCalling,
-    IonTorrentExpressionAnalysis
-)
-
-from .pacbio_pipeline import (
-    PacBioPipeline,
-    PacBioQualityControl,
-    PacBioAlignment,
-    PacBioVariantCalling,
-    PacBioAssembly,
-    PacBioIsoformAnalysis
-)
-
-from .nanopore_pipeline import (
-    NanoporePipeline,
-    NanoporeQualityControl,
-    NanoporeAlignment,
-    NanoporeVariantCalling,
-    NanoporeAssembly,
-    NanoporeBasecalling
-)
-
 from .common_preprocessing import (
-    FastqProcessor,
-    QualityTrimmer,
     AdapterRemover,
     ContaminantFilter,
-    ReadDeduplicator,
+    FastqProcessor,
+    PreprocessingPipeline,
     QualityMetrics,
-    PreprocessingPipeline
+    QualityTrimmer,
+    ReadDeduplicator,
 )
-
-from .workflow_dispatcher import (
-    WorkflowDispatcher,
-    JobManager,
-    ResourceMonitor,
-    WorkflowScheduler,
-    PlatformDetector,
-    WorkflowValidator,
-    DockerManager,
-    CeleryJobManager,
-    DockerConfig,
-    QueueConfig,
-    Job,
-    JobStatus,
-    PlatformType
+from .illumina_pipeline import (
+    IlluminaAlignment,
+    IlluminaExpressionAnalysis,
+    IlluminaPipeline,
+    IlluminaQualityControl,
+    IlluminaVariantCalling,
 )
-
+from .ion_torrent_pipeline import (
+    IonTorrentAlignment,
+    IonTorrentExpressionAnalysis,
+    IonTorrentPipeline,
+    IonTorrentQualityControl,
+    IonTorrentVariantCalling,
+)
+from .nanopore_pipeline import (
+    NanoporeAlignment,
+    NanoporeAssembly,
+    NanoporeBasecalling,
+    NanoporePipeline,
+    NanoporeQualityControl,
+    NanoporeVariantCalling,
+)
 from .ngs_pipeline_integration import (
-    NGSPipelineManager,
-    PipelineStepExecutor,
-    PipelineValidator,
     EnhancedWorkflowDispatcher,
+    NGSPipelineManager,
     PipelineDefinition,
-    PipelineStep,
     PipelineExecution,
     PipelineStatus,
-    PipelineType
+    PipelineStep,
+    PipelineStepExecutor,
+    PipelineType,
+    PipelineValidator,
+)
+from .pacbio_pipeline import (
+    PacBioAlignment,
+    PacBioAssembly,
+    PacBioIsoformAnalysis,
+    PacBioPipeline,
+    PacBioQualityControl,
+    PacBioVariantCalling,
+)
+from .workflow_dispatcher import (
+    CeleryJobManager,
+    DockerConfig,
+    DockerManager,
+    Job,
+    JobManager,
+    JobStatus,
+    PlatformDetector,
+    PlatformType,
+    QueueConfig,
+    ResourceMonitor,
+    WorkflowDispatcher,
+    WorkflowScheduler,
+    WorkflowValidator,
 )
 
 __version__ = "1.0.0"
@@ -99,17 +93,15 @@ __all__ = [
     # Illumina components
     "IlluminaPipeline",
     "IlluminaQualityControl",
-    "IlluminaAlignment", 
+    "IlluminaAlignment",
     "IlluminaVariantCalling",
     "IlluminaExpressionAnalysis",
-    
     # Ion Torrent components
     "IonTorrentPipeline",
     "IonTorrentQualityControl",
     "IonTorrentAlignment",
-    "IonTorrentVariantCalling", 
+    "IonTorrentVariantCalling",
     "IonTorrentExpressionAnalysis",
-    
     # PacBio components
     "PacBioPipeline",
     "PacBioQualityControl",
@@ -117,7 +109,6 @@ __all__ = [
     "PacBioVariantCalling",
     "PacBioAssembly",
     "PacBioIsoformAnalysis",
-    
     # Nanopore components
     "NanoporePipeline",
     "NanoporeQualityControl",
@@ -125,7 +116,6 @@ __all__ = [
     "NanoporeVariantCalling",
     "NanoporeAssembly",
     "NanoporeBasecalling",
-    
     # Common preprocessing components
     "FastqProcessor",
     "QualityTrimmer",
@@ -134,7 +124,6 @@ __all__ = [
     "ReadDeduplicator",
     "QualityMetrics",
     "PreprocessingPipeline",
-    
     # Workflow management components
     "WorkflowDispatcher",
     "JobManager",
@@ -142,7 +131,6 @@ __all__ = [
     "WorkflowScheduler",
     "PlatformDetector",
     "WorkflowValidator",
-    
     # Docker and job queue components
     "DockerManager",
     "CeleryJobManager",
@@ -151,7 +139,6 @@ __all__ = [
     "Job",
     "JobStatus",
     "PlatformType",
-    
     # NGS Pipeline integration components
     "NGSPipelineManager",
     "PipelineStepExecutor",
@@ -161,5 +148,5 @@ __all__ = [
     "PipelineStep",
     "PipelineExecution",
     "PipelineStatus",
-    "PipelineType"
+    "PipelineType",
 ]

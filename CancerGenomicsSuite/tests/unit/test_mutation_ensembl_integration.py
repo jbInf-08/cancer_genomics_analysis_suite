@@ -23,7 +23,9 @@ def test_fetch_external_ensembl_json():
         mock_r.status_code = 200
         mock_r.json.return_value = {"Xrefs": [], "id": "ENSG00000000001"}
         m.return_value = mock_r
-        data = a.fetch_external_data("https://rest.ensembl.org/lookup/symbol/human/TP53")
+        data = a.fetch_external_data(
+            "https://rest.ensembl.org/lookup/symbol/human/TP53"
+        )
     assert "id" in data
 
 

@@ -18,7 +18,4 @@ from .tree_dash import TreeDashboard
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite Team"
 
-__all__ = [
-    "PhylogeneticTreeBuilder",
-    "TreeDashboard"
-]
+__all__ = ["PhylogeneticTreeBuilder", "TreeDashboard"]

@@ -24,9 +24,7 @@ from CancerGenomicsSuite.modules.gromacs_integration.gromacs_client import GROMA
 logger = logging.getLogger(__name__)
 
 RCSB_PDB_URL = "https://files.rcsb.org/download/{pdb_id}.pdb"
-ALPHAFOLD_PDB_URL = (
-    "https://alphafold.ebi.ac.uk/files/AF-{uniprot}-F1-model_v4.pdb"
-)
+ALPHAFOLD_PDB_URL = "https://alphafold.ebi.ac.uk/files/AF-{uniprot}-F1-model_v4.pdb"
 UNIPROT_SEARCH = "https://rest.uniprot.org/uniprotkb/search"
 MAX_DOWNLOAD_BYTES = 80 * 1024 * 1024
 
@@ -84,7 +82,11 @@ def _http_download(
             "http_status": e.code,
             "user_message": (
                 f"{label}: HTTP {e.code} from remote server. "
-                + ("Not found — check PDB ID or UniProt accession." if e.code == 404 else str(e.reason))
+                + (
+                    "Not found — check PDB ID or UniProt accession."
+                    if e.code == 404
+                    else str(e.reason)
+                )
             ),
             "url": url,
             "response_snippet": body,
@@ -111,7 +113,9 @@ def _http_download(
     return True, None
 
 
-def download_pdb_rcsb(pdb_id: str, dest_dir: Path, timeout: int = 90) -> Tuple[Path, Optional[Dict[str, Any]]]:
+def download_pdb_rcsb(
+    pdb_id: str, dest_dir: Path, timeout: int = 90
+) -> Tuple[Path, Optional[Dict[str, Any]]]:
     pid = pdb_id.strip().upper()
     if len(pid) != 4 or not re.match(r"^[0-9A-Z]{4}$", pid):
         raise ValueError(
@@ -125,10 +129,14 @@ def download_pdb_rcsb(pdb_id: str, dest_dir: Path, timeout: int = 90) -> Tuple[P
     return dest, None
 
 
-def download_alphafold_model(uniprot: str, dest_dir: Path, timeout: int = 120) -> Tuple[Path, Optional[Dict[str, Any]]]:
+def download_alphafold_model(
+    uniprot: str, dest_dir: Path, timeout: int = 120
+) -> Tuple[Path, Optional[Dict[str, Any]]]:
     acc = uniprot.strip().upper()
     if not re.match(r"^[A-NR-Z0-9]{6,15}$", acc):
-        raise ValueError("UniProt accession looks invalid (expected 6–15 letter/digit characters).")
+        raise ValueError(
+            "UniProt accession looks invalid (expected 6–15 letter/digit characters)."
+        )
     url = ALPHAFOLD_PDB_URL.format(uniprot=acc)
     dest = dest_dir / f"AF-{acc}-F1-model_v4.pdb"
     ok, err = _http_download(url, dest, timeout=timeout, label="AlphaFold DB")
@@ -246,7 +254,9 @@ class MolecularDynamicsWorkflow:
                 }
             run_dir = Path(tempfile.mkdtemp(prefix="md_tpr_", dir=self.work_root))
             shutil.copy2(tpr, run_dir / "simulation.tpr")
-            sim = self._client.run_simulation({"tpr": str(run_dir / "simulation.tpr")}, {})
+            sim = self._client.run_simulation(
+                {"tpr": str(run_dir / "simulation.tpr")}, {}
+            )
             sim.update({"work_dir": str(run_dir), "structure_source": "tpr", **meta})
             return sim
 
@@ -279,7 +289,10 @@ class MolecularDynamicsWorkflow:
                     return {
                         "success": False,
                         "error": f"PDB file not found: {pdb_path}",
-                        "error_detail": {"error_kind": "missing_file", "path": str(pdb_path)},
+                        "error_detail": {
+                            "error_kind": "missing_file",
+                            "path": str(pdb_path),
+                        },
                         "work_dir": str(run_dir),
                         **meta,
                     }
@@ -288,7 +301,9 @@ class MolecularDynamicsWorkflow:
                 structure_source = "local_pdb"
             elif pdb_id:
                 try:
-                    pdb_file, dl_err = download_pdb_rcsb(str(pdb_id), run_dir, timeout=rcsb_timeout)
+                    pdb_file, dl_err = download_pdb_rcsb(
+                        str(pdb_id), run_dir, timeout=rcsb_timeout
+                    )
                 except ValueError as e:
                     return {
                         "success": False,
@@ -309,7 +324,9 @@ class MolecularDynamicsWorkflow:
                 structure_source = "rcsb"
             elif af_up:
                 try:
-                    pdb_file, dl_err = download_alphafold_model(str(af_up), run_dir, timeout=af_timeout)
+                    pdb_file, dl_err = download_alphafold_model(
+                        str(af_up), run_dir, timeout=af_timeout
+                    )
                 except ValueError as e:
                     return {
                         "success": False,
@@ -321,7 +338,9 @@ class MolecularDynamicsWorkflow:
                 if dl_err:
                     return {
                         "success": False,
-                        "error": dl_err.get("user_message", "AlphaFold download failed"),
+                        "error": dl_err.get(
+                            "user_message", "AlphaFold download failed"
+                        ),
                         "error_detail": dl_err,
                         "work_dir": str(run_dir),
                         "structure_source": "alphafold",
@@ -329,20 +348,28 @@ class MolecularDynamicsWorkflow:
                     }
                 structure_source = "alphafold"
             else:
-                acc, uerr = resolve_uniprot_from_gene_symbol(str(af_gene), organism_id=organism)
+                acc, uerr = resolve_uniprot_from_gene_symbol(
+                    str(af_gene), organism_id=organism
+                )
                 if uerr or not acc:
                     return {
                         "success": False,
-                        "error": (uerr or {}).get("user_message", "UniProt resolution failed"),
+                        "error": (uerr or {}).get(
+                            "user_message", "UniProt resolution failed"
+                        ),
                         "error_detail": uerr or {"error_kind": "uniprot_failed"},
                         "work_dir": str(run_dir),
                         **meta,
                     }
-                pdb_file, dl_err = download_alphafold_model(acc, run_dir, timeout=af_timeout)
+                pdb_file, dl_err = download_alphafold_model(
+                    acc, run_dir, timeout=af_timeout
+                )
                 if dl_err:
                     return {
                         "success": False,
-                        "error": dl_err.get("user_message", "AlphaFold download failed"),
+                        "error": dl_err.get(
+                            "user_message", "AlphaFold download failed"
+                        ),
                         "error_detail": dl_err,
                         "work_dir": str(run_dir),
                         "structure_source": "alphafold",
@@ -369,7 +396,9 @@ class MolecularDynamicsWorkflow:
                     **meta,
                 }
 
-            em = self._client.run_energy_minimization_from_pdb(str(pdb_file), str(run_dir))
+            em = self._client.run_energy_minimization_from_pdb(
+                str(pdb_file), str(run_dir)
+            )
             em["pdb_file"] = str(pdb_file)
             em["gromacs_version"] = self._client.get_version()
             em["structure_source"] = structure_source
@@ -383,7 +412,10 @@ class MolecularDynamicsWorkflow:
             return {
                 "success": False,
                 "error": str(e),
-                "error_detail": {"error_kind": "exception", "exception_type": type(e).__name__},
+                "error_detail": {
+                    "error_kind": "exception",
+                    "exception_type": type(e).__name__,
+                },
                 "work_dir": str(run_dir),
                 **meta,
             }

@@ -25,37 +25,37 @@ Usage:
     from CancerGenomicsSuite.app.orm.utils import create_tables, run_migrations
 """
 
-import logging
-from pathlib import Path
-from typing import Optional, List, Dict, Any, Union
-from datetime import datetime
 import json
+import logging
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 # Import the database instance from the main app
 from .. import db
 
 # Import all database models
 from .models import (
+    AnalysisJob,
+    AnalysisResult,
+    DataFile,
+    Dataset,
     GeneExpression,
     MutationRecord,
-    AnalysisJob,
-    DataFile, 
-    AnalysisResult,
     Project,
-    Dataset
 )
 
 # Import utility functions
 from .utils import (
-    create_tables,
-    run_migrations,
     backup_database,
-    restore_database,
-    get_database_stats,
     cleanup_old_data,
-    validate_model_data,
+    create_tables,
+    deserialize_model,
+    get_database_stats,
+    restore_database,
+    run_migrations,
     serialize_model,
-    deserialize_model
+    validate_model_data,
 )
 
 # Configure logging
@@ -67,72 +67,69 @@ __version__ = "1.0.0"
 # Export all public components
 __all__ = [
     # Database instance
-    'db',
-    
+    "db",
     # Models
-    'GeneExpression',
-    'MutationRecord',
-    'AnalysisJob',
-    'DataFile', 
-    'AnalysisResult',
-    'Project',
-    'Dataset',
-    
+    "GeneExpression",
+    "MutationRecord",
+    "AnalysisJob",
+    "DataFile",
+    "AnalysisResult",
+    "Project",
+    "Dataset",
     # Utility functions
-    'create_tables',
-    'run_migrations',
-    'backup_database',
-    'restore_database',
-    'get_database_stats',
-    'cleanup_old_data',
-    'validate_model_data',
-    'serialize_model',
-    'deserialize_model',
-    
+    "create_tables",
+    "run_migrations",
+    "backup_database",
+    "restore_database",
+    "get_database_stats",
+    "cleanup_old_data",
+    "validate_model_data",
+    "serialize_model",
+    "deserialize_model",
     # Package info
-    '__version__',
-    'get_package_info'
+    "__version__",
+    "get_package_info",
 ]
 
 
 def get_package_info() -> Dict[str, Any]:
     """
     Get information about the database package.
-    
+
     Returns:
         Dict containing package information
     """
     return {
-        'name': 'CancerGenomicsSuite.app.orm',
-        'version': __version__,
-        'description': 'Database package for Cancer Genomics Analysis Suite',
-        'models': [
-            'GeneExpression',
-            'MutationRecord',
-            'AnalysisJob',
-            'DataFile',
-            'AnalysisResult',
-            'Project',
-            'Dataset'
+        "name": "CancerGenomicsSuite.app.orm",
+        "version": __version__,
+        "description": "Database package for Cancer Genomics Analysis Suite",
+        "models": [
+            "GeneExpression",
+            "MutationRecord",
+            "AnalysisJob",
+            "DataFile",
+            "AnalysisResult",
+            "Project",
+            "Dataset",
         ],
-        'features': [
-            'Model definitions',
-            'Migration management',
-            'Database utilities',
-            'Data validation',
-            'Backup and restore',
-            'Query optimization'
-        ]
+        "features": [
+            "Model definitions",
+            "Migration management",
+            "Database utilities",
+            "Data validation",
+            "Backup and restore",
+            "Query optimization",
+        ],
     }
 
 
 def initialize_database_package(app=None) -> bool:
     """
     Initialize the database package with the Flask application.
-    
+
     Args:
         app: Flask application instance (optional)
-        
+
     Returns:
         bool: True if initialization successful, False otherwise
     """
@@ -141,16 +138,16 @@ def initialize_database_package(app=None) -> bool:
             with app.app_context():
                 # Create all tables
                 create_tables()
-                
+
                 # Run any pending migrations
                 run_migrations()
-                
+
                 logger.info("Database package initialized successfully")
                 return True
         else:
             logger.warning("No Flask app provided for database initialization")
             return False
-            
+
     except Exception as e:
         logger.error(f"Database package initialization failed: {e}")
         return False
@@ -159,40 +156,48 @@ def initialize_database_package(app=None) -> bool:
 def get_model_by_name(model_name: str):
     """
     Get a model class by its name.
-    
+
     Args:
         model_name: Name of the model class
-        
+
     Returns:
         Model class or None if not found
     """
     models = {
-        'GeneExpression': GeneExpression,
-        'MutationRecord': MutationRecord,
-        'AnalysisJob': AnalysisJob,
-        'DataFile': DataFile,
-        'AnalysisResult': AnalysisResult,
-        'Project': Project,
-        'Dataset': Dataset
+        "GeneExpression": GeneExpression,
+        "MutationRecord": MutationRecord,
+        "AnalysisJob": AnalysisJob,
+        "DataFile": DataFile,
+        "AnalysisResult": AnalysisResult,
+        "Project": Project,
+        "Dataset": Dataset,
     }
-    
+
     return models.get(model_name)
 
 
 def get_all_models() -> List[Any]:
     """
     Get all available model classes.
-    
+
     Returns:
         List of model classes
     """
-    return [GeneExpression, MutationRecord, AnalysisJob, DataFile, AnalysisResult, Project, Dataset]
+    return [
+        GeneExpression,
+        MutationRecord,
+        AnalysisJob,
+        DataFile,
+        AnalysisResult,
+        Project,
+        Dataset,
+    ]
 
 
 def get_model_table_names() -> List[str]:
     """
     Get all table names for the models.
-    
+
     Returns:
         List of table names
     """
@@ -202,7 +207,7 @@ def get_model_table_names() -> List[str]:
 def validate_database_connection() -> bool:
     """
     Validate that the database connection is working.
-    
+
     Returns:
         bool: True if connection is valid, False otherwise
     """
@@ -210,7 +215,8 @@ def validate_database_connection() -> bool:
         # Try to execute a simple query
         # SQLAlchemy 2.0+ requires text() wrapper for raw SQL
         from sqlalchemy import text
-        db.session.execute(text('SELECT 1'))
+
+        db.session.execute(text("SELECT 1"))
         logger.info("Database connection validated successfully")
         return True
     except Exception as e:
@@ -221,35 +227,35 @@ def validate_database_connection() -> bool:
 def get_database_info() -> Dict[str, Any]:
     """
     Get comprehensive database information.
-    
+
     Returns:
         Dict containing database information
     """
     try:
         # Get database URL (without password for security)
         db_url = str(db.engine.url)
-        if '@' in db_url:
+        if "@" in db_url:
             # Hide password in URL
-            parts = db_url.split('@')
+            parts = db_url.split("@")
             if len(parts) == 2:
-                user_part = parts[0].split('//')[-1]
-                if ':' in user_part:
-                    user, _ = user_part.split(':', 1)
+                user_part = parts[0].split("//")[-1]
+                if ":" in user_part:
+                    user, _ = user_part.split(":", 1)
                     db_url = db_url.replace(user_part, f"{user}:***")
-        
+
         return {
-            'url': db_url,
-            'dialect': db.engine.dialect.name,
-            'driver': db.engine.dialect.driver,
-            'pool_size': db.engine.pool.size(),
-            'checked_out': db.engine.pool.checkedout(),
-            'overflow': db.engine.pool.overflow(),
-            'models': get_model_table_names(),
-            'package_version': __version__
+            "url": db_url,
+            "dialect": db.engine.dialect.name,
+            "driver": db.engine.dialect.driver,
+            "pool_size": db.engine.pool.size(),
+            "checked_out": db.engine.pool.checkedout(),
+            "overflow": db.engine.pool.overflow(),
+            "models": get_model_table_names(),
+            "package_version": __version__,
         }
     except Exception as e:
         logger.error(f"Failed to get database info: {e}")
-        return {'error': str(e)}
+        return {"error": str(e)}
 
 
 # Initialize package logging

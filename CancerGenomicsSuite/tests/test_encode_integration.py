@@ -1,6 +1,9 @@
 from unittest import mock
 
-from modules.external_data_integrators.encode_integration import query_encode, fetch_file_metadata
+from modules.external_data_integrators.encode_integration import (
+    fetch_file_metadata,
+    query_encode,
+)
 
 
 def test_query_encode_parses_graph():
@@ -19,5 +22,3 @@ def test_fetch_file_metadata_returns_json():
         mget.return_value.raise_for_status.return_value = None
         res = fetch_file_metadata("ENCFF000AAA")
         assert res == fake
-
-

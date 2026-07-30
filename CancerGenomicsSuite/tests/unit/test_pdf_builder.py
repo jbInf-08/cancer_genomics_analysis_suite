@@ -23,7 +23,9 @@ def test_pdf_builder_a4_and_letter(tmp_path):
     b2.add_paragraph("P")
     b2.add_table([["1", "2"]], headers=["a", "b"], title="Tbl")
     b2.add_dataframe_table(pd.DataFrame({"x": [1]}), title="DF")
-    b2.add_chart({"data": [[1, 2]], "categories": ["a", "b"]}, chart_type="bar", title="Ch")
+    b2.add_chart(
+        {"data": [[1, 2]], "categories": ["a", "b"]}, chart_type="bar", title="Ch"
+    )
     b2.add_chart({"data": [[1]], "categories": ["a"]}, chart_type="line", title="Ln")
     b2.add_metadata()
     out = b2.build()
@@ -66,7 +68,13 @@ def test_pdf_builder_create_analysis_report(tmp_path):
         {
             "summary": "S",
             "tables": [{"title": "T", "data": df}],
-            "charts": [{"type": "bar", "title": "C", "data": {"data": [[1]], "categories": ["x"]}}],
+            "charts": [
+                {
+                    "type": "bar",
+                    "title": "C",
+                    "data": {"data": [[1]], "categories": ["x"]},
+                }
+            ],
             "conclusions": ["done"],
         },
         output_path=str(p),

@@ -74,10 +74,7 @@ def build_ensembl_error_payload(
             f"{message}"
         )
     elif status_code == 503:
-        user = (
-            "Ensembl service unavailable (HTTP 503). Retry later. "
-            f"{message}"
-        )
+        user = "Ensembl service unavailable (HTTP 503). Retry later. " f"{message}"
     elif status_code in (400, 404):
         user = (
             "Ensembl rejected the request (bad region, species, or assembly). "
@@ -96,7 +93,9 @@ def build_ensembl_error_payload(
     }
 
 
-def safe_response_json_list(response: requests.Response) -> Tuple[List[Any], Optional[Dict[str, Any]]]:
+def safe_response_json_list(
+    response: requests.Response,
+) -> Tuple[List[Any], Optional[Dict[str, Any]]]:
     """
     Parse JSON body expected to be a list (overlap/region). On failure return ([], error_payload).
     """
@@ -218,6 +217,8 @@ def sanitize_uniprot_accession(raw: str) -> Optional[str]:
     s = (raw or "").strip().upper()
     if not s:
         return None
-    if re.match(r"^[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}$", s):
+    if re.match(
+        r"^[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}$", s
+    ):
         return s
     return None

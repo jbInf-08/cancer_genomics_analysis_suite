@@ -24,18 +24,14 @@ Functions:
 """
 
 from .microarray import (
+    ClusteringResult,
+    DifferentialExpressionResult,
     MicroarrayAnalyzer,
     MicroarrayData,
-    DifferentialExpressionResult,
-    ClusteringResult,
+    create_sample_analyzer,
     create_sample_microarray_data,
-    create_sample_analyzer
 )
-
-from .microarray_dash import (
-    MicroarrayDashboard,
-    create_microarray_dashboard
-)
+from .microarray_dash import MicroarrayDashboard, create_microarray_dashboard
 
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite"
@@ -50,7 +46,7 @@ __all__ = [
     "MicroarrayDashboard",
     "create_sample_microarray_data",
     "create_sample_analyzer",
-    "create_microarray_dashboard"
+    "create_microarray_dashboard",
 ]
 
 # Module description
@@ -140,49 +136,51 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
+
 # Module initialization
 def _initialize_module():
     """Initialize the microarray analyzer module."""
     logger.info("Initializing Microarray Analyzer module")
-    
+
     # Check for required dependencies
     try:
+        import dash
+        import matplotlib
         import numpy
         import pandas
-        import scipy
-        import sklearn
-        import matplotlib
-        import seaborn
-        import dash
         import plotly
+        import scipy
+        import seaborn
+        import sklearn
+
         logger.info("All required dependencies found")
     except ImportError as e:
         logger.warning(f"Missing dependency: {e}")
         logger.warning("Some features may not be available")
-    
+
     # Log supported platforms
-    supported_platforms = [
-        "Affymetrix", "Illumina", "Agilent", "NimbleGen", "Custom"
-    ]
+    supported_platforms = ["Affymetrix", "Illumina", "Agilent", "NimbleGen", "Custom"]
     logger.info(f"Supported platforms: {', '.join(supported_platforms)}")
-    
+
     # Log normalization methods
-    normalization_methods = [
-        "quantile", "rma", "gcrma", "mas5", "loess", "vsn", "none"
-    ]
+    normalization_methods = ["quantile", "rma", "gcrma", "mas5", "loess", "vsn", "none"]
     logger.info(f"Normalization methods: {', '.join(normalization_methods)}")
-    
+
     # Log analysis capabilities
     analysis_capabilities = [
-        "differential_expression", "clustering", "pca", "quality_control"
+        "differential_expression",
+        "clustering",
+        "pca",
+        "quality_control",
     ]
     logger.info(f"Analysis capabilities: {', '.join(analysis_capabilities)}")
+
 
 # Run initialization
 _initialize_module()
@@ -203,16 +201,18 @@ MIN_CV_THRESHOLD = 0.1
 MAX_CV_THRESHOLD = 2.0
 
 # Export constants
-__all__.extend([
-    "DEFAULT_NORMALIZATION_METHOD",
-    "DEFAULT_DASHBOARD_PORT",
-    "DEFAULT_FOLD_CHANGE_THRESHOLD",
-    "DEFAULT_P_VALUE_THRESHOLD",
-    "DEFAULT_ADJUSTED_P_VALUE_THRESHOLD",
-    "DEFAULT_N_CLUSTERS",
-    "DEFAULT_PCA_COMPONENTS",
-    "MIN_EXPRESSION_THRESHOLD",
-    "MAX_MISSING_PERCENTAGE",
-    "MIN_CV_THRESHOLD",
-    "MAX_CV_THRESHOLD"
-])
+__all__.extend(
+    [
+        "DEFAULT_NORMALIZATION_METHOD",
+        "DEFAULT_DASHBOARD_PORT",
+        "DEFAULT_FOLD_CHANGE_THRESHOLD",
+        "DEFAULT_P_VALUE_THRESHOLD",
+        "DEFAULT_ADJUSTED_P_VALUE_THRESHOLD",
+        "DEFAULT_N_CLUSTERS",
+        "DEFAULT_PCA_COMPONENTS",
+        "MIN_EXPRESSION_THRESHOLD",
+        "MAX_MISSING_PERCENTAGE",
+        "MIN_CV_THRESHOLD",
+        "MAX_CV_THRESHOLD",
+    ]
+)

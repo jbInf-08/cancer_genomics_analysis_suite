@@ -13,10 +13,10 @@ Components:
 - ReportingPipeline: Handles automated report generation tasks
 """
 
-from .queue_manager import QueueManager
+from .annotation_pipeline import AnnotationPipeline
 from .blast_pipeline import BlastPipeline
 from .ml_predictor_pipeline import MLPredictorPipeline
-from .annotation_pipeline import AnnotationPipeline
+from .queue_manager import QueueManager
 from .reporting_pipeline import ReportingPipeline
 
 __version__ = "1.0.0"
@@ -27,5 +27,5 @@ __all__ = [
     "BlastPipeline",
     "MLPredictorPipeline",
     "AnnotationPipeline",
-    "ReportingPipeline"
+    "ReportingPipeline",
 ]

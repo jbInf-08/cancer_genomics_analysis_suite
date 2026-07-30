@@ -23,16 +23,12 @@ Functions:
 
 from .browser import (
     GenomeBrowser,
-    UCSCGenomeBrowser,
-    GenomicRegion,
     GenomicFeature,
-    create_sample_genome_browser
+    GenomicRegion,
+    UCSCGenomeBrowser,
+    create_sample_genome_browser,
 )
-
-from .browser_dash import (
-    GenomeBrowserDashboard,
-    create_genome_browser_dashboard
-)
+from .browser_dash import GenomeBrowserDashboard, create_genome_browser_dashboard
 
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite"
@@ -41,12 +37,12 @@ __email__ = "support@cancergenomics.com"
 # Module metadata
 __all__ = [
     "GenomeBrowser",
-    "UCSCGenomeBrowser", 
+    "UCSCGenomeBrowser",
     "GenomeBrowserDashboard",
     "GenomicRegion",
     "GenomicFeature",
     "create_sample_genome_browser",
-    "create_genome_browser_dashboard"
+    "create_genome_browser_dashboard",
 ]
 
 # Module description
@@ -99,39 +95,42 @@ logger = logging.getLogger(__name__)
 if not logger.handlers:
     handler = logging.StreamHandler()
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
+
 # Module initialization
 def _initialize_module():
     """Initialize the genome browser module."""
     logger.info("Initializing Genome Browser module")
-    
+
     # Check for required dependencies
     try:
         import dash
-        import plotly
         import pandas
+        import plotly
         import requests
+
         logger.info("All required dependencies found")
     except ImportError as e:
         logger.warning(f"Missing dependency: {e}")
         logger.warning("Some features may not be available")
-    
+
     # Log supported reference genomes
     supported_genomes = {
         "hg38": "Human (GRCh38)",
-        "hg19": "Human (GRCh37)", 
+        "hg19": "Human (GRCh37)",
         "mm10": "Mouse (GRCm38)",
         "mm9": "Mouse (NCBIM37)",
         "dm6": "Drosophila (BDGP6)",
-        "ce11": "C. elegans (WBcel235)"
+        "ce11": "C. elegans (WBcel235)",
     }
-    
+
     logger.info(f"Supported reference genomes: {list(supported_genomes.keys())}")
+
 
 # Run initialization
 _initialize_module()
@@ -144,10 +143,12 @@ DEFAULT_ZOOM_FACTOR = 2.0
 DEFAULT_PAN_DISTANCE = 10000
 
 # Export constants
-__all__.extend([
-    "DEFAULT_REFERENCE_GENOME",
-    "DEFAULT_DASHBOARD_PORT", 
-    "MAX_FEATURES_DISPLAY",
-    "DEFAULT_ZOOM_FACTOR",
-    "DEFAULT_PAN_DISTANCE"
-])
+__all__.extend(
+    [
+        "DEFAULT_REFERENCE_GENOME",
+        "DEFAULT_DASHBOARD_PORT",
+        "MAX_FEATURES_DISPLAY",
+        "DEFAULT_ZOOM_FACTOR",
+        "DEFAULT_PAN_DISTANCE",
+    ]
+)

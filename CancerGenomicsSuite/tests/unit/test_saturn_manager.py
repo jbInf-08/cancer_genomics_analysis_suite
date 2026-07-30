@@ -6,7 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from CancerGenomicsSuite.modules.pipeline_orchestration.saturn_manager import SATurnManager
+from CancerGenomicsSuite.modules.pipeline_orchestration.saturn_manager import (
+    SATurnManager,
+)
 
 
 def test_execute_job_completed(tmp_path):
@@ -15,7 +17,9 @@ def test_execute_job_completed(tmp_path):
     fake.returncode = 0
     mgr = SATurnManager(work_dir=str(tmp_path / "saturn_root"))
     with patch("subprocess.Popen", return_value=fake) as popen:
-        info = mgr.execute_job("workflow.yaml", saturn_args=["--threads", "2"], job_name="job_a")
+        info = mgr.execute_job(
+            "workflow.yaml", saturn_args=["--threads", "2"], job_name="job_a"
+        )
     assert info["status"] == "completed"
     assert info["return_code"] == 0
     cmd = popen.call_args[0][0]

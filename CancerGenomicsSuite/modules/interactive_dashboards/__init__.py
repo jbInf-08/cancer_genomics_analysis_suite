@@ -9,19 +9,24 @@ Components:
 - LiveControls: Provides real-time control and interaction capabilities
 """
 
-from .dashboard_loader import DashboardLoader, DashboardConfig, DashboardType, DashboardWidget
-from .live_controls import LiveControls, ControlType, ControlWidget, LiveDataStream
+from .dashboard_loader import (
+    DashboardConfig,
+    DashboardLoader,
+    DashboardType,
+    DashboardWidget,
+)
+from .live_controls import ControlType, ControlWidget, LiveControls, LiveDataStream
 
 __all__ = [
-    'DashboardLoader',
-    'DashboardConfig',
-    'DashboardType',
-    'DashboardWidget',
-    'LiveControls',
-    'ControlType',
-    'ControlWidget',
-    'LiveDataStream'
+    "DashboardLoader",
+    "DashboardConfig",
+    "DashboardType",
+    "DashboardWidget",
+    "LiveControls",
+    "ControlType",
+    "ControlWidget",
+    "LiveDataStream",
 ]
 
-__version__ = '1.0.0'
-__author__ = 'Cancer Genomics Analysis Suite'
+__version__ = "1.0.0"
+__author__ = "Cancer Genomics Analysis Suite"

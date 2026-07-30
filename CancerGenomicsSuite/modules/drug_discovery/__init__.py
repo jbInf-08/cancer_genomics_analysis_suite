@@ -11,23 +11,14 @@ This module provides comprehensive drug discovery and analysis capabilities incl
 - Drug safety and toxicity assessment
 """
 
+from .clinical_trials import ClinicalTrialMatcher, DrugTrialIntegrator, TrialAnalyzer
 from .drug_analyzer import (
     DrugAnalyzer,
-    DrugTargetIdentifier,
+    DrugMechanismAnalyzer,
     DrugRepurposingAnalyzer,
-    DrugMechanismAnalyzer
+    DrugTargetIdentifier,
 )
-
-from .clinical_trials import (
-    ClinicalTrialMatcher,
-    TrialAnalyzer,
-    DrugTrialIntegrator
-)
-
-from .drug_dashboard import (
-    DrugDiscoveryDashboard,
-    DrugVisualizationEngine
-)
+from .drug_dashboard import DrugDiscoveryDashboard, DrugVisualizationEngine
 
 __version__ = "1.0.0"
 __author__ = "Cancer Genomics Analysis Suite Team"
@@ -36,15 +27,13 @@ __all__ = [
     # Core Analysis
     "DrugAnalyzer",
     "DrugTargetIdentifier",
-    "DrugRepurposingAnalyzer", 
+    "DrugRepurposingAnalyzer",
     "DrugMechanismAnalyzer",
-    
     # Clinical Trials
     "ClinicalTrialMatcher",
     "TrialAnalyzer",
     "DrugTrialIntegrator",
-    
     # Dashboard
     "DrugDiscoveryDashboard",
-    "DrugVisualizationEngine"
+    "DrugVisualizationEngine",
 ]

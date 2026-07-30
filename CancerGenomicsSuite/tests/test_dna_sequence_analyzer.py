@@ -11,8 +11,8 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from CancerGenomicsSuite.modules.dna_sequence_analyzer.analyzer import (
-    DNAAnalyzer,
     AnalysisConfig,
+    DNAAnalyzer,
 )
 from CancerGenomicsSuite.modules.dna_sequence_analyzer.utils import DNAUtils
 

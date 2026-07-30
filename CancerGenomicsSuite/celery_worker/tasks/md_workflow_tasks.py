@@ -59,7 +59,11 @@ def run_md_workflow(
     result = ex.run_molecular_dynamics_workflow(config, workflow_name=workflow_name)
     self.update_state(
         state="SUCCESS",
-        meta={"status": "completed", "success": result.get("success"), "workflow": workflow_name},
+        meta={
+            "status": "completed",
+            "success": result.get("success"),
+            "workflow": workflow_name,
+        },
     )
     logger.info("Celery MD task %s done: %s", workflow_name, result.get("success"))
     return result

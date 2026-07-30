@@ -9,12 +9,13 @@ including biomarker discovery, drug analysis, and integration capabilities.
 try:
     from .biomarker_discovery import (
         BiomarkerAnalyzer,
-        StatisticalBiomarkerDiscovery,
-        MLBiomarkerDiscovery,
-        BiomarkerValidator,
         BiomarkerDiscoveryDashboard,
-        BiomarkerVisualizationEngine
+        BiomarkerValidator,
+        BiomarkerVisualizationEngine,
+        MLBiomarkerDiscovery,
+        StatisticalBiomarkerDiscovery,
     )
+
     _BIOMARKER_DISCOVERY_AVAILABLE = True
 except ImportError as e:
     print(f"Warning: Biomarker discovery modules not available: {e}")
@@ -30,16 +31,17 @@ except ImportError as e:
 # Import drug discovery modules
 try:
     from .drug_discovery import (
-        DrugAnalyzer,
-        DrugTargetIdentifier,
-        DrugRepurposingAnalyzer,
-        DrugMechanismAnalyzer,
         ClinicalTrialMatcher,
-        TrialAnalyzer,
-        DrugTrialIntegrator,
+        DrugAnalyzer,
         DrugDiscoveryDashboard,
-        DrugVisualizationEngine
+        DrugMechanismAnalyzer,
+        DrugRepurposingAnalyzer,
+        DrugTargetIdentifier,
+        DrugTrialIntegrator,
+        DrugVisualizationEngine,
+        TrialAnalyzer,
     )
+
     _DRUG_DISCOVERY_AVAILABLE = True
 except ImportError as e:
     print(f"Warning: Drug discovery modules not available: {e}")
@@ -58,13 +60,18 @@ except ImportError as e:
 # Import drug-biomarker integration modules
 try:
     from .drug_biomarker_integration import (
-        DrugBiomarkerAnalyzer,
-        PharmacogenomicsIntegrator,
-        PersonalizedMedicineEngine,
-        DrugResponsePredictor as IntegratedDrugResponsePredictor,
         BiomarkerBasedPredictor,
-        MultiOmicsPredictor
+        DrugBiomarkerAnalyzer,
     )
+    from .drug_biomarker_integration import (
+        DrugResponsePredictor as IntegratedDrugResponsePredictor,
+    )
+    from .drug_biomarker_integration import (
+        MultiOmicsPredictor,
+        PersonalizedMedicineEngine,
+        PharmacogenomicsIntegrator,
+    )
+
     _DRUG_BIOMARKER_INTEGRATION_AVAILABLE = True
 except ImportError as e:
     print(f"Warning: Drug-biomarker integration modules not available: {e}")
@@ -81,10 +88,11 @@ except ImportError as e:
 try:
     from .biomarker_drug_api import (
         create_biomarker_api,
+        create_clinical_api,
         create_drug_api,
         create_integration_api,
-        create_clinical_api
     )
+
     _API_MODULES_AVAILABLE = True
 except ImportError as e:
     print(f"Warning: API modules not available: {e}")
@@ -103,45 +111,53 @@ __all__ = []
 
 # Add biomarker discovery modules if available
 if _BIOMARKER_DISCOVERY_AVAILABLE:
-    __all__.extend([
-        "BiomarkerAnalyzer",
-        "StatisticalBiomarkerDiscovery",
-        "MLBiomarkerDiscovery",
-        "BiomarkerValidator",
-        "BiomarkerDiscoveryDashboard",
-        "BiomarkerVisualizationEngine"
-    ])
+    __all__.extend(
+        [
+            "BiomarkerAnalyzer",
+            "StatisticalBiomarkerDiscovery",
+            "MLBiomarkerDiscovery",
+            "BiomarkerValidator",
+            "BiomarkerDiscoveryDashboard",
+            "BiomarkerVisualizationEngine",
+        ]
+    )
 
 # Add drug discovery modules if available
 if _DRUG_DISCOVERY_AVAILABLE:
-    __all__.extend([
-        "DrugAnalyzer",
-        "DrugTargetIdentifier",
-        "DrugRepurposingAnalyzer",
-        "DrugMechanismAnalyzer",
-        "ClinicalTrialMatcher",
-        "TrialAnalyzer",
-        "DrugTrialIntegrator",
-        "DrugDiscoveryDashboard",
-        "DrugVisualizationEngine"
-    ])
+    __all__.extend(
+        [
+            "DrugAnalyzer",
+            "DrugTargetIdentifier",
+            "DrugRepurposingAnalyzer",
+            "DrugMechanismAnalyzer",
+            "ClinicalTrialMatcher",
+            "TrialAnalyzer",
+            "DrugTrialIntegrator",
+            "DrugDiscoveryDashboard",
+            "DrugVisualizationEngine",
+        ]
+    )
 
 # Add drug-biomarker integration modules if available
 if _DRUG_BIOMARKER_INTEGRATION_AVAILABLE:
-    __all__.extend([
-        "DrugBiomarkerAnalyzer",
-        "PharmacogenomicsIntegrator",
-        "PersonalizedMedicineEngine",
-        "IntegratedDrugResponsePredictor",
-        "BiomarkerBasedPredictor",
-        "MultiOmicsPredictor"
-    ])
+    __all__.extend(
+        [
+            "DrugBiomarkerAnalyzer",
+            "PharmacogenomicsIntegrator",
+            "PersonalizedMedicineEngine",
+            "IntegratedDrugResponsePredictor",
+            "BiomarkerBasedPredictor",
+            "MultiOmicsPredictor",
+        ]
+    )
 
 # Add API modules if available
 if _API_MODULES_AVAILABLE:
-    __all__.extend([
-        "create_biomarker_api",
-        "create_drug_api",
-        "create_integration_api",
-        "create_clinical_api"
-    ])
+    __all__.extend(
+        [
+            "create_biomarker_api",
+            "create_drug_api",
+            "create_integration_api",
+            "create_clinical_api",
+        ]
+    )

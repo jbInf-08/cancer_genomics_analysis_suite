@@ -6,15 +6,15 @@ This module provides comprehensive Nextflow pipeline management capabilities
 for cancer genomics analysis workflows.
 """
 
-import os
 import json
-import subprocess
 import logging
-from typing import Dict, List, Optional, Any, Union
-from pathlib import Path
-from datetime import datetime
-import tempfile
+import os
 import shutil
+import subprocess
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -22,18 +22,20 @@ logger = logging.getLogger(__name__)
 class NextflowManager:
     """
     Manager for Nextflow pipeline execution and monitoring.
-    
+
     Provides functionality to:
     - Execute Nextflow pipelines
     - Monitor pipeline progress
     - Manage pipeline configurations
     - Handle pipeline outputs
     """
-    
-    def __init__(self, work_dir: Optional[str] = None, config_file: Optional[str] = None):
+
+    def __init__(
+        self, work_dir: Optional[str] = None, config_file: Optional[str] = None
+    ):
         """
         Initialize Nextflow manager.
-        
+
         Args:
             work_dir: Working directory for pipeline execution
             config_file: Path to Nextflow configuration file
@@ -41,69 +43,53 @@ class NextflowManager:
         self.work_dir = Path(work_dir) if work_dir else Path.cwd() / "nextflow_work"
         self.config_file = config_file
         self.work_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Pipeline execution tracking
         self.active_pipelines: Dict[str, Dict] = {}
         self.pipeline_history: List[Dict] = []
-        
+
         # Default Nextflow configuration
         self.default_config = {
-            "process": {
-                "cpus": 4,
-                "memory": "8.GB",
-                "time": "1.h"
-            },
-            "executor": {
-                "name": "local",
-                "queueSize": 100
-            },
+            "process": {"cpus": 4, "memory": "8.GB", "time": "1.h"},
+            "executor": {"name": "local", "queueSize": 100},
             "workDir": str(self.work_dir),
-            "report": {
-                "enabled": True,
-                "file": "pipeline_report.html"
-            },
-            "timeline": {
-                "enabled": True,
-                "file": "pipeline_timeline.html"
-            },
-            "trace": {
-                "enabled": True,
-                "file": "pipeline_trace.txt"
-            }
+            "report": {"enabled": True, "file": "pipeline_report.html"},
+            "timeline": {"enabled": True, "file": "pipeline_timeline.html"},
+            "trace": {"enabled": True, "file": "pipeline_trace.txt"},
         }
-    
+
     def create_config_file(self, config: Optional[Dict] = None) -> str:
         """
         Create Nextflow configuration file.
-        
+
         Args:
             config: Configuration dictionary to use
-            
+
         Returns:
             Path to created configuration file
         """
         config_data = config or self.default_config
-        
+
         config_file = self.work_dir / "nextflow.config"
-        
-        with open(config_file, 'w') as f:
+
+        with open(config_file, "w") as f:
             f.write("// Nextflow configuration for Cancer Genomics Analysis\n")
             f.write("// Generated on {}\n\n".format(datetime.now().isoformat()))
-            
+
             # Write process configuration
             if "process" in config_data:
                 f.write("process {\n")
                 for key, value in config_data["process"].items():
                     f.write(f"    {key} = {value}\n")
                 f.write("}\n\n")
-            
+
             # Write executor configuration
             if "executor" in config_data:
                 f.write("executor {\n")
                 for key, value in config_data["executor"].items():
                     f.write(f"    {key} = {value}\n")
                 f.write("}\n\n")
-            
+
             # Write other configurations
             for section, settings in config_data.items():
                 if section not in ["process", "executor"]:
@@ -114,70 +100,72 @@ class NextflowManager:
                     else:
                         f.write(f"    {settings}\n")
                     f.write("}\n\n")
-        
+
         return str(config_file)
-    
+
     def execute_pipeline(
         self,
         pipeline_script: str,
         params: Optional[Dict[str, Any]] = None,
         profile: Optional[str] = None,
         config: Optional[Dict] = None,
-        pipeline_name: Optional[str] = None
+        pipeline_name: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Execute a Nextflow pipeline.
-        
+
         Args:
             pipeline_script: Path to Nextflow pipeline script
             params: Pipeline parameters
             profile: Nextflow profile to use
             config: Configuration overrides
             pipeline_name: Name for the pipeline execution
-            
+
         Returns:
             Dictionary with execution details and results
         """
-        pipeline_name = pipeline_name or f"pipeline_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        
+        pipeline_name = (
+            pipeline_name or f"pipeline_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        )
+
         # Create execution directory
         exec_dir = self.work_dir / pipeline_name
         exec_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Create configuration file if needed
         config_file = None
         if config:
             config_file = self.create_config_file(config)
-        
+
         # Build Nextflow command
         cmd = ["nextflow", "run", pipeline_script]
-        
+
         if config_file:
             cmd.extend(["-c", config_file])
-        
+
         if profile:
             cmd.extend(["-profile", profile])
-        
+
         if params:
             for key, value in params.items():
                 cmd.extend(["--" + key, str(value)])
-        
+
         # Add output directory
         cmd.extend(["-w", str(exec_dir)])
-        
+
         # Execute pipeline
         logger.info(f"Executing Nextflow pipeline: {pipeline_name}")
         logger.info(f"Command: {' '.join(cmd)}")
-        
+
         try:
             process = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                cwd=str(exec_dir)
+                cwd=str(exec_dir),
             )
-            
+
             # Store pipeline information
             pipeline_info = {
                 "name": pipeline_name,
@@ -188,175 +176,176 @@ class NextflowManager:
                 "exec_dir": str(exec_dir),
                 "process": process,
                 "start_time": datetime.now(),
-                "status": "running"
+                "status": "running",
             }
-            
+
             self.active_pipelines[pipeline_name] = pipeline_info
-            
+
             # Wait for completion
             stdout, stderr = process.communicate()
-            
+
             # Update pipeline status
-            pipeline_info.update({
-                "end_time": datetime.now(),
-                "status": "completed" if process.returncode == 0 else "failed",
-                "return_code": process.returncode,
-                "stdout": stdout,
-                "stderr": stderr
-            })
-            
+            pipeline_info.update(
+                {
+                    "end_time": datetime.now(),
+                    "status": "completed" if process.returncode == 0 else "failed",
+                    "return_code": process.returncode,
+                    "stdout": stdout,
+                    "stderr": stderr,
+                }
+            )
+
             # Move to history
             self.pipeline_history.append(pipeline_info)
             del self.active_pipelines[pipeline_name]
-            
-            logger.info(f"Pipeline {pipeline_name} completed with status: {pipeline_info['status']}")
-            
+
+            logger.info(
+                f"Pipeline {pipeline_name} completed with status: {pipeline_info['status']}"
+            )
+
             return pipeline_info
-            
+
         except Exception as e:
             logger.error(f"Failed to execute pipeline {pipeline_name}: {e}")
-            
+
             # Update pipeline status
             if pipeline_name in self.active_pipelines:
-                self.active_pipelines[pipeline_name].update({
-                    "end_time": datetime.now(),
-                    "status": "error",
-                    "error": str(e)
-                })
+                self.active_pipelines[pipeline_name].update(
+                    {"end_time": datetime.now(), "status": "error", "error": str(e)}
+                )
                 self.pipeline_history.append(self.active_pipelines[pipeline_name])
                 del self.active_pipelines[pipeline_name]
-            
+
             raise
-    
+
     def get_pipeline_status(self, pipeline_name: str) -> Optional[Dict[str, Any]]:
         """
         Get status of a pipeline execution.
-        
+
         Args:
             pipeline_name: Name of the pipeline
-            
+
         Returns:
             Pipeline status information or None if not found
         """
         if pipeline_name in self.active_pipelines:
             pipeline_info = self.active_pipelines[pipeline_name].copy()
-            pipeline_info["duration"] = (datetime.now() - pipeline_info["start_time"]).total_seconds()
+            pipeline_info["duration"] = (
+                datetime.now() - pipeline_info["start_time"]
+            ).total_seconds()
             return pipeline_info
-        
+
         # Check history
         for pipeline in self.pipeline_history:
             if pipeline["name"] == pipeline_name:
                 return pipeline
-        
+
         return None
-    
+
     def list_pipelines(self, status: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         List all pipelines with optional status filter.
-        
+
         Args:
             status: Filter by status (running, completed, failed, error)
-            
+
         Returns:
             List of pipeline information dictionaries
         """
         all_pipelines = list(self.active_pipelines.values()) + self.pipeline_history
-        
+
         if status:
             all_pipelines = [p for p in all_pipelines if p.get("status") == status]
-        
+
         return all_pipelines
-    
+
     def stop_pipeline(self, pipeline_name: str) -> bool:
         """
         Stop a running pipeline.
-        
+
         Args:
             pipeline_name: Name of the pipeline to stop
-            
+
         Returns:
             True if pipeline was stopped successfully
         """
         if pipeline_name not in self.active_pipelines:
             return False
-        
+
         pipeline_info = self.active_pipelines[pipeline_name]
         process = pipeline_info.get("process")
-        
+
         if process and process.poll() is None:
             process.terminate()
-            pipeline_info.update({
-                "end_time": datetime.now(),
-                "status": "stopped"
-            })
-            
+            pipeline_info.update({"end_time": datetime.now(), "status": "stopped"})
+
             # Move to history
             self.pipeline_history.append(pipeline_info)
             del self.active_pipelines[pipeline_name]
-            
+
             logger.info(f"Pipeline {pipeline_name} stopped")
             return True
-        
+
         return False
-    
+
     def get_pipeline_outputs(self, pipeline_name: str) -> Dict[str, Any]:
         """
         Get outputs from a completed pipeline.
-        
+
         Args:
             pipeline_name: Name of the pipeline
-            
+
         Returns:
             Dictionary with output file information
         """
         pipeline_info = self.get_pipeline_status(pipeline_name)
         if not pipeline_info or pipeline_info["status"] not in ["completed", "failed"]:
             return {}
-        
+
         exec_dir = Path(pipeline_info["exec_dir"])
-        outputs = {
-            "execution_directory": str(exec_dir),
-            "files": [],
-            "reports": {}
-        }
-        
+        outputs = {"execution_directory": str(exec_dir), "files": [], "reports": {}}
+
         # Find output files
         for file_path in exec_dir.rglob("*"):
             if file_path.is_file():
                 rel_path = file_path.relative_to(exec_dir)
-                outputs["files"].append({
-                    "path": str(rel_path),
-                    "size": file_path.stat().st_size,
-                    "modified": datetime.fromtimestamp(file_path.stat().st_mtime).isoformat()
-                })
-        
+                outputs["files"].append(
+                    {
+                        "path": str(rel_path),
+                        "size": file_path.stat().st_size,
+                        "modified": datetime.fromtimestamp(
+                            file_path.stat().st_mtime
+                        ).isoformat(),
+                    }
+                )
+
         # Find Nextflow reports
         report_files = {
             "report": "pipeline_report.html",
             "timeline": "pipeline_timeline.html",
-            "trace": "pipeline_trace.txt"
+            "trace": "pipeline_trace.txt",
         }
-        
+
         for report_type, filename in report_files.items():
             report_path = exec_dir / filename
             if report_path.exists():
                 outputs["reports"][report_type] = str(report_path)
-        
+
         return outputs
-    
+
     def create_cancer_genomics_pipeline(self, pipeline_type: str) -> str:
         """
         Create a pre-configured cancer genomics pipeline.
-        
+
         Args:
             pipeline_type: Type of pipeline (variant_calling, expression_analysis, etc.)
-            
+
         Returns:
             Path to created pipeline script
         """
         pipeline_dir = self.work_dir / "pipelines"
         pipeline_dir.mkdir(parents=True, exist_ok=True)
-        
+
         if pipeline_type == "variant_calling":
             return self._create_variant_calling_pipeline(pipeline_dir)
         elif pipeline_type == "expression_analysis":
@@ -365,11 +354,11 @@ class NextflowManager:
             return self._create_multi_omics_pipeline(pipeline_dir)
         else:
             raise ValueError(f"Unknown pipeline type: {pipeline_type}")
-    
+
     def _create_variant_calling_pipeline(self, pipeline_dir: Path) -> str:
         """Create variant calling pipeline script."""
         pipeline_script = pipeline_dir / "variant_calling.nf"
-        
+
         script_content = '''#!/usr/bin/env nextflow
 
 /*
@@ -569,19 +558,19 @@ process ANNOVAR {
     """
 }
 '''
-        
-        with open(pipeline_script, 'w') as f:
+
+        with open(pipeline_script, "w") as f:
             f.write(script_content)
-        
+
         # Make executable
         os.chmod(pipeline_script, 0o755)
-        
+
         return str(pipeline_script)
-    
+
     def _create_expression_analysis_pipeline(self, pipeline_dir: Path) -> str:
         """Create expression analysis pipeline script."""
         pipeline_script = pipeline_dir / "expression_analysis.nf"
-        
+
         script_content = '''#!/usr/bin/env nextflow
 
 /*
@@ -757,19 +746,19 @@ process DESEQ2 {
     """
 }
 '''
-        
-        with open(pipeline_script, 'w') as f:
+
+        with open(pipeline_script, "w") as f:
             f.write(script_content)
-        
+
         # Make executable
         os.chmod(pipeline_script, 0o755)
-        
+
         return str(pipeline_script)
-    
+
     def _create_multi_omics_pipeline(self, pipeline_dir: Path) -> str:
         """Create multi-omics integration pipeline script."""
         pipeline_script = pipeline_dir / "multi_omics.nf"
-        
+
         script_content = '''#!/usr/bin/env nextflow
 
 /*
@@ -968,11 +957,11 @@ process PATHWAY_ANALYSIS {
     """
 }
 '''
-        
-        with open(pipeline_script, 'w') as f:
+
+        with open(pipeline_script, "w") as f:
             f.write(script_content)
-        
+
         # Make executable
         os.chmod(pipeline_script, 0o755)
-        
+
         return str(pipeline_script)

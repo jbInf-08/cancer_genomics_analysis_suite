@@ -30,24 +30,24 @@ __description__ = "A comprehensive platform for cancer genomics analysis"
 
 # Import main components
 from .config.settings import settings
-from .plugin_registry import get_registered_plugins, get_plugins_by_category
+from .plugin_registry import get_plugins_by_category, get_registered_plugins
 
 # Version info
 VERSION_INFO = {
     "version": __version__,
     "author": __author__,
     "email": __email__,
-    "description": __description__
+    "description": __description__,
 }
 
 # Package metadata
 __all__ = [
     "__version__",
-    "__author__", 
+    "__author__",
     "__email__",
     "__description__",
     "settings",
     "get_registered_plugins",
     "get_plugins_by_category",
-    "VERSION_INFO"
+    "VERSION_INFO",
 ]
