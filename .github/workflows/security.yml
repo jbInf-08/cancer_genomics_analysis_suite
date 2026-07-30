@@ -103,12 +103,18 @@ jobs:
 
       # trivy-action v0.33.x has intermittently failed bootstrapping its own binary;
       # run the official image directly for a deterministic scan.
+      # --timeout: the default 5m is not enough for this image. Trivy has to
+      # walk torch's shared objects, and libtorch_cpu.so alone is large enough
+      # that the scan died with "semaphore acquire: context deadline exceeded"
+      # partway through a layer -- a timeout, not a finding, but it fails the
+      # job exactly as a finding would.
       - name: Run Trivy vulnerability scanner
         run: |
           docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v "${{ github.workspace }}:/workspace" \
             aquasec/trivy:0.58.1 image \
+            --timeout 30m \
             --severity CRITICAL --exit-code 0 \
             --format sarif --output /workspace/trivy-results.sarif \
             cancer-genomics-analysis-suite:security-scan
