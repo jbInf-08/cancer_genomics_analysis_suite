@@ -13,6 +13,7 @@ import pandas as pd
 import json
 import base64
 import os
+import tempfile
 from typing import Dict, List, Any
 import logging
 

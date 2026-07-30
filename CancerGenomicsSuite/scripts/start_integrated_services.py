@@ -8,6 +8,7 @@ and provides options for different startup configurations.
 
 import os
 import sys
+import shlex
 import subprocess
 import argparse
 import time
@@ -140,9 +141,11 @@ class IntegratedServicesManager:
             logger.info(f"Starting CGAS service in {working_dir}")
             
             # Start the process
+            # shlex.split rather than shell=True: the command comes from a JSON
+            # config file and needs no shell features, so it should not be
+            # handed to a shell for interpretation.
             process = subprocess.Popen(
-                command,
-                shell=True,
+                shlex.split(command),
                 cwd=working_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -171,9 +174,11 @@ class IntegratedServicesManager:
             logger.info(f"Starting Biomarker Identifier service in {working_dir}")
             
             # Start the process
+            # shlex.split rather than shell=True: the command comes from a JSON
+            # config file and needs no shell features, so it should not be
+            # handed to a shell for interpretation.
             process = subprocess.Popen(
-                command,
-                shell=True,
+                shlex.split(command),
                 cwd=working_dir,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,

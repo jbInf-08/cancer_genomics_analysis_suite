@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 import base64
 import io
 import zipfile
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Template, Environment, FileSystemLoader, select_autoescape
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 import plotly.express as px
@@ -116,7 +116,18 @@ class ReportBuilder:
         self.template_dir.mkdir(exist_ok=True)
         
         # Initialize Jinja2 environment
-        self.jinja_env = Environment(loader=FileSystemLoader(str(self.template_dir)))
+        # select_autoescape rather than autoescape=True: this environment also
+        # renders the markdown template, which must not be HTML-escaped. Section
+        # bodies that are deliberately raw HTML already opt out via |safe in the
+        # template, so escaping by default only affects the title, subtitle and
+        # metadata values that are interpolated into the HTML report.
+        self.jinja_env = Environment(
+            loader=FileSystemLoader(str(self.template_dir)),
+            autoescape=select_autoescape(
+                enabled_extensions=("html", "xml"),
+                default_for_string=False,
+            ),
+        )
         
         # Report storage
         self.reports = {}

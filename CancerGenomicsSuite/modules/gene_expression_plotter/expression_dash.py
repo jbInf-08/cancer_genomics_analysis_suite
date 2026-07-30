@@ -13,6 +13,7 @@ from dash import html, dcc, dash_table, Input, Output, State, callback_context
 import plotly.graph_objects as go
 import plotly.express as px
 import pandas as pd
+import numpy as np
 import json
 import base64
 import io
