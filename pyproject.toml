@@ -293,7 +293,35 @@ known_third_party = ["pandas", "numpy", "scipy", "sklearn", "matplotlib", "seabo
 
 # MyPy configuration
 [tool.mypy]
-python_version = "3.8"
+# 3.11 is what CI runs. This said 3.8, which is both end-of-life and wrong for
+# this project -- and it made mypy reject `match` statements in its own
+# dependencies, reporting a syntax error inside pytest.
+python_version = "3.11"
+
+# Deliberately no mypy_path. The code imports itself as `modules.x`,
+# `config.settings` and so on -- paths relative to the package root rather than
+# `CancerGenomicsSuite.modules.x`. Pointing mypy_path at the package makes every
+# file resolve under two module names at once ("Source file found twice"), since
+# CI invokes `mypy CancerGenomicsSuite/`. Those self-imports fall under
+# ignore_missing_imports instead, which costs nothing here: the modules are in
+# the same run and get checked on their own.
+explicit_package_bases = true
+namespace_packages = true
+
+# Most of the scientific stack ships no stubs. Without this mypy stops at the
+# import layer -- it was reporting "errors prevented further checking" and
+# never type-checking any code at all.
+ignore_missing_imports = true
+
+# ignore_missing_imports covers modules mypy cannot find; it does not cover
+# libraries that are installed but ship no stubs, which report import-untyped
+# separately. Almost the whole scientific stack here is in that category and
+# will not gain stubs, so the code is silenced rather than left as 945 findings
+# that no change to this repo can clear.
+disable_error_code = ["import-untyped"]
+
+# Tests and generated code are not the target here.
+exclude = '(^|/)(tests|migrations|\.venv|venv|build|dist)/'
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
