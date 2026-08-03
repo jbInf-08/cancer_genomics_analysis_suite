@@ -120,7 +120,7 @@ def create_biomarker_api() -> Blueprint:
         except Exception as e:
             logger.error(f"Error in biomarker discovery: {e}")
             logger.error(traceback.format_exc())
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @biomarker_bp.route("/validate", methods=["POST"])
     def validate_biomarkers():
@@ -164,7 +164,7 @@ def create_biomarker_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in biomarker validation: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @biomarker_bp.route("/export/<format>", methods=["POST"])
     def export_biomarkers(format: str):
@@ -199,7 +199,7 @@ def create_biomarker_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in biomarker export: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     return biomarker_bp
 
@@ -278,7 +278,7 @@ def create_drug_api() -> Blueprint:
         except Exception as e:
             logger.error(f"Error in drug analysis: {e}")
             logger.error(traceback.format_exc())
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @drug_bp.route("/repurpose", methods=["POST"])
     def repurpose_drugs():
@@ -349,7 +349,7 @@ def create_drug_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in drug repurposing: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @drug_bp.route("/targets", methods=["POST"])
     def identify_targets():
@@ -423,7 +423,7 @@ def create_drug_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in target identification: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @drug_bp.route("/export/<format>", methods=["POST"])
     def export_drugs(format: str):
@@ -456,7 +456,7 @@ def create_drug_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in drug export: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     return drug_bp
 
@@ -531,7 +531,7 @@ def create_integration_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in integration analysis: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @integration_bp.route("/predict", methods=["POST"])
     def predict_response():
@@ -571,7 +571,7 @@ def create_integration_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in response prediction: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @integration_bp.route("/pharmacogenomics", methods=["POST"])
     def create_pharmacogenomics_profile():
@@ -619,7 +619,7 @@ def create_integration_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in pharmacogenomics profile creation: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     return integration_bp
 
@@ -690,7 +690,7 @@ def create_clinical_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in treatment recommendations: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     @clinical_bp.route("/risk-assessment", methods=["POST"])
     def assess_risk():
@@ -762,7 +762,7 @@ def create_clinical_api() -> Blueprint:
 
         except Exception as e:
             logger.error(f"Error in risk assessment: {e}")
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Internal server error"}), 500
 
     def _generate_risk_recommendations(
         risk_level: str, risk_factors: List[str]

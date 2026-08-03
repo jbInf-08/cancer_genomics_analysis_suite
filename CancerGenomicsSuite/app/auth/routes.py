@@ -51,9 +51,21 @@ except ImportError:
     log_auth_event = lambda event, user, details=None: None
     require_permission = lambda perm: lambda f: f
     require_admin = lambda f: f
-    ValidationError = Exception
-    AuthenticationError = Exception
-    AuthorizationError = Exception
+    # Distinct classes, not aliases of Exception. Aliasing turned
+    # `except ValidationError` at the /register handler below into a catch-all
+    # that echoed any internal exception text back to an unauthenticated
+    # caller with a 400. These mirror the real hierarchy in app/auth/__init__.py.
+    class AuthError(Exception):
+        pass
+
+    class ValidationError(AuthError):
+        pass
+
+    class AuthenticationError(AuthError):
+        pass
+
+    class AuthorizationError(AuthError):
+        pass
 
 # Create blueprint
 auth_bp = Blueprint("auth", __name__)
