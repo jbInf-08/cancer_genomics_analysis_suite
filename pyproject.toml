@@ -41,9 +41,9 @@ dependencies = [
     "plotly>=5.17.0",
     "flask>=2.3.3",
     "flask-sqlalchemy>=3.0.5",
-    "flask-cors>=4.0.0",
+    "flask-cors>=4.0.2",
     "flask-login>=0.6.3",
-    "gunicorn>=21.2.0",
+    "gunicorn>=22.0.0",
     
     # Database
     "sqlalchemy>=2.0.21",
@@ -89,8 +89,8 @@ dependencies = [
     "confluent-kafka>=2.3.0",
     
     # OAuth2 Authentication
-    "authlib>=1.2.1",
-    "python-jose[cryptography]>=3.3.0",
+    "authlib>=1.6.9",
+    "python-jose[cryptography]>=3.4.0",
     "requests-oauthlib>=1.3.1",
     
     
@@ -126,18 +126,18 @@ dependencies = [
     
     # Computer Vision and Image Processing
     "opencv-python>=4.8.1.78",
-    "pillow>=10.1.0",
+    "pillow>=12.3.0",
     "scikit-image>=0.22.0",
     
     # Advanced ML and Statistics
-    "lightgbm>=4.1.0",
+    "lightgbm>=4.6.0",
     "catboost>=1.2.2",
     "shap>=0.43.0",
     "lime>=0.2.0.1",
     
     # Natural Language Processing
     "spacy>=3.7.2",
-    "nltk>=3.8.1",
+    "nltk>=3.10.0",
     "textblob>=0.17.1",
     "gensim>=4.3.2",
     
@@ -176,7 +176,7 @@ dependencies = [
     "tensorboard>=2.15.1",
     
     # Security and Authentication
-    "cryptography>=41.0.8",
+    "cryptography>=48.0.1",
     "passlib[bcrypt]>=1.7.4",
     
     # Async and Concurrency

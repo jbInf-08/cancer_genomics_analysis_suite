@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - name: prometheus
-        image: prom/prometheus:latest
+        image: prom/prometheus:v3.13.2
         ports:
         - containerPort: 9090
         volumeMounts:
@@ -100,7 +100,7 @@ spec:
     spec:
       containers:
       - name: grafana
-        image: grafana/grafana:latest
+        image: grafana/grafana:12.4.6
         ports:
         - containerPort: 3000
         env:
@@ -180,7 +180,7 @@ spec:
     spec:
       containers:
       - name: alertmanager
-        image: prom/alertmanager:latest
+        image: prom/alertmanager:v0.33.1
         ports:
         - containerPort: 9093
         volumeMounts:
