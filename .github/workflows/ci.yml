@@ -150,6 +150,19 @@ jobs:
         run: |
           pytest CancerGenomicsSuite/tests/ -m unit --cov=CancerGenomicsSuite --cov-report=xml --cov-report=html --junitxml=test-results-unit.xml
 
+      # BLOCKING, and separate from pytest on purpose. pyproject sets
+      # --cov-fail-under, but the pytest-cov this job resolves (7.1.0) prints
+      # "FAIL Required test coverage of N% not reached" without setting a
+      # non-zero exit status, so the step above reported success while its own
+      # log recorded the failure. pytest-cov 4.1.0 exits non-zero for the same
+      # command, which is why it failed locally and passed here.
+      #
+      # `coverage report --fail-under` exits 2 when the floor is missed
+      # regardless of which pytest-cov is installed, so the gate holds on its
+      # own terms. Keep the number in step with pyproject's --cov-fail-under.
+      - name: Enforce coverage floor
+        run: coverage report --fail-under=8
+
       - name: Upload coverage reports
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
         # Runs even when the tests above fail so partial coverage is still
