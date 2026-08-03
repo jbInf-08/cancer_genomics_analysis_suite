@@ -33,15 +33,15 @@ from anthropic import Anthropic
 from chromadb.config import Settings
 
 # LangChain for conversational AI
-from langchain import LLMChain, PromptTemplate
 from langchain.agents import AgentType, Tool, initialize_agent
-from langchain.chains import ConversationalRetrievalChain, RetrievalQA
-from langchain.embeddings import HuggingFaceEmbeddings, OpenAIEmbeddings
-from langchain.llms import Anthropic as LangChainAnthropic
-from langchain.llms import OpenAI
+from langchain.chains import ConversationalRetrievalChain, LLMChain, RetrievalQA
 from langchain.memory import ConversationBufferMemory, ConversationSummaryMemory
-from langchain.tools import BaseTool
-from langchain.vectorstores import FAISS, Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings, OpenAIEmbeddings
+from langchain_community.llms import Anthropic as LangChainAnthropic
+from langchain_community.llms import OpenAI
+from langchain_community.vectorstores import FAISS, Chroma
+from langchain_core.prompts import PromptTemplate
+from langchain_core.tools import BaseTool
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 from sentence_transformers import SentenceTransformer
