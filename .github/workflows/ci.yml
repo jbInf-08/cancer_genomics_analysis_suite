@@ -53,8 +53,15 @@ jobs:
       # misplaced statements and F82 undefined names. Undefined names are
       # guaranteed NameErrors at runtime, and there were 17 of them behind the
       # `|| true` that used to cover this step.
+      #
+      # Scoped to the whole repository, not just CancerGenomicsSuite/. While it
+      # covered only that package, data_collection/ accumulated 117 undefined
+      # names -- one per generated collector, all the same templating fault --
+      # and CI stayed green throughout. The style checks below stay narrow
+      # because their backlog is a formatting sweep; this one must not, because
+      # its findings are runtime failures wherever they live.
       - name: Run Flake8 (errors -- blocking)
-        run: flake8 CancerGenomicsSuite/ --select=E9,F63,F7,F82 --count
+        run: flake8 . --select=E9,F63,F7,F82 --count
 
       # ADVISORY, and genuinely so -- not a check dressed up as one. The tree
       # currently carries ~30k style findings (mostly W293 trailing whitespace

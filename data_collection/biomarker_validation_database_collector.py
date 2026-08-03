@@ -48,7 +48,7 @@ class BiomarkerValidationDatabaseCollector(DataCollectorBase):
             # Mock data collection for demonstration
             mock_data = [
                 {
-                    "sample_id": f"{source_id}_sample_{i}",
+                    "sample_id": f"biomarker_validation_database_sample_{i}",
                     "data_type": data_type,
                     "value": i * 1.5,
                     "metadata": f"Sample {i} from biomarker_validation_database"

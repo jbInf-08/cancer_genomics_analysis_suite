@@ -48,7 +48,7 @@ class ClinicalTrialsDrugsCollector(DataCollectorBase):
             # Mock data collection for demonstration
             mock_data = [
                 {
-                    "sample_id": f"{source_id}_sample_{i}",
+                    "sample_id": f"clinical_trials_drugs_sample_{i}",
                     "data_type": data_type,
                     "value": i * 1.5,
                     "metadata": f"Sample {i} from clinical_trials_drugs"
