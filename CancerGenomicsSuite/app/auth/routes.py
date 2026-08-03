@@ -51,6 +51,7 @@ except ImportError:
     log_auth_event = lambda event, user, details=None: None
     require_permission = lambda perm: lambda f: f
     require_admin = lambda f: f
+
     # Distinct classes, not aliases of Exception. Aliasing turned
     # `except ValidationError` at the /register handler below into a catch-all
     # that echoed any internal exception text back to an unauthenticated
@@ -66,6 +67,7 @@ except ImportError:
 
     class AuthorizationError(AuthError):
         pass
+
 
 # Create blueprint
 auth_bp = Blueprint("auth", __name__)

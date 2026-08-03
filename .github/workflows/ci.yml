@@ -64,21 +64,28 @@ jobs:
         run: flake8 . --select=E9,F63,F7,F82 --count
 
       # ADVISORY, and genuinely so -- not a check dressed up as one. The tree
-      # currently carries ~30k style findings (mostly W293 trailing whitespace
-      # and E501 long lines) and 278 files that black would reformat. Gating on
-      # any of that today would just block every pull request, and clearing it
-      # is a formatting sweep that should land on its own rather than riding
-      # along with unrelated changes. The step names say "advisory" so a green
-      # tick here is not mistaken for a clean tree.
+      # still carries ~3,050 style findings, dominated by F401 unused imports
+      # (1,352) and E501 long lines (814). Gating on those today would block
+      # every pull request, and clearing them is a sweep that should land on
+      # its own rather than riding along with unrelated changes. The step name
+      # says "advisory" so a green tick is not mistaken for a clean tree.
       - name: Run Flake8 (style -- advisory)
         run: flake8 CancerGenomicsSuite/ --count || true
 
-      - name: Run Black (advisory)
-        run: black --check --diff CancerGenomicsSuite/ || true
+      # BLOCKING. Both of these are at zero across all 330 files, so they gate
+      # rather than report. The comment above used to claim black would
+      # reformat 278 files; the only file it still wanted was one this branch
+      # fixed. Keeping them advisory now would only let the tree drift back.
+      # Note the versions are pinned above -- black's output differs between
+      # majors, so an unpinned upgrade would fail this step without any code
+      # changing.
+      - name: Run Black (blocking)
+        run: black --check --diff CancerGenomicsSuite/
 
-      - name: Run isort (advisory)
-        run: isort --check-only --diff CancerGenomicsSuite/ || true
+      - name: Run isort (blocking)
+        run: isort --check-only --diff CancerGenomicsSuite/
 
+      # ADVISORY. 3,716 findings across 220 files; a typing pass of its own.
       - name: Run MyPy (advisory)
         run: mypy CancerGenomicsSuite/ || true
 
@@ -142,6 +149,19 @@ jobs:
       - name: Run unit tests
         run: |
           pytest CancerGenomicsSuite/tests/ -m unit --cov=CancerGenomicsSuite --cov-report=xml --cov-report=html --junitxml=test-results-unit.xml
+
+      # BLOCKING, and separate from pytest on purpose. pyproject sets
+      # --cov-fail-under, but the pytest-cov this job resolves (7.1.0) prints
+      # "FAIL Required test coverage of N% not reached" without setting a
+      # non-zero exit status, so the step above reported success while its own
+      # log recorded the failure. pytest-cov 4.1.0 exits non-zero for the same
+      # command, which is why it failed locally and passed here.
+      #
+      # `coverage report --fail-under` exits 2 when the floor is missed
+      # regardless of which pytest-cov is installed, so the gate holds on its
+      # own terms. Keep the number in step with pyproject's --cov-fail-under.
+      - name: Enforce coverage floor
+        run: coverage report --fail-under=8
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
