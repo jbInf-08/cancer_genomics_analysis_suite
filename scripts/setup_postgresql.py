@@ -21,6 +21,7 @@ import os
 import sys
 import argparse
 import logging
+import re
 from pathlib import Path
 
 # Add project root to path
@@ -31,6 +32,23 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+
+def redact_password(url):
+    """Replace the password in a database URL with ``***``.
+
+    The summary this script prints ended with the full connection string,
+    password included. That is worth avoiding even for a local setup helper:
+    the line lands in terminal scrollback, in the log of any CI or
+    provisioning job that runs the script, and in a pasted transcript.
+
+    Writing the real URL to .env is left alone -- holding credentials is what
+    that file is for, and it is covered by .gitignore.
+    """
+    match = re.match(r'^(?P<prefix>\w+://[^:/@]+:)(?P<password>[^@]*)(?P<rest>@.*)$', url)
+    if not match:
+        return url
+    return f"{match.group('prefix')}***{match.group('rest')}"
 
 
 def check_psycopg2():
@@ -301,9 +319,10 @@ def main():
     print("\n" + "=" * 60)
     print("DATABASE SETUP COMPLETE")
     print("=" * 60)
-    print(f"\nConnection URL: {database_url}")
-    print("\nTo use PostgreSQL, update your .env file:")
-    print(f"  DATABASE_URL={database_url}")
+    print(f"\nConnection URL: {redact_password(database_url)}")
+    print("\nTo use PostgreSQL, set DATABASE_URL in your .env file:")
+    print(f"  DATABASE_URL={redact_password(database_url)}")
+    print("  (substitute the password you passed as --password)")
     
 
 if __name__ == '__main__':
