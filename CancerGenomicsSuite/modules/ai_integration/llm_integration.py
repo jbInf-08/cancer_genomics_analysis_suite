@@ -54,13 +54,14 @@ except ImportError:
     np = None
 
 try:
-    from langchain import LLMChain, PromptTemplate
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    from langchain.chains import LLMChain
     from langchain_community.document_loaders import PyPDFLoader, TextLoader
     from langchain_community.embeddings import HuggingFaceEmbeddings, OpenAIEmbeddings
     from langchain_community.llms import Anthropic as LangChainAnthropic
     from langchain_community.llms import OpenAI
     from langchain_community.vectorstores import FAISS, Chroma
+    from langchain_core.prompts import PromptTemplate
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
 except ImportError:
     LLMChain = PromptTemplate = None
     OpenAI = LangChainAnthropic = None
