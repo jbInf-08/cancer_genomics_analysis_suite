@@ -18,10 +18,41 @@ spec:
         app: cancer-genomics-celery
         component: worker
     spec:
+      # The image already creates and switches to `appuser`, so no runAsUser is
+      # set here -- pinning a UID would not match the ownership of /app baked
+      # into the image. runAsNonRoot makes the cluster enforce what the image
+      # already does.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: celery-worker
         image: cancer-genomics:latest  # Will be updated by CI/CD
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         command: ["celery", "-A", "celery_worker.celery", "worker", "--loglevel=info", "--concurrency=2"]
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - celery -A celery_worker.celery inspect ping -d celery@$HOSTNAME
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - celery -A celery_worker.celery inspect ping -d celery@$HOSTNAME
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 15
         env:
         - name: FLASK_ENV
           valueFrom:
@@ -89,10 +120,38 @@ spec:
       initContainers:
       - name: wait-for-db
         image: postgres:15-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop: ["ALL"]
         command: ['sh', '-c', 'until pg_isready -h postgres-service -p 5432; do echo waiting for postgres; sleep 2; done;']
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
       - name: wait-for-redis
         image: redis:7-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop: ["ALL"]
         command: ['sh', '-c', 'until redis-cli -h redis-service -p 6379 ping; do echo waiting for redis; sleep 2; done;']
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -114,10 +173,39 @@ spec:
         app: cancer-genomics-celery-beat
         component: scheduler
     spec:
+      # The image already creates and switches to `appuser`, so no runAsUser is
+      # set here -- pinning a UID would not match the ownership of /app baked
+      # into the image. runAsNonRoot makes the cluster enforce what the image
+      # already does.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: celery-beat
         image: cancer-genomics:latest  # Will be updated by CI/CD
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         command: ["celery", "-A", "celery_worker.celery", "beat", "--loglevel=info"]
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pgrep -f "celery.*beat" > /dev/null
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pgrep -f "celery.*beat" > /dev/null
+          initialDelaySeconds: 30
+          periodSeconds: 30
         env:
         - name: FLASK_ENV
           valueFrom:
@@ -185,7 +273,35 @@ spec:
       initContainers:
       - name: wait-for-db
         image: postgres:15-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop: ["ALL"]
         command: ['sh', '-c', 'until pg_isready -h postgres-service -p 5432; do echo waiting for postgres; sleep 2; done;']
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
       - name: wait-for-redis
         image: redis:7-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 65534
+          capabilities:
+            drop: ["ALL"]
         command: ['sh', '-c', 'until redis-cli -h redis-service -p 6379 ping; do echo waiting for redis; sleep 2; done;']
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"

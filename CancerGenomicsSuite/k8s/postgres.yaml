@@ -34,9 +34,24 @@ spec:
         app: postgres
         component: database
     spec:
+      # postgres:15-alpine runs as uid 70; fsGroup makes the PVC writable
+      # by it. The root filesystem stays writable because initdb and the
+      # unix socket in /var/run/postgresql are outside the data volume.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: postgres
         image: postgres:15-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         ports:
         - containerPort: 5432
         env:

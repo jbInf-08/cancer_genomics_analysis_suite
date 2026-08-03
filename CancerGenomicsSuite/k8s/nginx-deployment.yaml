@@ -18,12 +18,32 @@ spec:
         app: nginx
         component: nginx
     spec:
+      # nginx:1.25-alpine ships the `nginx` user as uid 101. Running as
+      # that user means the listener has to move above 1024, which is
+      # why nginx.conf now says 8080 and the Service targets 8080.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: nginx
         image: nginx:1.25-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         volumeMounts:
+        - name: nginx-cache
+          mountPath: /var/cache/nginx
+        - name: nginx-run
+          mountPath: /var/run
         - name: nginx-config
           mountPath: /etc/nginx/conf.d
         resources:
@@ -36,16 +56,20 @@ spec:
         livenessProbe:
           httpGet:
             path: /health
-            port: 80
+            port: 8080
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
-            port: 80
+            port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5
       volumes:
+      - name: nginx-cache
+        emptyDir: {}
+      - name: nginx-run
+        emptyDir: {}
       - name: nginx-config
         configMap:
           name: nginx-config
@@ -64,6 +88,6 @@ spec:
     component: nginx
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 8080
     protocol: TCP
   type: LoadBalancer  # Change to ClusterIP if using Ingress

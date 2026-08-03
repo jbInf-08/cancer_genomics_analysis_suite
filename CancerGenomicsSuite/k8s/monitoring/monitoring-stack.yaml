@@ -21,11 +21,42 @@ spec:
       labels:
         app: prometheus
     spec:
+      # 65534 is the nobody user the prom/prometheus image already runs as;
+      # naming it lets the cluster enforce non-root rather than trust the image.
+      # fsGroup makes the mounted PVC writable by that user.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: prometheus
         image: prom/prometheus:v3.13.2
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          # Prometheus only writes to its TSDB path, which is the mounted PVC
+          # below, so the root filesystem can stay read-only.
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         ports:
         - containerPort: 9090
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 10
+          periodSeconds: 10
         volumeMounts:
         - name: prometheus-config
           mountPath: /etc/prometheus
@@ -98,22 +129,59 @@ spec:
       labels:
         app: grafana
     spec:
+      # 472 is the grafana user the official image runs as.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 472
+        runAsGroup: 472
+        fsGroup: 472
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: grafana
         image: grafana/grafana:12.4.6
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          # Unlike Prometheus, Grafana also writes outside its data directory,
+          # so a read-only root needs somewhere to put scratch files -- hence
+          # the grafana-tmp emptyDir mounted at /tmp below.
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         ports:
         - containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
         env:
-        - name: GF_SECURITY_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: grafana-secrets
-              key: admin-password
+        # Grafana reads any GF_* setting from a file when the variable is
+        # suffixed __FILE. Passing the password itself as an environment
+        # variable exposes it to anything that can read /proc/<pid>/environ,
+        # to `kubectl describe pod`, and to crash dumps; the mounted file is
+        # readable only by the container's own user.
+        - name: GF_SECURITY_ADMIN_PASSWORD__FILE
+          value: /etc/grafana/secrets/admin-password
         volumeMounts:
         - name: grafana-data
           mountPath: /var/lib/grafana
         - name: grafana-dashboards
           mountPath: /var/lib/grafana/dashboards
+        - name: grafana-tmp
+          mountPath: /tmp
+        - name: grafana-secrets
+          mountPath: /etc/grafana/secrets
+          readOnly: true
         resources:
           requests:
             memory: "1Gi"
@@ -128,6 +196,12 @@ spec:
       - name: grafana-dashboards
         configMap:
           name: grafana-dashboards
+      - name: grafana-tmp
+        emptyDir: {}
+      - name: grafana-secrets
+        secret:
+          secretName: grafana-secrets
+          defaultMode: 0400
 ---
 apiVersion: v1
 kind: Service
@@ -178,11 +252,39 @@ spec:
       labels:
         app: alertmanager
     spec:
+      # Same nobody user as Prometheus; the image is from the same project.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: alertmanager
         image: prom/alertmanager:v0.33.1
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          # --storage.path is the mounted PVC, so nothing writes to the root.
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         ports:
         - containerPort: 9093
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 30
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 10
+          periodSeconds: 10
         volumeMounts:
         - name: alertmanager-config
           mountPath: /etc/alertmanager
@@ -281,3 +383,31 @@ data:
           Alert: {{ .Annotations.summary }}
           Description: {{ .Annotations.description }}
           {{ end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: monitoring-default-deny-ingress
+  namespace: monitoring
+spec:
+  # Every pod in the namespace. Without a policy selecting them, the cluster
+  # default is to allow all ingress from anywhere, which is what
+  # CKV2_K8S_6 flags.
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Prometheus scrapes Grafana and Alertmanager, and Grafana queries
+    # Prometheus, so the namespace has to be able to talk to itself.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+    # Prometheus needs to be reachable from the application namespace it
+    # scrapes, and Grafana from wherever the UI is exposed. Left to the
+    # namespace label rather than a pod selector so adding a scrape target
+    # does not mean editing this policy.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: cancer-genomics

@@ -38,3 +38,33 @@ spec:
       cpu: "100m"
       memory: "256Mi"
     type: Container
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cancer-genomics-ingress
+  namespace: cancer-genomics
+spec:
+  # Selects every pod in the namespace. Without a policy selecting them the
+  # cluster default is to accept traffic from anywhere in the cluster, which
+  # is what CKV2_K8S_6 reports against each Deployment here.
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # The tiers talk to each other: web and celery reach postgres, redis and
+    # neo4j, and nginx fronts web.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: cancer-genomics
+    # Prometheus scrapes the workloads from the monitoring namespace.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+    # External traffic arrives through the ingress controller.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx

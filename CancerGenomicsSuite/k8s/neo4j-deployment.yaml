@@ -177,9 +177,25 @@ spec:
         app: neo4j
         component: core
     spec:
+      # neo4j:5.15-enterprise runs as uid 7474. fsGroup makes the data,
+      # logs, import and plugins volumes writable by it. The root
+      # filesystem stays writable: Neo4j rewrites its own conf and
+      # unpacks plugins at startup, outside the mounted paths.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 7474
+        runAsGroup: 7474
+        fsGroup: 7474
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: neo4j
         image: neo4j:5.15-enterprise
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 7687
@@ -315,9 +331,25 @@ spec:
         app: neo4j
         component: read-replica
     spec:
+      # neo4j:5.15-enterprise runs as uid 7474. fsGroup makes the data,
+      # logs, import and plugins volumes writable by it. The root
+      # filesystem stays writable: Neo4j rewrites its own conf and
+      # unpacks plugins at startup, outside the mounted paths.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 7474
+        runAsGroup: 7474
+        fsGroup: 7474
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: neo4j
         image: neo4j:5.15-enterprise
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 7687
@@ -548,3 +580,31 @@ spec:
           annotations:
             summary: "Neo4j connection pool exhausted"
             description: "Neo4j instance {{ $labels.instance }} has high connection pool usage ({{ $value | humanizePercentage }})."
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: neo4j-ingress
+  namespace: neo4j
+spec:
+  # Selects every pod in the neo4j namespace; without one the cluster default
+  # accepts traffic from anywhere, which is what CKV2_K8S_6 reports.
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Core and read-replica members clustering with each other.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: neo4j
+    # The application tier is the only client of the bolt/http ports.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: cancer-genomics
+    # Prometheus scrapes neo4j-metrics.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
