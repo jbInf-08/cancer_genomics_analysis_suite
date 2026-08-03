@@ -17,7 +17,6 @@ A minimal local Kubernetes install with Helm is in `docs/LOCAL_HELM_QUICKSTART.m
 The following packages have been successfully installed and are working:
 
 ### Core Framework & Web
-- **bentoml** (1.1.7) - Model serving framework
 - **neo4j** (5.15.0) - Graph database driver
 - **langchain** (0.1.0) - LLM framework
 - **langchain-openai** (0.0.2) - OpenAI integration for LangChain
@@ -39,15 +38,12 @@ The following packages have been successfully installed and are working:
 
 ### AI/ML Libraries
 - **torch** (2.1.0) - PyTorch deep learning
-- **tensorflow** (2.13.0) - TensorFlow
-- **keras** (2.13.1) - High-level neural networks
 - **transformers** (4.35.2) - Hugging Face transformers
 - **openai** (1.109.1) - OpenAI API client
 - **anthropic** (0.7.8) - Anthropic API client
 - **spacy** (3.7.2) - NLP library
 - **gensim** (4.3.2) - Topic modeling
 - **shap** (0.43.0) - Model explainability
-- **mlflow** (2.8.1) - ML lifecycle management
 - **fastapi** (0.104.1) - Modern web API framework
 
 ## ✅ Recently Successfully Installed
@@ -166,9 +162,9 @@ After completing the installation, verify with:
 import CancerGenomicsSuite
 import dash, plotly, flask, sqlalchemy, celery
 import pandas, numpy, sklearn, biopython, matplotlib
-import torch, tensorflow, keras, transformers, openai, anthropic
-import spacy, gensim, shap, mlflow, fastapi
-import bentoml, neo4j, langchain, neptune
+import torch, transformers, openai, anthropic
+import spacy, gensim, shap, fastapi
+import neo4j, langchain, neptune
 
 print("All major dependencies imported successfully!")
 ```

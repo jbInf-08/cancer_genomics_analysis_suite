@@ -89,8 +89,6 @@ dash-table==5.0.0
 torch==2.1.0
 torchvision==0.16.0
 torchaudio==2.1.0
-tensorflow==2.15.0
-keras==2.15.0
 
 # Large Language Models
 transformers==4.35.2
@@ -127,8 +125,6 @@ faiss-cpu==1.7.4
 pinecone-client==2.2.4
 
 # Model Serving and Deployment
-mlflow==2.8.1
-bentoml==1.1.7
 fastapi==0.104.1
 uvicorn==0.24.0
 
