@@ -48,7 +48,7 @@ class DrugMarketDatabaseCollector(DataCollectorBase):
             # Mock data collection for demonstration
             mock_data = [
                 {
-                    "sample_id": f"{source_id}_sample_{i}",
+                    "sample_id": f"drug_market_database_sample_{i}",
                     "data_type": data_type,
                     "value": i * 1.5,
                     "metadata": f"Sample {i} from drug_market_database"
