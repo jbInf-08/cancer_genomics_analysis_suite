@@ -298,12 +298,23 @@ def main():
         print("\n5. Updating .env file...")
         update_env_file(database_url)
     
+    # Built from the same parts as database_url but with a literal placeholder
+    # where the password goes, so args.password never reaches stdout. Redacting
+    # database_url after the fact would read the same to a human but not to
+    # CodeQL, which follows the password through the helper and still reports
+    # py/clear-text-logging-sensitive-data -- correctly, since the sensitive
+    # value would genuinely have flowed into the formatted string.
+    display_url = (
+        f"postgresql://{args.user}:<password>@{args.host}:{args.port}/{args.db_name}"
+    )
+
     print("\n" + "=" * 60)
     print("DATABASE SETUP COMPLETE")
     print("=" * 60)
-    print(f"\nConnection URL: {database_url}")
-    print("\nTo use PostgreSQL, update your .env file:")
-    print(f"  DATABASE_URL={database_url}")
+    print(f"\nConnection URL: {display_url}")
+    print("\nTo use PostgreSQL, set DATABASE_URL in your .env file:")
+    print(f"  DATABASE_URL={display_url}")
+    print("  (substitute the password you passed as --password)")
     
 
 if __name__ == '__main__':
