@@ -108,7 +108,15 @@ jobs:
       # that the scan died with "semaphore acquire: context deadline exceeded"
       # partway through a layer -- a timeout, not a finding, but it fails the
       # job exactly as a finding would.
-      - name: Run Trivy vulnerability scanner
+      # Two passes over the same image, because they answer different questions.
+      #
+      # The reporting pass keeps --exit-code 0 and uploads everything to code
+      # scanning. All 37 CRITICALs it currently finds are Debian packages in
+      # python:3.11-bookworm with no fixed version published -- perl, OpenEXR,
+      # glib, zlib, sqlite, libxml2, openssh, the kernel headers. Gating on them
+      # would block every pull request with nothing a change could do to pass,
+      # so they stay visible in the Security tab instead.
+      - name: Run Trivy vulnerability scanner (report all)
         run: |
           docker run --rm \
             -v /var/run/docker.sock:/var/run/docker.sock \
@@ -117,6 +125,23 @@ jobs:
             --timeout 30m \
             --severity CRITICAL --exit-code 0 \
             --format sarif --output /workspace/trivy-results.sarif \
+            cancer-genomics-analysis-suite:security-scan
+
+      # BLOCKING, and narrowed to what a change could actually act on:
+      # --ignore-unfixed drops the CVEs with no published fix. That count is
+      # zero today, so this gates from a clean baseline rather than asserting
+      # one -- and it fails the moment a CRITICAL with an available fix lands in
+      # the image, which is the case worth stopping for.
+      - name: Fail on fixable CRITICALs
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.58.1 image \
+            --timeout 30m \
+            --severity CRITICAL \
+            --ignore-unfixed \
+            --exit-code 1 \
+            --format table \
             cancer-genomics-analysis-suite:security-scan
 
       - name: Upload Trivy scan results
