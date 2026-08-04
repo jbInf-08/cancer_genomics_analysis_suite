@@ -15,7 +15,6 @@ Environment Variables:
     HOST: Host to bind the application to (default: 0.0.0.0)
 """
 
-import os
 import sys
 from pathlib import Path
 

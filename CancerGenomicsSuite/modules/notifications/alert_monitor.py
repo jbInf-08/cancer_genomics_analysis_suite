@@ -5,7 +5,6 @@ Monitors system health and triggers alerts for the Cancer Genomics Analysis Suit
 Provides comprehensive monitoring of system resources, analysis status, and error conditions.
 """
 
-import asyncio
 import json
 import logging
 import sqlite3
@@ -18,7 +17,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
-import aiohttp
 import psutil
 import requests
 
@@ -182,7 +180,7 @@ class SlackNotifier(WebhookNotifier):
             )
 
         return {
-            "text": f"Alert from Cancer Genomics Analysis Suite",
+            "text": "Alert from Cancer Genomics Analysis Suite",
             "attachments": [attachment],
         }
 
@@ -398,14 +396,14 @@ class AlertMonitor:
             # Create indexes
             conn.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_alerts_status_severity 
+                CREATE INDEX IF NOT EXISTS idx_alerts_status_severity
                 ON alerts(status, severity, created_at)
             """
             )
 
             conn.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_metrics_timestamp 
+                CREATE INDEX IF NOT EXISTS idx_metrics_timestamp
                 ON metrics(timestamp)
             """
             )
@@ -607,7 +605,7 @@ class AlertMonitor:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute(
                 """
-                SELECT COUNT(*) FROM alerts 
+                SELECT COUNT(*) FROM alerts
                 WHERE source = ? AND status = 'active'
             """,
                 (f"monitor.{rule_name}",),
@@ -667,7 +665,7 @@ class AlertMonitor:
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """
-                UPDATE alerts 
+                UPDATE alerts
                 SET status = 'resolved', resolved_at = ?
                 WHERE source = ? AND status = 'active'
             """,
@@ -798,7 +796,7 @@ class AlertMonitor:
             if severity:
                 cursor = conn.execute(
                     """
-                    SELECT * FROM alerts 
+                    SELECT * FROM alerts
                     WHERE status = 'active' AND severity = ?
                     ORDER BY created_at DESC
                 """,
@@ -807,7 +805,7 @@ class AlertMonitor:
             else:
                 cursor = conn.execute(
                     """
-                    SELECT * FROM alerts 
+                    SELECT * FROM alerts
                     WHERE status = 'active'
                     ORDER BY severity DESC, created_at DESC
                 """
@@ -820,7 +818,7 @@ class AlertMonitor:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute(
                 """
-                UPDATE alerts 
+                UPDATE alerts
                 SET status = 'acknowledged', acknowledged_by = ?, acknowledged_at = ?
                 WHERE id = ? AND status = 'active'
             """,
@@ -834,7 +832,7 @@ class AlertMonitor:
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.execute(
                 """
-                UPDATE alerts 
+                UPDATE alerts
                 SET status = 'resolved', resolved_at = ?
                 WHERE id = ? AND status IN ('active', 'acknowledged')
             """,
@@ -851,7 +849,7 @@ class AlertMonitor:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
                 """
-                SELECT * FROM metrics 
+                SELECT * FROM metrics
                 WHERE timestamp >= ?
                 ORDER BY timestamp ASC
             """,
@@ -882,8 +880,8 @@ class AlertMonitor:
             # Count by severity
             cursor = conn.execute(
                 """
-                SELECT severity, COUNT(*) as count 
-                FROM alerts 
+                SELECT severity, COUNT(*) as count
+                FROM alerts
                 WHERE created_at >= ?
                 GROUP BY severity
             """,
@@ -894,8 +892,8 @@ class AlertMonitor:
             # Count by status
             cursor = conn.execute(
                 """
-                SELECT status, COUNT(*) as count 
-                FROM alerts 
+                SELECT status, COUNT(*) as count
+                FROM alerts
                 WHERE created_at >= ?
                 GROUP BY status
             """,
@@ -909,7 +907,7 @@ class AlertMonitor:
                 SELECT AVG(
                     (julianday(resolved_at) - julianday(created_at)) * 24 * 60
                 ) as avg_resolution_minutes
-                FROM alerts 
+                FROM alerts
                 WHERE resolved_at IS NOT NULL AND created_at >= ?
             """,
                 (since.isoformat(),),
@@ -931,7 +929,7 @@ class AlertMonitor:
             # Clean up old resolved alerts
             conn.execute(
                 """
-                DELETE FROM alerts 
+                DELETE FROM alerts
                 WHERE status = 'resolved' AND resolved_at < ?
             """,
                 (cutoff_date.isoformat(),),
@@ -940,7 +938,7 @@ class AlertMonitor:
             # Clean up old metrics
             conn.execute(
                 """
-                DELETE FROM metrics 
+                DELETE FROM metrics
                 WHERE timestamp < ?
             """,
                 (cutoff_date.isoformat(),),

@@ -6,8 +6,6 @@ This module provides Swagger UI integration for the Flask application,
 allowing interactive API documentation and testing.
 """
 
-import json
-import os
 from pathlib import Path
 
 import yaml
@@ -202,7 +200,7 @@ SWAGGER_UI_TEMPLATE = """
                     return response;
                 }
             });
-            
+
             // Add custom CSS for better styling
             const style = document.createElement('style');
             style.textContent = `

@@ -1,6 +1,5 @@
 """Molecular dynamics workflow wiring."""
 
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from CancerGenomicsSuite.modules.pipeline_orchestration.md_workflow import (

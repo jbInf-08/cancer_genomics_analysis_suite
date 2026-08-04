@@ -5,31 +5,21 @@ This module provides specialized processing capabilities for genomics data,
 including variant calling, structural variation analysis, and genomic annotation.
 """
 
-import json
 import logging
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from scipy import stats
-from scipy.stats import chi2_contingency
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-from ..omics_processor import (
-    OmicsDataProcessor,
-    ProcessingResult,
-    QualityControlMetrics,
-)
+from ..omics_processor import OmicsDataProcessor, ProcessingResult
 from ..omics_registry import OmicsFieldRegistry
 
 logger = logging.getLogger(__name__)

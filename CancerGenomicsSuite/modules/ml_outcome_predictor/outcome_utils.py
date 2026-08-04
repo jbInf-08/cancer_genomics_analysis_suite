@@ -7,19 +7,15 @@ and outcome metrics calculation utilities for cancer outcome prediction.
 
 import logging
 import warnings
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from scipy import stats
-from scipy.stats import chi2_contingency
-from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.feature_selection import (
     RFE,
-    SelectFromModel,
     SelectKBest,
     f_classif,
     f_regression,
@@ -27,7 +23,6 @@ from sklearn.feature_selection import (
     mutual_info_regression,
 )
 from sklearn.impute import KNNImputer, SimpleImputer
-from sklearn.manifold import TSNE
 from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,

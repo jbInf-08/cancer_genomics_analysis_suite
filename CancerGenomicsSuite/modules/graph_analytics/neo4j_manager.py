@@ -9,7 +9,7 @@ for cancer genomics graph analytics.
 import json
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
@@ -347,8 +347,8 @@ class Neo4jManager:
         query = """
         MATCH (g:Gene {gene_name: $gene_name})
         MATCH (v:Variant)
-        WHERE v.chromosome = g.chromosome 
-        AND v.position >= g.start_pos 
+        WHERE v.chromosome = g.chromosome
+        AND v.position >= g.start_pos
         AND v.position <= g.end_pos
         RETURN v, g
         ORDER BY v.position
@@ -566,8 +566,8 @@ class Neo4jManager:
         """
         query = """
         MATCH (g:Gene), (v:Variant)
-        WHERE v.chromosome = g.chromosome 
-        AND v.position >= g.start_pos 
+        WHERE v.chromosome = g.chromosome
+        AND v.position >= g.start_pos
         AND v.position <= g.end_pos
         CREATE (v)-[:AFFECTS]->(g)
         """

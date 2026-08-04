@@ -16,10 +16,8 @@ Usage:
 import argparse
 import logging
 import sys
-from pathlib import Path
 from typing import Any, Dict, List
 
-import numpy as np
 import pandas as pd
 
 from .omics_dashboard import create_comprehensive_omics_dashboard

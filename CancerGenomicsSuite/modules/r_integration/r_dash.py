@@ -5,15 +5,9 @@ Provides a Dash interface for executing R code, running statistical analyses,
 and creating visualizations using R packages.
 """
 
-import base64
-import json
 import logging
-from typing import Any, Dict, List
 
-import dash
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
 from dash import Input, Output, State, callback_context, dcc, html
 
 from .r_client import RClient

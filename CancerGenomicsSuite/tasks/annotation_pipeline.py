@@ -6,14 +6,11 @@ for the Cancer Genomics Analysis Suite, including variant annotation,
 gene annotation, and functional analysis workflows.
 """
 
-import json
 import logging
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd

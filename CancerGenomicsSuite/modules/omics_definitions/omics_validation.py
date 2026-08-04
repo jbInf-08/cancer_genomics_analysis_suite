@@ -5,30 +5,21 @@ This module provides comprehensive validation and quality control for all omics 
 including data format validation, quality metrics calculation, and automated quality control.
 """
 
-import json
 import logging
 import warnings
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from scipy import stats
-from scipy.stats import normaltest, shapiro
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import StandardScaler
+from scipy.stats import normaltest
 
 from .omics_metadata import OmicsMetadataManager
-from .omics_registry import OmicsDataType, OmicsFieldDefinition, OmicsFieldRegistry
+from .omics_registry import OmicsFieldRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -786,7 +777,7 @@ Generated on: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
 """
 
         if qc_result.recommendations:
-            report += f"""
+            report += """
 ## Recommendations
 """
             for i, rec in enumerate(qc_result.recommendations, 1):
@@ -891,21 +882,21 @@ Generated on: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
                 report += f"- {metric}: {value}\n"
 
         if validation_result.errors:
-            report += f"""
+            report += """
 ## Errors
 """
             for i, error in enumerate(validation_result.errors, 1):
                 report += f"{i}. {error}\n"
 
         if validation_result.warnings:
-            report += f"""
+            report += """
 ## Warnings
 """
             for i, warning in enumerate(validation_result.warnings, 1):
                 report += f"{i}. {warning}\n"
 
         if validation_result.recommendations:
-            report += f"""
+            report += """
 ## Recommendations
 """
             for i, rec in enumerate(validation_result.recommendations, 1):

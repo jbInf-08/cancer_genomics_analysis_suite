@@ -1,8 +1,8 @@
 """
 Cancer Genomics Analysis Suite
 
-A comprehensive, production-ready platform for cancer genomics analysis featuring 
-real-time mutation detection, clinical data integration, machine learning-based 
+A comprehensive, production-ready platform for cancer genomics analysis featuring
+real-time mutation detection, clinical data integration, machine learning-based
 outcome prediction, and multi-omics data analysis.
 
 This package provides:

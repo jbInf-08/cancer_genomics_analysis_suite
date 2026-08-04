@@ -5,27 +5,19 @@ Provides dynamic dashboard loading and management capabilities for the Cancer Ge
 Supports multiple dashboard types, widget management, and real-time configuration updates.
 """
 
-import importlib
-import inspect
 import json
 import logging
-import threading
-import time
-import uuid
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import dash
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import yaml
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import dcc, html
 
 logger = logging.getLogger(__name__)
 

@@ -13,12 +13,8 @@ from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-import aiohttp
-import neo4j
 import numpy as np
-import pandas as pd
 from kafka import KafkaConsumer, KafkaProducer
-from kafka.errors import KafkaError
 from neo4j import GraphDatabase
 from prometheus_client import Counter, Gauge, Histogram, start_http_server
 from sklearn.ensemble import IsolationForest
@@ -214,11 +210,11 @@ class Neo4jGraphProcessor:
         try:
             query = """
             MATCH (m:Mutation)
-            WHERE m.gene = $gene 
+            WHERE m.gene = $gene
             AND m.mutation_type = $mutation_type
             AND m.chromosome = $chromosome
             AND abs(m.position - $position) <= 100
-            RETURN m, 
+            RETURN m,
                    abs(m.position - $position) as distance,
                    m.pathogenicity_score,
                    m.severity
@@ -254,7 +250,7 @@ class Neo4jGraphProcessor:
         try:
             query = """
             MATCH (g:Gene {name: $gene})-[:INTERACTS_WITH]-(related:Gene)
-            RETURN g, related, 
+            RETURN g, related,
                    [(g)-[r:INTERACTS_WITH]-(related) | r.interaction_type] as interaction_types
             """
 

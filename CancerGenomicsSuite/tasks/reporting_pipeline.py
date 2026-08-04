@@ -6,20 +6,17 @@ for the Cancer Genomics Analysis Suite, including report generation,
 scheduling, and distribution workflows.
 """
 
-import json
 import logging
 import os
 import smtplib
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -464,10 +461,10 @@ class ReportingPipeline:
                 self.config.email_body_template
                 or f"""
             Please find attached the Cancer Genomics Analysis Report.
-            
+
             Report ID: {job.job_id}
             Generated: {job.completed_at.strftime('%Y-%m-%d %H:%M:%S')}
-            
+
             Best regards,
             Cancer Genomics Analysis Suite
             """

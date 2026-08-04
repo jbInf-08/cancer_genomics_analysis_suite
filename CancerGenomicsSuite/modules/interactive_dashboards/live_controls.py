@@ -5,32 +5,23 @@ Provides real-time control and interaction capabilities for the Cancer Genomics 
 Supports live data streaming, interactive controls, and real-time parameter adjustment.
 """
 
-import asyncio
 import json
 import logging
-import queue
 import sqlite3
 import threading
 import time
-import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional
 
-import aiohttp
 import dash
-import numpy as np
 import pandas as pd
 import pika
-import plotly.express as px
-import plotly.graph_objects as go
 import redis
-import websocket
 import zmq
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, dcc, html
 
 logger = logging.getLogger(__name__)
 

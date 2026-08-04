@@ -6,8 +6,7 @@ TypeError: descriptor '__call__' for 'type' objects doesn't apply to a 'property
 """
 
 import inspect
-import sys
-from typing import Any, Callable
+from typing import Callable
 
 
 def patch_dask_compatibility():

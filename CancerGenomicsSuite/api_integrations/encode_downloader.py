@@ -20,16 +20,14 @@ API Documentation: https://www.encodeproject.org/help/rest-api/
 import concurrent.futures
 import gzip
 import hashlib
-import json
 import logging
-import os
 import shutil
 import time
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import urljoin, urlparse
+from typing import Any, Dict, List, Optional
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests

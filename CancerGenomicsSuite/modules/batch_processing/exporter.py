@@ -12,19 +12,15 @@ import logging
 import pickle
 import queue
 import shutil
-import sqlite3
-import tarfile
-import threading
-import time
 import uuid
 import xml.etree.ElementTree as ET
 import zipfile
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import h5py
 import numpy as np

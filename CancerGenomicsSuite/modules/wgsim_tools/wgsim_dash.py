@@ -4,16 +4,9 @@ WGSIM Tools Integration Dashboard
 Provides a Dash interface for read simulation using wgsim and dwgsim tools.
 """
 
-import json
 import logging
-import os
-from typing import Any, Dict, List
 
-import dash
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, State, dcc, html
 
 from .wgsim_client import WGSIMClient
 

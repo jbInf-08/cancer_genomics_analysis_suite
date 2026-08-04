@@ -6,16 +6,11 @@ This module provides data pipeline management capabilities for real-time
 cancer genomics data processing.
 """
 
-import json
 import logging
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Union
-
-import numpy as np
-import pandas as pd
+from typing import Any, Dict, List, Optional
 
 from .kafka_manager import KafkaManager
 from .stream_processor import StreamProcessor

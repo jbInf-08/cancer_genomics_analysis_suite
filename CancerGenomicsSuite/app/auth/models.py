@@ -5,7 +5,6 @@ Authentication Models for Cancer Genomics Analysis Suite
 This module defines the user authentication models using SQLAlchemy.
 """
 
-from datetime import datetime
 
 from flask_login import UserMixin
 

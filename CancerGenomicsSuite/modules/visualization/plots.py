@@ -5,18 +5,16 @@ Provides comprehensive plotting functionality for cancer genomics data visualiza
 Supports various plot types including heatmaps, scatter plots, box plots, and specialized genomics plots.
 """
 
-import json
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.figure_factory as ff
 import plotly.graph_objects as go
 import seaborn as sns
 from plotly.subplots import make_subplots

@@ -6,14 +6,13 @@ using Dash/Plotly for visualization and user interaction.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 import dash
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objs as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, State, dcc, html
 
 from .biomarker_analyzer import (
     BiomarkerAnalyzer,

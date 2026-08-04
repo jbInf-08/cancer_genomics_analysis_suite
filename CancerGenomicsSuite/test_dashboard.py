@@ -4,7 +4,6 @@ Test script for the Cancer Genomics Dashboard
 This script tests the dashboard without requiring all dependencies to be installed.
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -22,7 +21,7 @@ def test_plugin_registry():
         )
 
         plugins = get_registered_plugins()
-        print(f"✓ Plugin registry loaded successfully")
+        print("✓ Plugin registry loaded successfully")
         print(f"✓ Found {len(plugins)} plugins")
 
         if plugins:
@@ -46,7 +45,7 @@ def test_settings():
     try:
         from CancerGenomicsSuite.config.settings import settings
 
-        print(f"✓ Settings loaded successfully")
+        print("✓ Settings loaded successfully")
         print(f"✓ App name: {settings.app_name}")
         print(f"✓ Host: {settings.host}")
         print(f"✓ Port: {settings.port}")
@@ -118,11 +117,11 @@ def test_dashboard_import():
         )()
 
         # Now try to import the dashboard
-        from CancerGenomicsSuite.main_dashboard import app, plugins, server
+        from CancerGenomicsSuite.main_dashboard import plugins
 
-        print(f"✓ Dashboard imported successfully")
-        print(f"✓ Flask server created")
-        print(f"✓ Dash app created")
+        print("✓ Dashboard imported successfully")
+        print("✓ Flask server created")
+        print("✓ Dash app created")
         print(f"✓ Plugins loaded: {len(plugins)}")
         return True
     except Exception as e:

@@ -3,8 +3,7 @@ AWS S3 Storage Client
 """
 
 import os
-from datetime import datetime
-from typing import BinaryIO, List, Optional, Union
+from typing import BinaryIO, List, Optional
 
 import boto3
 from botocore.exceptions import ClientError, NoCredentialsError

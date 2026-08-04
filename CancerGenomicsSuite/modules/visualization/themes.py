@@ -5,18 +5,14 @@ Provides comprehensive theme management and styling for the Cancer Genomics Anal
 Includes predefined themes, color palettes, and customization options for visualizations.
 """
 
-import colorsys
 import json
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
-import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import plotly.express as px
-import plotly.graph_objects as go
 import seaborn as sns
 
 logger = logging.getLogger(__name__)

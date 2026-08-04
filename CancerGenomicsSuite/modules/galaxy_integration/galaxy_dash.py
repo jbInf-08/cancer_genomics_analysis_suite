@@ -6,15 +6,10 @@ Provides a Dash interface for interacting with Galaxy workflows and tools.
 
 import json
 import logging
-from typing import Any, Dict, List
 
-import dash
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, State, dcc, html
 
-from .galaxy_client import GalaxyClient, GalaxyDataset, GalaxyWorkflow
+from .galaxy_client import GalaxyClient
 
 logger = logging.getLogger(__name__)
 
@@ -400,7 +395,7 @@ def register_callbacks(app):
                 return html.Div(
                     [
                         html.P(
-                            f"✅ Workflow started successfully",
+                            "✅ Workflow started successfully",
                             className="success-message",
                         ),
                         html.P(f"Job ID: {job_id}", className="info-message"),

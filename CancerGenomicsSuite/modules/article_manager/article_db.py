@@ -8,20 +8,15 @@ scientific articles in a database system for cancer genomics research.
 import hashlib
 import json
 import logging
-import re
 import sqlite3
 import warnings
-from collections import Counter, defaultdict
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
-import networkx as nx
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -264,9 +259,9 @@ class ArticleDatabaseManager:
                 # Insert article
                 cursor = conn.execute(
                     """
-                    INSERT OR REPLACE INTO articles 
-                    (hash, title, authors, abstract, doi, pmid, url, journal, 
-                     publication_date, keywords, citations, source, scraped_date, 
+                    INSERT OR REPLACE INTO articles
+                    (hash, title, authors, abstract, doi, pmid, url, journal,
+                     publication_date, keywords, citations, source, scraped_date,
                      content, tags, notes, rating, read_status, relevance_score)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
@@ -480,7 +475,7 @@ class ArticleDatabaseManager:
 
                 # Get results
                 search_query = f"""
-                    SELECT * FROM articles 
+                    SELECT * FROM articles
                     WHERE {where_clause}
                     ORDER BY updated_at DESC
                     LIMIT ? OFFSET ?
@@ -709,10 +704,10 @@ class ArticleDatabaseManager:
             # Articles by year
             cursor = conn.execute(
                 """
-                SELECT substr(publication_date, 1, 4) as year, COUNT(*) 
-                FROM articles 
-                WHERE publication_date IS NOT NULL 
-                GROUP BY year 
+                SELECT substr(publication_date, 1, 4) as year, COUNT(*)
+                FROM articles
+                WHERE publication_date IS NOT NULL
+                GROUP BY year
                 ORDER BY year DESC
             """
             )
@@ -721,8 +716,8 @@ class ArticleDatabaseManager:
             # Recent activity
             cursor = conn.execute(
                 """
-                SELECT DATE(created_at) as date, COUNT(*) 
-                FROM articles 
+                SELECT DATE(created_at) as date, COUNT(*)
+                FROM articles
                 WHERE created_at >= date('now', '-30 days')
                 GROUP BY DATE(created_at)
                 ORDER BY date DESC

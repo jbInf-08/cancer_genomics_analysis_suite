@@ -13,33 +13,19 @@ Features:
 - Batch export operations
 """
 
-import base64
-import io
 import json
 import logging
-import zipfile
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-import dash
 import numpy as np
-import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dcc, html, no_update
+from dash import Input, Output, State, dcc, html, no_update
 
 from ...orm import db
 
 # Import database models and utilities
-from ...orm.models import (
-    AnalysisJob,
-    AnalysisResult,
-    DataFile,
-    Dataset,
-    GeneExpression,
-    MutationRecord,
-    Project,
-)
+from ...orm.models import AnalysisJob, AnalysisResult, GeneExpression, MutationRecord
 
 logger = logging.getLogger(__name__)
 

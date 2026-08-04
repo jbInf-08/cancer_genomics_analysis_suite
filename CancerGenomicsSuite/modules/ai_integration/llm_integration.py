@@ -6,17 +6,13 @@ clinical notes, generating reports, and answering genomic queries using state-of
 language models.
 """
 
-import asyncio
 import json
 import logging
-import os
 import re
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-import aiohttp
+from typing import Any, Dict, List, Optional
 
 # LLM and NLP libraries
 try:
@@ -275,9 +271,9 @@ class ScientificLiteratureProcessor:
 
         prompt = f"""
         Extract the following information from this scientific paper:
-        
+
         Content: {content[:2000]}...
-        
+
         Please provide a JSON response with:
         - title: The paper title
         - abstract: The abstract (if available)
@@ -286,7 +282,7 @@ class ScientificLiteratureProcessor:
         - year: Publication year
         - doi: DOI if available
         - keywords: List of key terms
-        
+
         JSON Response:
         """
 
@@ -506,15 +502,15 @@ class ClinicalNotesAnalyzer:
 
         prompt = f"""
         Summarize the following clinical note in a clear, concise manner:
-        
+
         Note: {note}
-        
+
         Please provide a summary that includes:
         - Key symptoms and findings
         - Diagnoses or assessments
         - Treatment plans or recommendations
         - Important follow-up items
-        
+
         Summary:
         """
 
@@ -659,15 +655,15 @@ class GenomicQueryEngine:
 
         prompt = f"""
         Explain the following genomic concept in simple, understandable terms:
-        
+
         Concept: {concept}
-        
+
         Please provide:
         1. A clear definition
         2. Why it's important in cancer research
         3. How it's used in clinical practice
         4. Any relevant examples
-        
+
         Explanation:
         """
 
@@ -719,12 +715,12 @@ class ReportGenerator:
 
         prompt = f"""
         Generate a {report_type} genomic analysis report based on the following data:
-        
+
         {formatted_data}
-        
+
         Use this template structure:
         {template}
-        
+
         Please provide a well-structured, professional report that includes:
         - Executive summary
         - Key findings
@@ -732,7 +728,7 @@ class ReportGenerator:
         - Clinical implications
         - Recommendations
         - References (if applicable)
-        
+
         Report:
         """
 
@@ -817,9 +813,9 @@ class ReportGenerator:
 
         prompt = f"""
         Generate a concise patient summary based on the following data:
-        
+
         Patient Data: {json.dumps(patient_data, indent=2)}
-        
+
         Please provide:
         1. Patient demographics
         2. Clinical presentation
@@ -827,7 +823,7 @@ class ReportGenerator:
         4. Key mutations/variants
         5. Clinical implications
         6. Treatment considerations
-        
+
         Patient Summary:
         """
 
@@ -858,10 +854,10 @@ class ReportGenerator:
 
         prompt = f"""
         Generate a comprehensive literature review on the topic: {topic}
-        
+
         Based on the following papers:
         {papers_text}
-        
+
         Please provide:
         1. Introduction and background
         2. Current state of research
@@ -869,7 +865,7 @@ class ReportGenerator:
         4. Gaps in current knowledge
         5. Future research directions
         6. Conclusions
-        
+
         Literature Review:
         """
 

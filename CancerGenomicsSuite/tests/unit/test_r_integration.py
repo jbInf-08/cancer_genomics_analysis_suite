@@ -21,7 +21,7 @@ if sys.platform == "win32":
 import os
 import subprocess
 import tempfile
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -97,7 +97,7 @@ class TestRScriptExecution:
         result = client.execute_r_script('stop("Test error")')
 
         assert isinstance(result, dict)
-        assert result["success"] == False or "error" in result.get("stderr", "").lower()
+        assert not result["success"] or "error" in result.get("stderr", "").lower()
 
     @patch("subprocess.run")
     def test_execute_r_script_timeout(self, mock_run):
@@ -107,7 +107,7 @@ class TestRScriptExecution:
         client = RClient()
         result = client.execute_r_script("Sys.sleep(1000)")
 
-        assert result["success"] == False
+        assert not result["success"]
         assert (
             "timeout" in result.get("error", "").lower()
             or "timeout" in result.get("stderr", "").lower()
@@ -181,7 +181,7 @@ class TestDataConversion:
         )
 
         result = client.load_data(df, "test_df")
-        assert result == True
+        assert result
 
     @pytest.mark.skipif(not RPY2_AVAILABLE, reason="rpy2 not available")
     def test_load_numpy_array(self):
@@ -194,7 +194,7 @@ class TestDataConversion:
         arr = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
 
         result = client.load_data(arr, "test_arr")
-        assert result == True
+        assert result
 
     @pytest.mark.skipif(not RPY2_AVAILABLE, reason="rpy2 not available")
     def test_load_list(self):
@@ -207,7 +207,7 @@ class TestDataConversion:
         lst = ["gene1", "gene2", "gene3"]
 
         result = client.load_data(lst, "test_list")
-        assert result == True
+        assert result
 
     def test_load_data_fallback_when_no_rpy2(self):
         """Test that load_data returns False when rpy2 is not available."""
@@ -217,7 +217,7 @@ class TestDataConversion:
         df = pd.DataFrame({"a": [1, 2, 3]})
         result = client.load_data(df, "test")
 
-        assert result == False
+        assert not result
 
 
 class TestPlotGeneration:

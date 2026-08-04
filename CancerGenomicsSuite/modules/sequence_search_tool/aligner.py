@@ -6,21 +6,16 @@ integrating various alignment algorithms and providing comprehensive
 sequence search capabilities for the Cancer Genomics Analysis Suite.
 """
 
-import json
 import logging
 import re
-import time
 from collections import defaultdict
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 from Bio import pairwise2
 from Bio.Align import substitution_matrices
 from Bio.pairwise2 import format_alignment
-from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction
 
 

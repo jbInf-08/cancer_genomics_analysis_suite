@@ -6,7 +6,6 @@ This module provides a unified interface for executing workflows
 using different pipeline orchestration systems (Nextflow, Snakemake).
 """
 
-import asyncio
 import concurrent.futures
 import json
 import logging

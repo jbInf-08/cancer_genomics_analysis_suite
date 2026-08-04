@@ -5,13 +5,12 @@ This module provides automatic discovery, health monitoring, and load balancing
 for biomarker analysis services including CGAS and biomarker_identifier.
 """
 
-import json
 import logging
 import os
 import threading
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 

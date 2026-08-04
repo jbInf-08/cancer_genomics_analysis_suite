@@ -77,7 +77,7 @@ Usage Examples:
 
 Basic mutation prediction:
     from CancerGenomicsSuite.modules.mutation_effect_predictor import Mutation, MutationEffectPredictor
-    
+
     mutation = Mutation(
         gene_symbol="BRCA1",
         chromosome="chr17",
@@ -89,23 +89,23 @@ Basic mutation prediction:
         ref_amino_acid="G",
         alt_amino_acid="E"
     )
-    
+
     predictor = MutationEffectPredictor()
     results = predictor.predict_mutation_effect(mutation)
-    
+
     for result in results:
         print(f"{result.predictor_name}: {result.prediction_class} (score: {result.prediction_score:.3f})")
 
 Interactive dashboard:
     from CancerGenomicsSuite.modules.mutation_effect_predictor import create_mutation_effect_dashboard
-    
+
     dashboard = create_mutation_effect_dashboard()
     dashboard.run(port=8051)
 
 Batch processing:
     mutations = [mutation1, mutation2, mutation3]
     batch_results = predictor.batch_predict(mutations)
-    
+
     for mutation_key, results in batch_results.items():
         consensus = predictor.get_consensus_prediction(results)
         print(f"Consensus for {mutation_key}: {consensus['consensus_class']}")

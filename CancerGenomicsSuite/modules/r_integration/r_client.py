@@ -5,7 +5,6 @@ Provides functionality to execute R scripts and interact with R packages
 for statistical analysis and bioinformatics computations.
 """
 
-import json
 import logging
 import os
 import subprocess
@@ -382,19 +381,19 @@ class RClient:
             # Run DESeq2 analysis
             deseq2_code = f"""
             library(DESeq2)
-            
+
             # Create DESeqDataSet
             dds <- DESeqDataSetFromMatrix(countData = count_data,
                                         colData = metadata,
                                         design = as.formula("{design_formula}"))
-            
+
             # Run DESeq2
             dds <- DESeq(dds)
-            
+
             # Get results
             res <- results(dds)
             res_df <- as.data.frame(res)
-            
+
             # Return results
             res_df
             """
@@ -442,19 +441,19 @@ class RClient:
             # Run limma analysis
             limma_code = """
             library(limma)
-            
+
             # Create design matrix if not provided
             if (!exists("design_matrix")) {
                 design_matrix <- model.matrix(~ condition, data = metadata)
             }
-            
+
             # Fit linear model
             fit <- lmFit(expression_data, design_matrix)
             fit <- eBayes(fit)
-            
+
             # Get results
             results <- topTable(fit, number = Inf)
-            
+
             # Return results
             results
             """
@@ -493,7 +492,7 @@ class RClient:
 
             plot_code = f"""
             library(pheatmap)
-            
+
             # Create heatmap
             pheatmap(heatmap_data,
                     main = "{title}",
@@ -532,12 +531,12 @@ class RClient:
             go_code = f"""
             library(clusterProfiler)
             library({organism})
-            
+
             # Convert gene symbols to ENTREZ IDs
-            gene_ids <- bitr(gene_list, fromType = "SYMBOL", 
-                           toType = "ENTREZID", 
+            gene_ids <- bitr(gene_list, fromType = "SYMBOL",
+                           toType = "ENTREZID",
                            OrgDb = {organism})
-            
+
             # Run GO enrichment
             go_results <- enrichGO(gene = gene_ids$ENTREZID,
                                  OrgDb = {organism},
@@ -546,10 +545,10 @@ class RClient:
                                  pvalueCutoff = {pvalue_cutoff},
                                  qvalueCutoff = 0.2,
                                  readable = TRUE)
-            
+
             # Convert to data frame
             go_df <- as.data.frame(go_results)
-            
+
             # Return results
             go_df
             """

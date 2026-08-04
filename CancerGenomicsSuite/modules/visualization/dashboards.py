@@ -7,19 +7,16 @@ Supports interactive dashboards with multiple widgets, layouts, and real-time up
 
 import json
 import logging
-import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, Union
 
 import dash
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, dcc, html
 
 logger = logging.getLogger(__name__)
 
@@ -385,7 +382,7 @@ class DashboardBuilder:
                 grid_children.append(
                     html.Div(
                         widget_component,
-                        className=f"grid-item",
+                        className="grid-item",
                         style={
                             "grid-column": f"span {widget.size[0]}",
                             "grid-row": f"span {widget.size[1]}",

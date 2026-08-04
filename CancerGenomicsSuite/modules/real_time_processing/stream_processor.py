@@ -6,16 +6,12 @@ This module provides real-time stream processing capabilities for cancer genomic
 using Apache Kafka and various processing engines.
 """
 
-import json
 import logging
-import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
-import pandas as pd
 
 from .kafka_manager import KafkaManager
 

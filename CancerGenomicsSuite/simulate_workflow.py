@@ -20,16 +20,21 @@ Options:
 
 import argparse
 import json
-import os
 import random
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
-import numpy as np
-import pandas as pd
-from workflow_workbench import WorkflowEngine, WorkflowSimulator, WorkflowStep
+# Re-exported, not used here: tests/test_workflow_simulation.py does
+# `from simulate_workflow import WorkflowEngine, WorkflowSimulator,
+# WorkflowStep`. Without the noqa an unused-import sweep removes these and
+# that module stops importing -- which is how they were lost once already.
+from workflow_workbench import (  # noqa: F401
+    WorkflowEngine,
+    WorkflowSimulator,
+    WorkflowStep,
+)
 
 
 class CancerGenomicsWorkflowSimulator:

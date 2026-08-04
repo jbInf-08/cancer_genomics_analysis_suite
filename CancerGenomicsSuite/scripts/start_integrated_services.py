@@ -20,7 +20,6 @@ from typing import Any, Dict, Optional
 # Add the parent directory to the path to import CGAS modules
 sys.path.append(str(Path(__file__).parent.parent))
 
-from integrations.config import get_config
 from integrations.service_discovery import ServiceDiscovery
 
 logger = logging.getLogger(__name__)

@@ -7,9 +7,8 @@ including statistical analysis, machine learning, and validation methods.
 
 import logging
 import warnings
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -18,19 +17,11 @@ import scipy.stats as stats
 warnings.filterwarnings("ignore")
 
 # Machine Learning
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectKBest, f_classif, mutual_info_classif
-from sklearn.linear_model import ElasticNet, LogisticRegression
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.svm import SVC, SVR
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.svm import SVC
 
 # Apply compatibility patches before importing ML libraries
 try:
@@ -78,12 +69,9 @@ else:
     lgb = None
 
 # Bioinformatics
-from Bio import Entrez
-from Bio.Entrez import efetch, esearch
 
 # Statistical Analysis
-from scipy.stats import chi2_contingency, mannwhitneyu, pearsonr, spearmanr, ttest_ind
-from statsmodels.stats.contingency_tables import mcnemar
+from scipy.stats import chi2_contingency, mannwhitneyu, pearsonr, ttest_ind
 from statsmodels.stats.multitest import multipletests
 
 logger = logging.getLogger(__name__)

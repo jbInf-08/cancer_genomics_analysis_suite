@@ -9,10 +9,8 @@ for real-time cancer genomics data processing.
 import json
 import logging
 import threading
-import time
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional
 
 try:
     from kafka import KafkaAdminClient, KafkaConsumer, KafkaProducer

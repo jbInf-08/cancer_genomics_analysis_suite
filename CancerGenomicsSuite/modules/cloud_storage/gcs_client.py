@@ -4,7 +4,7 @@ Google Cloud Storage Client
 
 import os
 from datetime import datetime, timedelta
-from typing import BinaryIO, List, Optional, Union
+from typing import BinaryIO, List, Optional
 
 from google.cloud import storage
 from google.cloud.exceptions import GoogleCloudError, NotFound

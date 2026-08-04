@@ -13,19 +13,16 @@ Features:
 """
 
 import logging
-from typing import Any, Dict, List, Optional
 
-import dash
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dcc, html, no_update
+from dash import Input, Output, State, html, no_update
 
 from ...orm import db
 
 # Import database models and utilities
-from ...orm.models import DataFile, GeneExpression
+from ...orm.models import GeneExpression
 
 logger = logging.getLogger(__name__)
 

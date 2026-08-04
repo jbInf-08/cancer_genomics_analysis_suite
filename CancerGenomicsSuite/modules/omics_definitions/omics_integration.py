@@ -7,8 +7,8 @@ including correlation analysis, network building, and comprehensive integration 
 
 import logging
 import warnings
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -16,24 +16,20 @@ import pandas as pd
 warnings.filterwarnings("ignore")
 
 import networkx as nx
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from scipy import stats
-from scipy.cluster.hierarchy import dendrogram, linkage
 from sklearn.cluster import DBSCAN, AgglomerativeClustering, KMeans
 from sklearn.cross_decomposition import CCA, PLSCanonical
-from sklearn.decomposition import ICA, PCA, FactorAnalysis
+from sklearn.decomposition import ICA, PCA
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import ElasticNet, Lasso, Ridge
 from sklearn.manifold import TSNE, UMAP
-from sklearn.metrics import adjusted_rand_score, silhouette_score
+from sklearn.metrics import silhouette_score
 from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
 from .omics_metadata import OmicsMetadataManager
-from .omics_registry import OmicsFieldDefinition, OmicsFieldRegistry
+from .omics_registry import OmicsFieldRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -855,7 +851,7 @@ Generated on: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
                 f"- {omics_type}: {data.shape[0]} features, {data.shape[1]} samples\n"
             )
 
-        report += f"""
+        report += """
 ## Quality Metrics
 """
 

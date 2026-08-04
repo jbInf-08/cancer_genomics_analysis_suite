@@ -6,15 +6,12 @@ This module provides comprehensive Nextflow pipeline management capabilities
 for cancer genomics analysis workflows.
 """
 
-import json
 import logging
 import os
-import shutil
 import subprocess
-import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -363,7 +360,7 @@ class NextflowManager:
 
 /*
  * Cancer Genomics Variant Calling Pipeline
- * 
+ *
  * This pipeline performs variant calling on cancer genomics data
  * using best practices for somatic variant detection.
  */
@@ -376,25 +373,25 @@ params.known_sites = "reference/dbsnp.vcf.gz"
 workflow {
     // Quality control
     FASTQC(Channel.fromFilePairs(params.reads))
-    
+
     // Trimming
     TRIMMOMATIC(FASTQC.out)
-    
+
     // Alignment
     BWA_MEM(TRIMMOMATIC.out, params.reference)
-    
+
     // Mark duplicates
     MARK_DUPLICATES(BWA_MEM.out)
-    
+
     // Base quality score recalibration
     BQSR(MARK_DUPLICATES.out, params.reference, params.known_sites)
-    
+
     // Variant calling
     MUTECT2(BQSR.out, params.reference)
-    
+
     // Variant filtering
     FILTER_VARIANTS(MUTECT2.out)
-    
+
     // Annotation
     ANNOVAR(FILTER_VARIANTS.out)
 }
@@ -402,14 +399,14 @@ workflow {
 process FASTQC {
     cpus 4
     memory '8.GB'
-    
+
     input:
     tuple val(sample), path(reads)
-    
+
     output:
     path("${sample}_fastqc.html"), emit: html
     path("${sample}_fastqc.zip"), emit: zip
-    
+
     script:
     """
     fastqc ${reads} -o .
@@ -419,13 +416,13 @@ process FASTQC {
 process TRIMMOMATIC {
     cpus 4
     memory '8.GB'
-    
+
     input:
     tuple val(sample), path(reads)
-    
+
     output:
     tuple val(sample), path("${sample}_trimmed_R{1,2}.fastq.gz"), emit: trimmed
-    
+
     script:
     """
     trimmomatic PE ${reads} \\
@@ -439,14 +436,14 @@ process TRIMMOMATIC {
 process BWA_MEM {
     cpus 8
     memory '16.GB'
-    
+
     input:
     tuple val(sample), path(reads)
     path reference
-    
+
     output:
     path("${sample}.bam"), emit: bam
-    
+
     script:
     """
     bwa mem -t ${task.cpus} ${reference} ${reads} | \\
@@ -457,14 +454,14 @@ process BWA_MEM {
 process MARK_DUPLICATES {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path bam
-    
+
     output:
     path("${bam.baseName}_dedup.bam"), emit: bam
     path("${bam.baseName}_dedup.metrics"), emit: metrics
-    
+
     script:
     """
     gatk MarkDuplicates \\
@@ -477,16 +474,16 @@ process MARK_DUPLICATES {
 process BQSR {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path bam
     path reference
     path known_sites
-    
+
     output:
     path("${bam.baseName}_recal.bam"), emit: bam
     path("${bam.baseName}_recal.table"), emit: table
-    
+
     script:
     """
     gatk BaseRecalibrator \\
@@ -494,7 +491,7 @@ process BQSR {
         -R ${reference} \\
         --known-sites ${known_sites} \\
         -O ${bam.baseName}_recal.table
-    
+
     gatk ApplyBQSR \\
         -I ${bam} \\
         -R ${reference} \\
@@ -506,14 +503,14 @@ process BQSR {
 process MUTECT2 {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path bam
     path reference
-    
+
     output:
     path("${bam.baseName}_variants.vcf"), emit: vcf
-    
+
     script:
     """
     gatk Mutect2 \\
@@ -526,13 +523,13 @@ process MUTECT2 {
 process FILTER_VARIANTS {
     cpus 2
     memory '4.GB'
-    
+
     input:
     path vcf
-    
+
     output:
     path("${vcf.baseName}_filtered.vcf"), emit: vcf
-    
+
     script:
     """
     gatk FilterMutectCalls \\
@@ -544,13 +541,13 @@ process FILTER_VARIANTS {
 process ANNOVAR {
     cpus 2
     memory '4.GB'
-    
+
     input:
     path vcf
-    
+
     output:
     path("${vcf.baseName}_annotated.vcf"), emit: vcf
-    
+
     script:
     """
     convert2annovar.pl -format vcf4 ${vcf} > ${vcf.baseName}.avinput
@@ -575,7 +572,7 @@ process ANNOVAR {
 
 /*
  * Cancer Genomics Expression Analysis Pipeline
- * 
+ *
  * This pipeline performs RNA-seq expression analysis for cancer genomics
  * including quality control, alignment, quantification, and differential expression.
  */
@@ -588,19 +585,19 @@ params.output_dir = "results"
 workflow {
     // Quality control
     FASTQC(Channel.fromFilePairs(params.reads))
-    
+
     // Trimming
     TRIMMOMATIC(FASTQC.out)
-    
+
     // Alignment
     STAR(TRIMMOMATIC.out, params.reference, params.gtf)
-    
+
     // Quantification
     FEATURECOUNTS(STAR.out, params.gtf)
-    
+
     // Quality assessment
     RSEQC(STAR.out)
-    
+
     // Differential expression
     DESEQ2(FEATURECOUNTS.out)
 }
@@ -608,14 +605,14 @@ workflow {
 process FASTQC {
     cpus 4
     memory '8.GB'
-    
+
     input:
     tuple val(sample), path(reads)
-    
+
     output:
     path("${sample}_fastqc.html"), emit: html
     path("${sample}_fastqc.zip"), emit: zip
-    
+
     script:
     """
     fastqc ${reads} -o .
@@ -625,13 +622,13 @@ process FASTQC {
 process TRIMMOMATIC {
     cpus 4
     memory '8.GB'
-    
+
     input:
     tuple val(sample), path(reads)
-    
+
     output:
     tuple val(sample), path("${sample}_trimmed_R{1,2}.fastq.gz"), emit: trimmed
-    
+
     script:
     """
     trimmomatic PE ${reads} \\
@@ -645,16 +642,16 @@ process TRIMMOMATIC {
 process STAR {
     cpus 8
     memory '32.GB'
-    
+
     input:
     tuple val(sample), path(reads)
     path reference
     path gtf
-    
+
     output:
     path("${sample}Aligned.sortedByCoord.out.bam"), emit: bam
     path("${sample}Log.final.out"), emit: log
-    
+
     script:
     """
     STAR --runMode alignReads \\
@@ -670,14 +667,14 @@ process STAR {
 process FEATURECOUNTS {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path bam
     path gtf
-    
+
     output:
     path("${bam.baseName}_counts.txt"), emit: counts
-    
+
     script:
     """
     featureCounts -a ${gtf} -o ${bam.baseName}_counts.txt ${bam}
@@ -687,14 +684,14 @@ process FEATURECOUNTS {
 process RSEQC {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path bam
-    
+
     output:
     path("${bam.baseName}_geneBodyCoverage.txt"), emit: coverage
     path("${bam.baseName}_infer_experiment.txt"), emit: experiment
-    
+
     script:
     """
     geneBody_coverage.py -i ${bam} -r ${gtf} -o ${bam.baseName}
@@ -705,38 +702,38 @@ process RSEQC {
 process DESEQ2 {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path counts
-    
+
     output:
     path("deseq2_results.csv"), emit: results
     path("deseq2_plots.pdf"), emit: plots
-    
+
     script:
     """
     Rscript -e "
     library(DESeq2)
     library(ggplot2)
-    
+
     # Read count data
     counts <- read.table('${counts}', header=TRUE, row.names=1)
-    
+
     # Create sample metadata
     colData <- data.frame(
         condition = c(rep('control', ncol(counts)/2), rep('treatment', ncol(counts)/2))
     )
-    
+
     # Create DESeq2 object
     dds <- DESeqDataSetFromMatrix(countData = counts, colData = colData, design = ~ condition)
-    
+
     # Run DESeq2
     dds <- DESeq(dds)
     res <- results(dds)
-    
+
     # Save results
     write.csv(res, 'deseq2_results.csv')
-    
+
     # Create plots
     pdf('deseq2_plots.pdf')
     plotMA(res)
@@ -763,7 +760,7 @@ process DESEQ2 {
 
 /*
  * Cancer Genomics Multi-Omics Integration Pipeline
- * 
+ *
  * This pipeline integrates multiple omics data types for comprehensive
  * cancer genomics analysis including genomics, transcriptomics, and epigenomics.
  */
@@ -777,16 +774,16 @@ params.output_dir = "results"
 workflow {
     // Process genomics data
     PROCESS_GENOMICS(Channel.fromPath(params.genomics_data))
-    
+
     // Process transcriptomics data
     PROCESS_TRANSCRIPTOMICS(Channel.fromPath(params.transcriptomics_data))
-    
+
     // Process epigenomics data
     PROCESS_EPIGENOMICS(Channel.fromPath(params.epigenomics_data))
-    
+
     // Integrate omics data
     INTEGRATE_OMICS(PROCESS_GENOMICS.out, PROCESS_TRANSCRIPTOMICS.out, PROCESS_EPIGENOMICS.out)
-    
+
     // Pathway analysis
     PATHWAY_ANALYSIS(INTEGRATE_OMICS.out)
 }
@@ -794,21 +791,21 @@ workflow {
 process PROCESS_GENOMICS {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path vcf
-    
+
     output:
     path("${vcf.baseName}_processed.vcf"), emit: vcf
-    
+
     script:
     """
     # Filter variants
     bcftools filter -i 'QUAL>20 && DP>10' ${vcf} > ${vcf.baseName}_filtered.vcf
-    
+
     # Annotate variants
     annovar annotate_variation.pl -geneanno -buildver hg38 ${vcf.baseName}_filtered.vcf humandb/
-    
+
     # Create processed output
     cp ${vcf.baseName}_filtered.vcf ${vcf.baseName}_processed.vcf
     """
@@ -817,18 +814,18 @@ process PROCESS_GENOMICS {
 process PROCESS_TRANSCRIPTOMICS {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path bam
-    
+
     output:
     path("${bam.baseName}_expression.txt"), emit: expression
-    
+
     script:
     """
     # Count reads
     featureCounts -a ${gtf} -o ${bam.baseName}_counts.txt ${bam}
-    
+
     # Normalize expression
     Rscript -e "
     counts <- read.table('${bam.baseName}_counts.txt', header=TRUE, row.names=1)
@@ -841,13 +838,13 @@ process PROCESS_TRANSCRIPTOMICS {
 process PROCESS_EPIGENOMICS {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path bed
-    
+
     output:
     path("${bed.baseName}_processed.bed"), emit: bed
-    
+
     script:
     """
     # Sort and merge peaks
@@ -859,30 +856,30 @@ process PROCESS_EPIGENOMICS {
 process INTEGRATE_OMICS {
     cpus 8
     memory '16.GB'
-    
+
     input:
     path genomics
     path transcriptomics
     path epigenomics
-    
+
     output:
     path("integrated_omics_data.csv"), emit: integrated
-    
+
     script:
     """
     Rscript -e "
     library(GenomicRanges)
     library(SummarizedExperiment)
-    
+
     # Read genomics data
     genomics <- read.table('${genomics}', header=TRUE)
-    
+
     # Read transcriptomics data
     transcriptomics <- read.table('${transcriptomics}', header=TRUE)
-    
+
     # Read epigenomics data
     epigenomics <- read.table('${epigenomics}', header=FALSE)
-    
+
     # Integrate data
     integrated_data <- data.frame(
         gene_id = rownames(transcriptomics),
@@ -895,7 +892,7 @@ process INTEGRATE_OMICS {
             nrow(epigenomics)
         })
     )
-    
+
     write.csv(integrated_data, 'integrated_omics_data.csv', row.names=FALSE)
     "
     """
@@ -904,44 +901,44 @@ process INTEGRATE_OMICS {
 process PATHWAY_ANALYSIS {
     cpus 4
     memory '8.GB'
-    
+
     input:
     path integrated_data
-    
+
     output:
     path("pathway_analysis_results.csv"), emit: results
     path("pathway_plots.pdf"), emit: plots
-    
+
     script:
     """
     Rscript -e "
     library(clusterProfiler)
     library(org.Hs.eg.db)
     library(ggplot2)
-    
+
     # Read integrated data
     data <- read.csv('${integrated_data}')
-    
+
     # Perform pathway analysis
     gene_list <- data[data[,'expression'] > 2, 'gene_id']
-    
+
     # Convert gene symbols to ENTREZ IDs
     gene_entrez <- bitr(gene_list, fromType='SYMBOL', toType='ENTREZID', OrgDb=org.Hs.eg.db)
-    
+
     # GO enrichment
-    go_results <- enrichGO(gene=gene_entrez[,'ENTREZID'], 
-                          OrgDb=org.Hs.eg.db, 
-                          ont='BP', 
+    go_results <- enrichGO(gene=gene_entrez[,'ENTREZID'],
+                          OrgDb=org.Hs.eg.db,
+                          ont='BP',
                           pAdjustMethod='BH')
-    
+
     # KEGG enrichment
-    kegg_results <- enrichKEGG(gene=gene_entrez[,'ENTREZID'], 
-                              organism='hsa', 
+    kegg_results <- enrichKEGG(gene=gene_entrez[,'ENTREZID'],
+                              organism='hsa',
                               pAdjustMethod='BH')
-    
+
     # Save results
     write.csv(go_results@result, 'pathway_analysis_results.csv')
-    
+
     # Create plots
     pdf('pathway_plots.pdf')
     if(nrow(go_results@result) > 0) {

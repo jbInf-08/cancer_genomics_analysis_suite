@@ -5,32 +5,19 @@ This module provides specialized processing capabilities for emerging and specia
 including fluxomics, phenomics, kinomics, phosphoproteomics, ubiquitomics, and chromatomics.
 """
 
-import json
 import logging
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from scipy import stats
-from scipy.stats import mannwhitneyu, ttest_ind
-from sklearn.cluster import AgglomerativeClustering, KMeans
-from sklearn.decomposition import PCA, FastICA
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import RobustScaler, StandardScaler
+from sklearn.preprocessing import StandardScaler
 
-from ..omics_processor import (
-    OmicsDataProcessor,
-    ProcessingResult,
-    QualityControlMetrics,
-)
+from ..omics_processor import OmicsDataProcessor, ProcessingResult
 from ..omics_registry import OmicsFieldRegistry
 
 logger = logging.getLogger(__name__)

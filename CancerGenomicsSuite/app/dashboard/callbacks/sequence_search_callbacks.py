@@ -15,23 +15,16 @@ Features:
 
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-import dash
 import numpy as np
-import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
-from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction, molecular_weight
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
-from dash import Input, Output, State, callback_context, dcc, html, no_update
-
-from ...orm import db
+from dash import Input, Output, State, html, no_update
 
 # Import database models and utilities
-from ...orm.models import DataFile
 
 logger = logging.getLogger(__name__)
 

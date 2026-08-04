@@ -17,7 +17,6 @@ Features:
 """
 
 import logging
-import os
 
 from celery import Celery
 from celery.signals import task_postrun, task_prerun, worker_ready, worker_shutdown

@@ -7,16 +7,11 @@ parameters, and visualize results through a web-based interface.
 """
 
 import base64
-import io
-import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 import dash
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dash_table, dcc, html
+from dash import Input, Output, State, dash_table, dcc, html
 
 from .tree_builder import PhylogeneticTreeBuilder, TreeConstructionConfig
 

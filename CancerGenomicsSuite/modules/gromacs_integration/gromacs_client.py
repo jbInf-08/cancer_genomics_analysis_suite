@@ -4,7 +4,6 @@ GROMACS Integration Client
 Provides functionality to interact with GROMACS for molecular dynamics simulations.
 """
 
-import json
 import logging
 import os
 import platform
@@ -12,7 +11,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

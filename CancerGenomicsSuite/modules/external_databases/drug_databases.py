@@ -7,14 +7,10 @@ ChEMBL, and PubChem for comprehensive drug information retrieval and analysis.
 
 import json
 import logging
-import time
 import warnings
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import urlencode
+from typing import Any, Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 import requests
 

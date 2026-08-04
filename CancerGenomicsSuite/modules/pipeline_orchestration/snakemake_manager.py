@@ -6,15 +6,11 @@ This module provides comprehensive Snakemake pipeline management capabilities
 for cancer genomics analysis workflows.
 """
 
-import json
 import logging
-import os
-import shutil
 import subprocess
-import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

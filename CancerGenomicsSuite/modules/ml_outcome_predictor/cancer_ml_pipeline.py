@@ -15,7 +15,7 @@ Features:
 
 Usage:
     from CancerGenomicsSuite.modules.ml_outcome_predictor.cancer_ml_pipeline import CancerMLPipeline
-    
+
     pipeline = CancerMLPipeline()
     pipeline.load_data("data/workflow_output/processed/mutations_processed_BRCA.csv")
     pipeline.train_models()
@@ -24,16 +24,14 @@ Usage:
 
 import json
 import logging
-import os
 import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.feature_selection import SelectKBest, f_classif, mutual_info_classif
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
@@ -41,15 +39,12 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     f1_score,
-    precision_recall_curve,
     precision_score,
     recall_score,
     roc_auc_score,
-    roc_curve,
 )
 from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
-from sklearn.pipeline import Pipeline as SKPipeline
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 
 # Try to import optional ML libraries
 try:

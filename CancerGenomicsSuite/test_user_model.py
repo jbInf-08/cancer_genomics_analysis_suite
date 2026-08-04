@@ -147,7 +147,7 @@ def test_user_model():
 
             # Delete the user
             temp_user.delete()
-            print(f"   ✅ Temp user deleted")
+            print("   ✅ Temp user deleted")
 
             # Verify deletion
             deleted_user = User.query.get(temp_id)

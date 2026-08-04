@@ -5,7 +5,6 @@ Provides functionality to execute MATLAB code and interact with MATLAB
 for numerical computing and signal processing operations.
 """
 
-import json
 import logging
 import os
 import subprocess

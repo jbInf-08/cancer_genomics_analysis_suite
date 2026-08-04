@@ -5,20 +5,18 @@ This module demonstrates the complete omics analysis pipeline with all implement
 omics fields, from data loading and validation to integration and visualization.
 """
 
-import json
 import logging
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
 
 from .omics_dashboard import create_comprehensive_omics_dashboard
-from .omics_integration import OmicsIntegrationEngine, get_omics_integration_engine
-from .omics_metadata import OmicsMetadataManager, get_omics_metadata_manager
-from .omics_processor import OmicsProcessorFactory, get_omics_processor_factory
-from .omics_registry import OmicsFieldRegistry, get_omics_registry
-from .omics_validation import OmicsValidationPipeline, get_omics_validation_pipeline
+from .omics_integration import get_omics_integration_engine
+from .omics_metadata import get_omics_metadata_manager
+from .omics_processor import get_omics_processor_factory
+from .omics_registry import get_omics_registry
+from .omics_validation import get_omics_validation_pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -469,7 +467,7 @@ including support for {len(self.registry.get_all_fields())} different omics fiel
             for omics_type, data in self.processed_data.items():
                 report += f"  - {omics_type}: {data.shape[0]} features, {data.shape[1]} samples\n"
 
-        report += f"""
+        report += """
 ## Validation Results
 """
 
@@ -481,7 +479,7 @@ including support for {len(self.registry.get_all_fields())} different omics fiel
             )
             report += f"- Validation passed for {passed_count}/{len(self.validation_results)} omics types\n"
 
-        report += f"""
+        report += """
 ## Integration Results
 """
 
@@ -494,7 +492,7 @@ including support for {len(self.registry.get_all_fields())} different omics fiel
                 ):
                     report += f"  - {method}: {result.integrated_data.shape[0]} features, {result.integrated_data.shape[1]} samples\n"
 
-        report += f"""
+        report += """
 ## Metadata Management Results
 """
 

@@ -14,20 +14,19 @@ Features:
 - Database statistics and monitoring
 """
 
-import json
 import logging
 import os
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, Optional, Type
 
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
 # Import database instance and models
 from .. import db
-from .models import AnalysisJob, AnalysisResult, DataFile
+from .models import AnalysisJob, AnalysisResult
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -184,7 +183,6 @@ def restore_database(backup_path: str) -> bool:
 
         if db_url.startswith("sqlite"):
             # SQLite restore
-            import sqlite3
 
             source_db = db_url.replace("sqlite:///", "")
 

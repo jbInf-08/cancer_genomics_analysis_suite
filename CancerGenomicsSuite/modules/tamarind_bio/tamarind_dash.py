@@ -4,16 +4,9 @@ Tamarind Bio Integration Dashboard
 Provides a Dash interface for bioinformatics workflows using Tamarind Bio.
 """
 
-import json
 import logging
-import os
-from typing import Any, Dict, List
 
-import dash
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, State, dcc, html
 
 from .tamarind_client import TamarindClient
 

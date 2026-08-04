@@ -6,10 +6,9 @@ This module provides Auth0-specific OAuth2 client functionality
 for the cancer genomics analysis suite.
 """
 
-import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import requests
 

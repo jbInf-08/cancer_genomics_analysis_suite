@@ -15,13 +15,10 @@ import warnings
 import xml.etree.ElementTree as ET
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import urljoin, urlparse
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
 
 import feedparser
-import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -652,8 +649,8 @@ class ArticleScraper:
                     # Insert article
                     conn.execute(
                         """
-                        INSERT OR IGNORE INTO articles 
-                        (hash, title, authors, abstract, doi, pmid, url, journal, 
+                        INSERT OR IGNORE INTO articles
+                        (hash, title, authors, abstract, doi, pmid, url, journal,
                          publication_date, keywords, citations, source, scraped_date, content)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
@@ -827,8 +824,8 @@ class ArticleScraper:
             # Get recent scraping activity
             cursor = conn.execute(
                 """
-                SELECT DATE(scraped_date) as date, COUNT(*) as count 
-                FROM articles 
+                SELECT DATE(scraped_date) as date, COUNT(*) as count
+                FROM articles
                 WHERE scraped_date >= date('now', '-30 days')
                 GROUP BY DATE(scraped_date)
                 ORDER BY date DESC

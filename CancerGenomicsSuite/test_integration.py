@@ -66,7 +66,7 @@ def test_compatibility_manager():
         manager = get_compatibility_manager()
 
         available_services = manager.get_available_services()
-        print(f"✅ Compatibility manager initialized")
+        print("✅ Compatibility manager initialized")
         print(f"   Available services: {available_services}")
 
         return True
@@ -150,7 +150,7 @@ def run_biomarker_discovery(data, labels):
 
         # Test biomarker discovery
         biomarkers = discover_biomarkers_compatible(data, labels)
-        print(f"✅ Biomarker discovery completed")
+        print("✅ Biomarker discovery completed")
         print(f"   Found {len(biomarkers)} biomarkers")
 
         if biomarkers:

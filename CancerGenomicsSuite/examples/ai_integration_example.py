@@ -6,11 +6,10 @@ models in the cancer genomics analysis pipeline.
 """
 
 import logging
-import os
 import sys
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -47,10 +46,9 @@ from modules.ai_integration import (
     ScientificLiteratureProcessor,
     SurvivalAnalysisModel,
 )
-from modules.ml_outcome_predictor import MLOutcomePredictor
 
 # Import existing modules
-from modules.omics_definitions import OmicsDataProcessor, OmicsFieldRegistry
+from modules.omics_definitions import OmicsFieldRegistry
 from modules.reporting_engine import HTMLReporter, PDFBuilder
 
 # Configure logging
@@ -481,7 +479,7 @@ def main():
     print("AI INTEGRATION EXAMPLE SUMMARY")
     print("=" * 80)
 
-    print(f"\nData Quality Assessment:")
+    print("\nData Quality Assessment:")
     if "data_quality" in results:
         quality_score = (
             results["data_quality"]
@@ -497,7 +495,7 @@ def main():
         )
         print(f"  - Anomalies Detected: {anomaly_count}")
 
-    print(f"\nAI Insights Generated:")
+    print("\nAI Insights Generated:")
     if "ai_insights" in results:
         insight_count = results["ai_insights"].get("insight_count", 0)
         print(f"  - Total Insights: {insight_count}")
@@ -505,7 +503,7 @@ def main():
         patterns = results["ai_insights"].get("patterns", {})
         print(f"  - Pattern Types Detected: {len(patterns)}")
 
-    print(f"\nPredictive Models:")
+    print("\nPredictive Models:")
     if "predictions" in results:
         best_model = results["predictions"].get("best_model", "Unknown")
         print(f"  - Best Model: {best_model}")
@@ -513,7 +511,7 @@ def main():
         ml_results = results["predictions"].get("ml_pipeline_results", {})
         print(f"  - Models Trained: {len(ml_results)}")
 
-    print(f"\nVisualizations Created:")
+    print("\nVisualizations Created:")
     if "visualizations" in results:
         dashboard = results["visualizations"].get("interactive_dashboard", {})
         components = len(dashboard.get("components", []))
@@ -522,14 +520,14 @@ def main():
         ai_features = len(dashboard.get("ai_features", []))
         print(f"  - AI Features: {ai_features}")
 
-    print(f"\nReports Generated:")
+    print("\nReports Generated:")
     if "reports" in results:
         html_path = results["reports"].get("html_report_path", "N/A")
         pdf_path = results["reports"].get("pdf_report_path", "N/A")
         print(f"  - HTML Report: {html_path}")
         print(f"  - PDF Report: {pdf_path}")
 
-    print(f"\nChatbot Interactions:")
+    print("\nChatbot Interactions:")
     if "chatbot_interactions" in results:
         interactions = results["chatbot_interactions"].get("total_interactions", 0)
         print(f"  - Sample Interactions: {interactions}")

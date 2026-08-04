@@ -8,7 +8,6 @@ import sys
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
 import requests
 
 # Package root = CancerGenomicsSuite

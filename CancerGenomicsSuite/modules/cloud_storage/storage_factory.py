@@ -3,7 +3,7 @@ Storage Factory for creating cloud storage clients
 """
 
 import os
-from typing import Optional, Union
+from typing import Optional
 
 from .base_storage import BaseStorageClient
 from .gcs_client import GCSStorageClient

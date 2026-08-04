@@ -23,8 +23,8 @@ import logging
 import os
 import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Union
-from urllib.parse import urlencode, urljoin
+from typing import Any, Dict, List, Optional
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests

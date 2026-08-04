@@ -6,14 +6,10 @@ This module provides comprehensive OAuth2 authentication management
 for the cancer genomics analysis suite.
 """
 
-import json
 import logging
 import secrets
-import threading
-import time
 from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, List, Optional, Union
-from urllib.parse import parse_qs, urlencode, urlparse
+from typing import Any, Dict, List, Optional
 
 try:
     from authlib.integrations.flask_client import OAuth

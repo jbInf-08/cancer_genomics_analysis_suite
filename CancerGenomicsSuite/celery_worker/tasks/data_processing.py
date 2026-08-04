@@ -10,12 +10,10 @@ import logging
 import os
 import shutil
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
-from celery import current_task
 from celery_worker import celery
 
 logger = logging.getLogger(__name__)

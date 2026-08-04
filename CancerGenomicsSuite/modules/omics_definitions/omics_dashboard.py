@@ -5,23 +5,19 @@ This module provides a comprehensive dashboard for all omics fields with interac
 visualizations, data management, and analysis capabilities.
 """
 
-import json
 import logging
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict
 
 import dash
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import Input, Output, State, callback_context, dcc, html
-from plotly.subplots import make_subplots
 
-from .omics_integration import OmicsIntegrationEngine, get_omics_integration_engine
-from .omics_metadata import OmicsMetadataManager, get_omics_metadata_manager
-from .omics_processor import OmicsProcessorFactory, get_omics_processor_factory
-from .omics_registry import OmicsFieldRegistry, get_omics_registry
+from .omics_integration import get_omics_integration_engine
+from .omics_metadata import get_omics_metadata_manager
+from .omics_processor import get_omics_processor_factory
+from .omics_registry import get_omics_registry
 
 logger = logging.getLogger(__name__)
 
@@ -726,19 +722,19 @@ class ComprehensiveOmicsDashboard:
             info_html = f"""
             <strong>{field.full_name}</strong><br>
             <em>{field.description}</em><br><br>
-            
+
             <strong>Category:</strong> {field.category}<br>
             <strong>Data Type:</strong> {field.data_type.value}<br>
             <strong>Complexity:</strong> {field.complexity_level}<br>
             <strong>Maturity:</strong> {field.maturity_level}<br>
             <strong>Clinical Relevance:</strong> {field.clinical_relevance}<br><br>
-            
+
             <strong>Primary Entities:</strong><br>
             {', '.join(field.primary_entities[:5])}<br><br>
-            
+
             <strong>Supported Analyses:</strong><br>
             {', '.join(field.supported_analyses[:5])}<br><br>
-            
+
             <strong>Required Tools:</strong><br>
             {', '.join(field.required_tools[:5])}
             """
@@ -943,7 +939,7 @@ class ComprehensiveOmicsDashboard:
                     dimensionality_display = html.Div(
                         [
                             html.H5("Dimensionality Reduction Results"),
-                            html.P(f"Method: PCA"),
+                            html.P("Method: PCA"),
                             html.P(f"Components: {reduced_data.shape[1]}"),
                             html.P(
                                 f"Explained variance: {integration_result.quality_metrics.get('variance_explained', 'N/A')}"
@@ -1072,13 +1068,13 @@ class ComprehensiveOmicsDashboard:
                     report = f"""
                     # Data Summary Report
                     Generated on: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
-                    
+
                     ## Loaded Datasets
                     """
                     for omics_type, data in self.loaded_data.items():
                         report += f"- {omics_type}: {data.shape[0]} features, {data.shape[1]} samples\n"
 
-                    report += f"""
+                    report += """
                     ## Processed Datasets
                     """
                     for omics_type, data in self.processed_data.items():
@@ -1096,7 +1092,7 @@ class ComprehensiveOmicsDashboard:
                     report = f"""
                     # Analysis Report
                     Generated on: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
-                    
+
                     ## Integration Results
                     """
                     for method, result in self.integration_results.items():

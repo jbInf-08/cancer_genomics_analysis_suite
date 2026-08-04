@@ -7,26 +7,18 @@ prediction, and multi-omics integration.
 """
 
 import logging
-import pickle
 import warnings
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
-import joblib
-import numpy as np
-import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 warnings.filterwarnings("ignore")
 
-import pytorch_lightning as pl
 
 # Scientific computing
-import scipy.stats as stats
 
 # Deep learning frameworks
 import torch
@@ -34,17 +26,8 @@ import torch.nn as nn
 import torch.optim as optim
 
 # Bioinformatics
-from Bio import SeqIO
-from Bio.Seq import Seq
-from Bio.SeqUtils import gc_fraction, molecular_weight
-from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
+from Bio.SeqUtils import gc_fraction
+from sklearn.metrics import f1_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from torch.utils.data import DataLoader, Dataset

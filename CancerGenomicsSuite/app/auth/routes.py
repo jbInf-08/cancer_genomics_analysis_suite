@@ -6,19 +6,8 @@ This module provides authentication-related routes including login, logout,
 registration, and user management functionality.
 """
 
-from flask import (
-    Blueprint,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
-from flask_login import current_user, login_required, login_user, logout_user
-from werkzeug.exceptions import BadRequest, Forbidden, Unauthorized
-from werkzeug.security import check_password_hash, generate_password_hash
+from flask import Blueprint, jsonify, request
+from werkzeug.security import check_password_hash
 
 # Import app components
 from .. import db
