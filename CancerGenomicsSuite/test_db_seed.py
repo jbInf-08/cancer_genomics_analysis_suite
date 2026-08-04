@@ -20,14 +20,12 @@ Options:
 """
 
 import argparse
-import os
 import random
 import sys
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-import numpy as np
 import pandas as pd
 
 

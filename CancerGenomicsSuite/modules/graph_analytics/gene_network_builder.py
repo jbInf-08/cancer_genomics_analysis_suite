@@ -8,7 +8,7 @@ data sources for cancer genomics analysis.
 
 import logging
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd

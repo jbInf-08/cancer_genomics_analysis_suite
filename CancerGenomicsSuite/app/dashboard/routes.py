@@ -6,8 +6,7 @@ This module provides dashboard-related routes for the main application interface
 including data visualization, analysis tools, and user management.
 """
 
-from flask import Blueprint, jsonify, render_template, request
-from flask_login import login_required
+from flask import Blueprint, jsonify, render_template
 
 # Create blueprint
 dashboard_bp = Blueprint("dashboard", __name__)

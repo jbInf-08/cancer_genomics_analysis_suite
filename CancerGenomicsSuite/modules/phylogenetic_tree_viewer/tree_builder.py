@@ -6,33 +6,24 @@ integrating various tree building algorithms and providing comprehensive
 phylogenetic analysis capabilities for the Cancer Genomics Analysis Suite.
 """
 
-import io
-import json
 import logging
 import time
-from collections import defaultdict
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
-import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from Bio import AlignIO, Phylo
 from Bio.Align import MultipleSeqAlignment
-from Bio.Phylo import draw_ascii
-from Bio.Phylo.Consensus import bootstrap_consensus, majority_consensus
+from Bio.Phylo.Consensus import bootstrap_consensus
 from Bio.Phylo.TreeConstruction import (
-    DistanceCalculator,
     DistanceTreeConstructor,
     ParsimonyScorer,
     ParsimonyTreeConstructor,
     _Matrix,
 )
-from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from matplotlib.patches import FancyBboxPatch
 
 
 @dataclass

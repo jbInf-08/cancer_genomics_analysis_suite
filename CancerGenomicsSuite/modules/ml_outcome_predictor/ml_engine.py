@@ -8,17 +8,13 @@ for predicting cancer treatment outcomes, survival rates, and drug responses.
 import logging
 import warnings
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List
 
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import (
-    GradientBoostingClassifier,
-    RandomForestClassifier,
-    RandomForestRegressor,
-)
-from sklearn.linear_model import CoxPHFitter, LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -29,7 +25,7 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
-from sklearn.model_selection import GridSearchCV, cross_val_score, train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.svm import SVC, SVR

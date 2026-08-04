@@ -6,16 +6,10 @@ and protein modeling using PyMOL.
 """
 
 import base64
-import json
 import logging
 import os
 import tempfile
-from typing import Any, Dict, List
 
-import dash
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
 from dash import Input, Output, State, callback_context, dcc, html
 
 from .pymol_client import PyMOLClient
@@ -381,7 +375,6 @@ def register_callbacks(app):
         try:
             # Save uploaded file
             import base64
-            import io
 
             content_type, content_string = contents.split(",")
             decoded = base64.b64decode(content_string)

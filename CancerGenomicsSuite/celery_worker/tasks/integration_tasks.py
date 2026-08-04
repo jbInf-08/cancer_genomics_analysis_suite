@@ -5,16 +5,13 @@ This module contains Celery tasks for external integrations,
 API calls, and system monitoring in the cancer genomics analysis suite.
 """
 
-import json
 import logging
 import os
-import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import psutil
 import requests
-from celery import current_task
 from celery_worker import celery
 
 logger = logging.getLogger(__name__)

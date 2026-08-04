@@ -14,12 +14,7 @@ from pathlib import Path
 # Add the parent directory to the path to import modules
 sys.path.append(str(Path(__file__).parent.parent))
 
-from modules.ngs_platform_support import (
-    EnhancedWorkflowDispatcher,
-    PipelineDefinition,
-    PipelineStatus,
-    PipelineType,
-)
+from modules.ngs_platform_support import EnhancedWorkflowDispatcher, PipelineStatus
 
 # Configure logging
 logging.basicConfig(
@@ -147,11 +142,7 @@ async def demonstrate_alert_monitoring():
     """Demonstrate alert monitoring with webhook notifications."""
     logger.info("\n=== Alert Monitoring Example ===")
 
-    from modules.notifications.alert_monitor import (
-        AlertMonitor,
-        AlertSeverity,
-        AlertStatus,
-    )
+    from modules.notifications.alert_monitor import AlertMonitor, AlertSeverity
 
     # Initialize alert monitor
     monitor = AlertMonitor()

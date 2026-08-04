@@ -18,11 +18,10 @@ import json
 import logging
 import os
 import platform
-import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 # Add the parent directory to the path to import modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -651,16 +650,16 @@ def main():
 Examples:
   # Run full setup
   python setup_auto_generation.py full-setup
-  
+
   # Check dependencies
   python setup_auto_generation.py check-dependencies
-  
+
   # Generate only BLAST databases
   python setup_auto_generation.py blast-databases
-  
+
   # Generate only mock data
   python setup_auto_generation.py mock-data
-  
+
   # Install missing dependencies
   python setup_auto_generation.py install-dependencies
         """,

@@ -8,11 +8,9 @@ and navigate through genomic regions.
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import dash
-import pandas as pd
-import plotly.express as px
 import plotly.graph_objs as go
 from dash import Input, Output, State, callback_context, dash_table, dcc, html
 
@@ -23,12 +21,7 @@ from CancerGenomicsSuite.modules.gene_annotation.gene_location_predictor import 
     GeneLocationPredictor,
 )
 
-from .browser import (
-    GenomeBrowser,
-    GenomicFeature,
-    GenomicRegion,
-    create_sample_genome_browser,
-)
+from .browser import GenomicFeature, GenomicRegion, create_sample_genome_browser
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

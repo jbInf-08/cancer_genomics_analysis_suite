@@ -5,56 +5,35 @@ This module provides intelligent visualization capabilities, automated insight g
 pattern recognition, and interactive visualizations for cancer genomics analysis.
 """
 
-import json
 import logging
 import warnings
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-import re
-
-import altair as alt
-import bokeh.plotting as bk
 
 # Visualization libraries
-import matplotlib.pyplot as plt
 import plotly.express as px
-import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
 # Statistical analysis
 import scipy.stats as stats
-import seaborn as sns
-
-# Deep Learning for pattern recognition
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, HoverTool
-from plotly.offline import plot
-from plotly.subplots import make_subplots
-from scipy.cluster.hierarchy import dendrogram, linkage
-from scipy.spatial.distance import pdist, squareform
 
 # Machine Learning for pattern recognition
-from sklearn.cluster import DBSCAN, AgglomerativeClustering, KMeans
+from sklearn.cluster import DBSCAN, KMeans
 from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.metrics import calinski_harabasz_score, silhouette_score
-from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+# Deep Learning for pattern recognition
+
 
 # Time series analysis
-from statsmodels.tsa.seasonal import seasonal_decompose
-from statsmodels.tsa.stattools import adfuller
 
 # Natural Language Processing for insights
-from textblob import TextBlob
 
 logger = logging.getLogger(__name__)
 

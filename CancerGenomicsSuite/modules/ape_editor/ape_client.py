@@ -12,8 +12,7 @@ import platform
 import shutil
 import subprocess
 import tempfile
-import xml.etree.ElementTree as ET
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

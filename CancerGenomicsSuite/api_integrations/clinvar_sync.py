@@ -25,9 +25,9 @@ import sqlite3
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import urlencode, urljoin
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests
@@ -684,7 +684,7 @@ class ClinVarSync:
             # Get recent sync operations
             recent_syncs = conn.execute(
                 """
-                SELECT COUNT(*) FROM sync_log 
+                SELECT COUNT(*) FROM sync_log
                 WHERE timestamp > datetime('now', '-7 days')
             """
             ).fetchone()[0]
@@ -692,7 +692,7 @@ class ClinVarSync:
             # Get success rate
             successful_syncs = conn.execute(
                 """
-                SELECT COUNT(*) FROM sync_log 
+                SELECT COUNT(*) FROM sync_log
                 WHERE status = 'success' AND timestamp > datetime('now', '-7 days')
             """
             ).fetchone()[0]

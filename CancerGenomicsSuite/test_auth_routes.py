@@ -6,7 +6,6 @@ This script demonstrates the simplified authentication routes
 for the Cancer Genomics Analysis Suite.
 """
 
-import json
 import sys
 from pathlib import Path
 

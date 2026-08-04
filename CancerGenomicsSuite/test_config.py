@@ -7,9 +7,9 @@ def test_config_import():
     print("Testing configuration package import...")
 
     try:
-        from CancerGenomicsSuite.config import settings, validate_configuration
+        from CancerGenomicsSuite.config import settings
 
-        print(f"✓ Configuration imported successfully")
+        print("✓ Configuration imported successfully")
         print(f"✓ App name: {settings.app_name}")
         print(f"✓ App version: {settings.app_version}")
         print(f"✓ Environment: {settings.flask_env}")
@@ -34,7 +34,7 @@ def test_config_validation():
 
         results = validate_configuration()
 
-        print(f"✓ Configuration validation completed")
+        print("✓ Configuration validation completed")
         print(f"✓ Valid: {results['valid']}")
         print(f"✓ Errors: {len(results['errors'])}")
         print(f"✓ Warnings: {len(results['warnings'])}")

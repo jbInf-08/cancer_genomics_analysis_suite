@@ -9,7 +9,7 @@ external APIs, security, logging, and feature flags.
 Usage:
     from config import settings
     print(settings.app_name)
-    
+
     # Access specific configuration sections
     db_url = settings.database.url
     api_key = settings.external_apis.cosmic_api_key

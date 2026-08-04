@@ -13,7 +13,6 @@ Usage:
 """
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -165,7 +164,7 @@ def main():
 
     args = parser.parse_args()
 
-    print(f"Cancer Genomics Analysis Suite - Celery Worker")
+    print("Cancer Genomics Analysis Suite - Celery Worker")
     print(f"Environment: {settings.flask_env}")
     print(f"Broker: {settings.celery.broker_url}")
     print(f"Result Backend: {settings.celery.result_backend}")

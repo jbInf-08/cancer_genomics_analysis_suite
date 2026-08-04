@@ -4,14 +4,12 @@ Tamarind Bio Integration Client
 Provides functionality to interact with Tamarind Bio for bioinformatics workflows.
 """
 
-import json
 import logging
 import os
 import platform
 import shutil
 import subprocess
-import tempfile
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 

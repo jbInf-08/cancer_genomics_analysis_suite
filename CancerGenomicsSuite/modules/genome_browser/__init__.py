@@ -67,20 +67,20 @@ Usage Examples:
 
 Basic genome browser:
     from CancerGenomicsSuite.modules.genome_browser import GenomeBrowser
-    
+
     browser = GenomeBrowser("hg38")
     browser.set_region("chr17", 43000000, 43100000)
     features = browser.get_features_in_region()
 
 Interactive dashboard:
     from CancerGenomicsSuite.modules.genome_browser import create_genome_browser_dashboard
-    
+
     dashboard = create_genome_browser_dashboard()
     dashboard.run(port=8050)
 
 UCSC integration:
     from CancerGenomicsSuite.modules.genome_browser import UCSCGenomeBrowser
-    
+
     ucsc_browser = UCSCGenomeBrowser("hg38")
     tracks = ucsc_browser.get_ucsc_tracks()
 """

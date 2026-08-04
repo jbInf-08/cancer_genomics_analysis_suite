@@ -5,20 +5,15 @@ This module provides a comprehensive Dash-based dashboard for article management
 search, analysis, and visualization.
 """
 
-import base64
-import io
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import dash
-import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash import Input, Output, State, callback_context, dcc, html
-from plotly.subplots import make_subplots
 
 from .article_db import ArticleDatabaseManager, ArticleMetadata, create_mock_articles
 

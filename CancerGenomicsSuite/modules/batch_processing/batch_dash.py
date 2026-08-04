@@ -9,22 +9,18 @@ import json
 import logging
 import queue
 import sqlite3
-import threading
-import time
 import uuid
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import dash
-import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, callback_context, dcc, html
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +182,7 @@ class BatchQueue:
 
             conn.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_status_priority 
+                CREATE INDEX IF NOT EXISTS idx_status_priority
                 ON jobs(status, priority DESC, created_at)
             """
             )

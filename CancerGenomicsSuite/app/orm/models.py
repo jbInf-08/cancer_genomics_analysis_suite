@@ -26,9 +26,8 @@ Models:
 import json
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import CheckConstraint, Index
 from sqlalchemy.exc import SQLAlchemyError
 

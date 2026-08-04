@@ -6,19 +6,13 @@ including pathway analysis, gene interaction networks, and mutation clustering.
 """
 
 import asyncio
-import json
 import logging
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
-import aiohttp
-import asyncpg
-import networkx as nx
 import numpy as np
-import pandas as pd
 from neo4j import Driver, GraphDatabase, Session
-from neo4j.exceptions import ServiceUnavailable, TransientError
 from prometheus_client import Counter, Gauge, Histogram
 
 # Configure logging
@@ -319,7 +313,7 @@ class Neo4jMutationAnalyzer:
             OPTIONAL MATCH (g)-[r:INTERACTS_WITH]-(related:Gene)
             OPTIONAL MATCH (g)-[:PART_OF_PATHWAY]-(p:Pathway)
             OPTIONAL MATCH (related)-[:PART_OF_PATHWAY]-(related_pathway:Pathway)
-            
+
             RETURN g,
                    collect(DISTINCT related) as interacting_genes,
                    collect(DISTINCT p) as affected_pathways,
@@ -390,10 +384,10 @@ class Neo4jMutationAnalyzer:
                 MATCH (m)-[:AFFECTS]->(g:Gene)
                 MATCH (g)-[:INTERACTS_WITH]-(related:Gene)<-[:AFFECTS]-(related_mutation:Mutation)
                 WHERE related_mutation <> m
-                
+
                 WITH m, g, collect(DISTINCT related_mutation) as related_mutations
                 WHERE size(related_mutations) >= $min_cluster_size
-                
+
                 RETURN m, g, related_mutations,
                        collect(DISTINCT g.symbol) as gene_symbols
                 """
@@ -402,10 +396,10 @@ class Neo4jMutationAnalyzer:
                 MATCH (m:Mutation)-[:AFFECTS]->(g:Gene)
                 MATCH (g)-[:INTERACTS_WITH]-(related:Gene)<-[:AFFECTS]-(related_mutation:Mutation)
                 WHERE related_mutation <> m
-                
+
                 WITH m, g, collect(DISTINCT related_mutation) as related_mutations
                 WHERE size(related_mutations) >= $min_cluster_size
-                
+
                 RETURN m, g, related_mutations,
                        collect(DISTINCT g.symbol) as gene_symbols
                 """
@@ -472,13 +466,13 @@ class Neo4jMutationAnalyzer:
             query = """
             UNWIND $gene_list as gene_symbol
             MATCH (g:Gene {symbol: gene_symbol})-[:PART_OF_PATHWAY]->(p:Pathway)
-            
+
             WITH p, count(g) as gene_count, collect(g.symbol) as genes_in_pathway
             WHERE gene_count >= 2
-            
+
             MATCH (p)<-[:PART_OF_PATHWAY]-(all_genes:Gene)
             WITH p, gene_count, genes_in_pathway, count(all_genes) as total_genes_in_pathway
-            
+
             RETURN p.name as pathway_name,
                    p.description as pathway_description,
                    p.source as pathway_source,
@@ -544,13 +538,13 @@ class Neo4jMutationAnalyzer:
             OPTIONAL MATCH path = (g)-[:INTERACTS_WITH*1..$max_depth]-(related:Gene)
             OPTIONAL MATCH (g)-[:PART_OF_PATHWAY]->(p:Pathway)
             OPTIONAL MATCH (g)<-[:AFFECTS]-(m:Mutation)
-            
-            WITH g, 
+
+            WITH g,
                  collect(DISTINCT related) as network_genes,
                  collect(DISTINCT p) as pathways,
                  collect(DISTINCT m) as mutations,
                  collect(DISTINCT path) as interaction_paths
-            
+
             RETURN g,
                    network_genes,
                    pathways,

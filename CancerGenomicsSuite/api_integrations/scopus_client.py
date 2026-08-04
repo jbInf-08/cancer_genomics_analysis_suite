@@ -22,11 +22,10 @@ import json
 import logging
 import os
 import time
-import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, Union
-from urllib.parse import urlencode, urljoin
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urljoin
 
 import pandas as pd
 import requests

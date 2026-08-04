@@ -7,15 +7,13 @@ metabolic pathways in cancer genomics data.
 
 import json
 import logging
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 import networkx as nx
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

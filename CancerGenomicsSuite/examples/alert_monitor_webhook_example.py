@@ -6,7 +6,6 @@ This script demonstrates how to set up and use the Slack/Teams webhook fallback
 functionality in the Cancer Genomics Analysis Suite alert monitoring system.
 """
 
-import asyncio
 import logging
 import os
 import sys
@@ -19,7 +18,6 @@ from modules.notifications.alert_monitor import (
     AlertMonitor,
     AlertSeverity,
     AlertStatus,
-    EmailNotifier,
     SlackNotifier,
     TeamsNotifier,
 )

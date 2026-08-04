@@ -6,11 +6,10 @@ including differential expression, normalization, and pathway enrichment.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
-from celery import current_task
 from celery_worker import celery
 
 logger = logging.getLogger(__name__)

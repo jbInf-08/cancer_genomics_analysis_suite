@@ -5,20 +5,19 @@ This module provides standardized data processing interfaces for all omics field
 including data loading, preprocessing, normalization, quality control, and validation.
 """
 
-import json
 import logging
 import warnings
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 
 warnings.filterwarnings("ignore")
 
-from .omics_registry import OmicsDataType, OmicsFieldDefinition, OmicsFieldRegistry
+from .omics_registry import OmicsDataType, OmicsFieldRegistry
 
 logger = logging.getLogger(__name__)
 

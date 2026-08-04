@@ -5,23 +5,18 @@ Provides interactive dashboard functionality for reporting in the Cancer Genomic
 Supports real-time report generation, filtering, and visualization of analysis results.
 """
 
-import base64
-import io
 import json
 import logging
-import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple
 
 import dash
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, State, dcc, html
 
 logger = logging.getLogger(__name__)
 

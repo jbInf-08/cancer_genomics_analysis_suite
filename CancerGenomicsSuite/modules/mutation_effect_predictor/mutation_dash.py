@@ -10,12 +10,10 @@ import json
 import logging
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import dash
-import numpy as np
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objs as go
 from dash import (
     Input,
@@ -44,13 +42,7 @@ from CancerGenomicsSuite.modules.pipeline_orchestration.workflow_executor import
     WorkflowExecutor,
 )
 
-from .predictor import (
-    Mutation,
-    MutationEffectPredictor,
-    PredictionResult,
-    create_sample_mutations,
-    create_sample_predictor,
-)
+from .predictor import Mutation, create_sample_mutations, create_sample_predictor
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

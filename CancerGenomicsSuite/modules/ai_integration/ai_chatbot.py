@@ -5,55 +5,34 @@ This module provides an intelligent chatbot assistant that can answer questions,
 provide analysis guidance, and assist users with genomic data analysis tasks.
 """
 
-import asyncio
 import json
 import logging
-import os
 import re
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-# Vector databases
-import chromadb
-import nltk
-import numpy as np
+from typing import Any, Dict, List, Optional
 
 # LLM and NLP libraries
 import openai
 
-# Data processing
-import pandas as pd
-
 # Natural Language Processing
 import spacy
-import torch
-from anthropic import Anthropic
-from chromadb.config import Settings
 
 # LangChain for conversational AI
-from langchain.agents import AgentType, Tool, initialize_agent
-from langchain.chains import ConversationalRetrievalChain, LLMChain, RetrievalQA
+from langchain.agents import Tool
+from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory, ConversationSummaryMemory
-from langchain_community.embeddings import HuggingFaceEmbeddings, OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.llms import Anthropic as LangChainAnthropic
 from langchain_community.llms import OpenAI
-from langchain_community.vectorstores import FAISS, Chroma
-from langchain_core.prompts import PromptTemplate
-from langchain_core.tools import BaseTool
-from nltk.corpus import stopwords
-from nltk.tokenize import sent_tokenize, word_tokenize
-from sentence_transformers import SentenceTransformer
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from textblob import TextBlob
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    TextGenerationPipeline,
-    pipeline,
-)
+from langchain_community.vectorstores import Chroma
+from nltk.tokenize import sent_tokenize
+
+# Vector databases
+
+
+# Data processing
+
 
 logger = logging.getLogger(__name__)
 
@@ -307,10 +286,10 @@ class GenomicAnalysisAssistant:
         # Generate analysis prompt
         prompt = f"""
         Based on the user's request: "{message}"
-        
+
         Analysis type: {analysis_type}
         Parameters: {parameters}
-        
+
         Please provide a detailed analysis plan and explain what genomic analysis would be most appropriate.
         """
 
@@ -340,9 +319,9 @@ class GenomicAnalysisAssistant:
 
         prompt = f"""
         The user wants to create a visualization: "{message}"
-        
+
         Visualization type: {viz_type}
-        
+
         Please provide guidance on the best visualization approach and explain what type of plot would be most effective.
         """
 
@@ -370,9 +349,9 @@ class GenomicAnalysisAssistant:
 
         prompt = f"""
         The user is asking for an explanation: "{message}"
-        
+
         Concept to explain: {concept}
-        
+
         Please provide a clear, comprehensive explanation suitable for someone working in cancer genomics.
         Include relevant examples and practical applications.
         """
@@ -409,14 +388,14 @@ class GenomicAnalysisAssistant:
 
         response_text = """
         I'm here to help you with cancer genomics analysis! Here are the main areas I can assist with:
-        
+
         • **Genomic Analysis**: Mutation analysis, gene expression analysis, pathway analysis
         • **Data Visualization**: Creating plots, charts, and interactive dashboards
         • **Statistical Analysis**: Hypothesis testing, correlation analysis, significance testing
         • **Machine Learning**: Training models for prediction and classification
         • **Literature Search**: Finding relevant research papers and scientific information
         • **Data Preprocessing**: Quality control, normalization, feature engineering
-        
+
         You can ask me questions like:
         - "How do I analyze gene expression data?"
         - "What's the best way to visualize mutation data?"
@@ -479,8 +458,8 @@ class GenomicAnalysisAssistant:
         """Handle general requests."""
         prompt = f"""
         The user has asked: "{message}"
-        
-        Please provide a helpful response related to cancer genomics analysis. 
+
+        Please provide a helpful response related to cancer genomics analysis.
         If the question is not related to genomics, politely redirect to genomic topics.
         """
 

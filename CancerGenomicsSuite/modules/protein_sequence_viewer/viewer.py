@@ -9,18 +9,12 @@ protein analysis capabilities for the Cancer Genomics Analysis Suite.
 import json
 import logging
 import re
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-import requests
-from Bio import SeqIO
-from Bio.ExPASy import Prodoc, Prosite
-from Bio.Seq import Seq
-from Bio.SeqUtils import molecular_weight
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
 
 

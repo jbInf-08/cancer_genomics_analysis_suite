@@ -7,15 +7,13 @@ operations for the Cancer Genomics Analysis Suite.
 """
 
 import logging
-import re
 from collections import Counter, defaultdict
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from Bio import SeqIO
 from Bio.Data import CodonTable
 from Bio.Seq import Seq
 from Bio.SeqUtils import gc_fraction, molecular_weight

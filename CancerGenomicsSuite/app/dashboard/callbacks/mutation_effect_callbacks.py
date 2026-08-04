@@ -15,19 +15,16 @@ Features:
 """
 
 import logging
-from typing import Any, Dict, List, Optional
 
-import dash
-import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dcc, html, no_update
+from dash import Input, Output, State, html, no_update
 
 from ...orm import db
 
 # Import database models and utilities
-from ...orm.models import DataFile, MutationRecord
+from ...orm.models import MutationRecord
 
 logger = logging.getLogger(__name__)
 
@@ -293,7 +290,7 @@ def register_mutation_effect_callbacks(app):
                 if mutation:
                     return html.Div(
                         [
-                            html.H4(f"Mutation Details"),
+                            html.H4("Mutation Details"),
                             html.P(f"Gene: {mutation.gene}"),
                             html.P(f"Variant: {mutation.variant}"),
                             html.P(f"Variant Type: {mutation.variant_type or 'N/A'}"),

@@ -458,7 +458,7 @@ class TemplateUtils:
 <body>
     <h1>{{ title }}</h1>
     <p>Generated on: {{ date }}</p>
-    
+
     {% for section in sections %}
     <div class="section">
         <h2>{{ section.title }}</h2>

@@ -6,12 +6,10 @@ including text, tables, charts, and images. It supports multiple output formats 
 customizable styling options.
 """
 
-import io
 import os
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
-import matplotlib.pyplot as plt
 import pandas as pd
 from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics.charts.linecharts import HorizontalLineChart

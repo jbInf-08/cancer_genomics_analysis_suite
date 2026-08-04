@@ -6,15 +6,12 @@ allowing users to input sequences, configure analysis parameters, and
 visualize results through a web-based interface.
 """
 
-import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 import dash
-import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dash_table, dcc, html
+from dash import Input, Output, State, dash_table, dcc, html
 
 from .viewer import ProteinAnalysisConfig, ProteinViewer
 

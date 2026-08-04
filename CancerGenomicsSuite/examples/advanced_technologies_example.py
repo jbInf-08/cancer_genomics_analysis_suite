@@ -11,12 +11,11 @@ integrated into the Cancer Genomics Analysis Suite:
 """
 
 import asyncio
-import json
 import logging
 import os
 import sys
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict
 
 # Add the parent directory to the path to import modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

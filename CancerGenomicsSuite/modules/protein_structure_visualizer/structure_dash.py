@@ -7,18 +7,13 @@ and explore structural features interactively.
 """
 
 import base64
-import io
 import json
 import logging
-import math
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import dash
-import numpy as np
-import pandas as pd
-import plotly.express as px
 import plotly.graph_objs as go
 from dash import (
     Input,
@@ -44,15 +39,7 @@ from CancerGenomicsSuite.modules.pipeline_orchestration.workflow_executor import
     WorkflowExecutor,
 )
 
-from .visualizer import (
-    Atom,
-    ProteinStructure,
-    ProteinStructureVisualizer,
-    Residue,
-    StructuralFeature,
-    create_sample_protein_structure,
-    create_sample_visualizer,
-)
+from .visualizer import create_sample_visualizer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

@@ -135,14 +135,14 @@ class DeliveryQueue:
 
             conn.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_status_priority 
+                CREATE INDEX IF NOT EXISTS idx_status_priority
                 ON messages(status, priority DESC, created_at)
             """
             )
 
             conn.execute(
                 """
-                CREATE INDEX IF NOT EXISTS idx_scheduled 
+                CREATE INDEX IF NOT EXISTS idx_scheduled
                 ON messages(scheduled_at) WHERE scheduled_at IS NOT NULL
             """
             )
@@ -182,7 +182,7 @@ class DeliveryQueue:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
                 """
-                SELECT * FROM messages 
+                SELECT * FROM messages
                 WHERE status IN ('pending', 'retrying')
                 AND (scheduled_at IS NULL OR scheduled_at <= ?)
                 ORDER BY priority DESC, created_at ASC
@@ -196,7 +196,7 @@ class DeliveryQueue:
                 # Update status to processing
                 conn.execute(
                     """
-                    UPDATE messages 
+                    UPDATE messages
                     SET status = 'processing', updated_at = CURRENT_TIMESTAMP
                     WHERE id = ?
                 """,
@@ -283,7 +283,7 @@ class DeliveryQueue:
 
             conn.execute(
                 f"""
-                UPDATE messages 
+                UPDATE messages
                 SET {', '.join(set_clauses)}
                 WHERE id = ?
             """,
@@ -378,8 +378,8 @@ class DeliveryQueue:
             # Get counts by status
             cursor = conn.execute(
                 """
-                SELECT status, COUNT(*) as count 
-                FROM messages 
+                SELECT status, COUNT(*) as count
+                FROM messages
                 GROUP BY status
             """
             )
@@ -388,9 +388,9 @@ class DeliveryQueue:
             # Get oldest pending message
             cursor = conn.execute(
                 """
-                SELECT created_at FROM messages 
-                WHERE status = 'pending' 
-                ORDER BY created_at ASC 
+                SELECT created_at FROM messages
+                WHERE status = 'pending'
+                ORDER BY created_at ASC
                 LIMIT 1
             """
             )
@@ -401,7 +401,7 @@ class DeliveryQueue:
                 """
                 SELECT AVG(retry_count) as avg_retries,
                        MAX(retry_count) as max_retries
-                FROM messages 
+                FROM messages
                 WHERE status IN ('retrying', 'failed')
             """
             )
@@ -424,9 +424,9 @@ class DeliveryQueue:
             conn.row_factory = sqlite3.Row
             cursor = conn.execute(
                 """
-                SELECT * FROM messages 
-                WHERE status = ? 
-                ORDER BY created_at DESC 
+                SELECT * FROM messages
+                WHERE status = ?
+                ORDER BY created_at DESC
                 LIMIT ?
             """,
                 (status.value, limit),
@@ -449,7 +449,7 @@ class DeliveryQueue:
                 placeholders = ",".join(["?" for _ in message_ids])
                 conn.execute(
                     f"""
-                    UPDATE messages 
+                    UPDATE messages
                     SET status = 'pending', retry_count = 0, updated_at = CURRENT_TIMESTAMP
                     WHERE id IN ({placeholders}) AND status = 'failed'
                 """,
@@ -458,7 +458,7 @@ class DeliveryQueue:
             else:
                 conn.execute(
                     """
-                    UPDATE messages 
+                    UPDATE messages
                     SET status = 'pending', retry_count = 0, updated_at = CURRENT_TIMESTAMP
                     WHERE status = 'failed'
                 """
@@ -481,8 +481,8 @@ class DeliveryQueue:
         with sqlite3.connect(self.db_path) as conn:
             conn.execute(
                 """
-                DELETE FROM messages 
-                WHERE status IN ('delivered', 'failed') 
+                DELETE FROM messages
+                WHERE status IN ('delivered', 'failed')
                 AND created_at < ?
             """,
                 (cutoff_date.isoformat(),),

@@ -8,16 +8,12 @@ prediction algorithms and integrates with external databases and tools.
 
 import json
 import logging
-import pickle
-import warnings
 from dataclasses import asdict, dataclass
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
-import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

@@ -12,21 +12,18 @@ import shutil
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, Generator
+from typing import Generator
 from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
 import pytest
-from celery import Celery
-from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from CancerGenomicsSuite.app import create_app
 from CancerGenomicsSuite.config.settings import TestConfig
 
 

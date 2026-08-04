@@ -15,13 +15,10 @@ sys.path.insert(0, str(project_root))
 
 from app import create_app, db
 from app.auth import (
-    PERMISSIONS,
     ROLES,
     authenticate_user,
     create_user,
     has_permission,
-    require_admin,
-    require_permission,
     validate_password,
 )
 

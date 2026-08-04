@@ -8,22 +8,18 @@ clinical data in cancer genomics research.
 import json
 import logging
 import warnings
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import scipy.stats as stats
-import seaborn as sns
 from lifelines import CoxPHFitter, KaplanMeierFitter
 from lifelines.statistics import logrank_test
 from plotly.subplots import make_subplots
-from scipy.stats import chi2_contingency, fisher_exact
+from scipy.stats import chi2_contingency
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.linear_model import CoxPHRegressor, LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler

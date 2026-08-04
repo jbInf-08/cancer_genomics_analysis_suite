@@ -8,8 +8,6 @@ including pipeline management, execution, monitoring, and integration with the w
 import asyncio
 import json
 import logging
-import os
-import subprocess
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -20,7 +18,7 @@ from typing import Any, Dict, List, Optional, Union
 import yaml
 
 from ..config.settings import settings
-from .workflow_dispatcher import CeleryJobManager, DockerManager, WorkflowDispatcher
+from .workflow_dispatcher import DockerManager, WorkflowDispatcher
 
 logger = logging.getLogger(__name__)
 

@@ -6,18 +6,15 @@ including quality control, alignment, variant calling, assembly, and isoform ana
 Supports various PacBio platforms: RS II, Sequel, Sequel II, and Revio.
 """
 
-import json
 import logging
 import os
 import subprocess
-import time
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List
 
 import numpy as np
-import pandas as pd
 
 # Try to import bioinformatics libraries
 try:

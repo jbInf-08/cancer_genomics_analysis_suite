@@ -105,21 +105,21 @@ Usage Examples:
 
 Basic structure loading and visualization:
     from CancerGenomicsSuite.modules.protein_structure_visualizer import ProteinStructureVisualizer
-    
+
     visualizer = ProteinStructureVisualizer()
     structure = visualizer.load_structure("protein.pdb", "1CRN")
-    
+
     # Calculate distance between residues
     distance = visualizer.calculate_distances("1CRN", "A", 10, 20)
     print(f"Distance between residues 10 and 20: {distance:.2f} Å")
-    
+
     # Find nearby residues
     nearby = visualizer.find_nearby_residues("1CRN", "A", 15, distance_cutoff=5.0)
     print(f"Found {len(nearby)} nearby residues")
 
 Interactive dashboard:
     from CancerGenomicsSuite.modules.protein_structure_visualizer import create_protein_structure_dashboard
-    
+
     dashboard = create_protein_structure_dashboard()
     dashboard.run(port=8053)
 
@@ -127,11 +127,11 @@ Structural analysis:
     # Get chain statistics
     stats = visualizer.get_chain_statistics("1CRN", "A")
     print(f"Chain A has {stats['total_residues']} residues")
-    
+
     # Predict secondary structure
     secondary_structure = visualizer.get_secondary_structure("1CRN", "A")
     print(f"Secondary structure: {secondary_structure}")
-    
+
     # Add structural features
     domain = StructuralFeature(
         feature_type="domain",

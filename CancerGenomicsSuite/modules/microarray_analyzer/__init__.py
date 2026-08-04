@@ -97,24 +97,24 @@ Usage Examples:
 
 Basic microarray analysis:
     from CancerGenomicsSuite.modules.microarray_analyzer import MicroarrayAnalyzer
-    
+
     analyzer = MicroarrayAnalyzer()
     data = analyzer.load_data("expression.csv", "samples.csv", "genes.csv")
     analyzer.normalize_data("quantile")
     results = analyzer.perform_differential_expression("group", "Control", "Treatment")
-    
+
     top_genes = analyzer.get_top_differentially_expressed(n=100)
 
 Interactive dashboard:
     from CancerGenomicsSuite.modules.microarray_analyzer import create_microarray_dashboard
-    
+
     dashboard = create_microarray_dashboard()
     dashboard.run(port=8052)
 
 Clustering analysis:
     analyzer.perform_clustering("kmeans", n_clusters=3)
     clustering_results = analyzer.clustering_results
-    
+
     print(f"Silhouette score: {clustering_results.silhouette_score}")
 
 PCA analysis:

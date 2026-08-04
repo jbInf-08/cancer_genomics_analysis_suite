@@ -4,16 +4,10 @@ Text Editors Integration Dashboard
 Provides a Dash interface for file editing, text processing, and editor management.
 """
 
-import json
 import logging
 import os
-from typing import Any, Dict, List
 
-import dash
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
-from dash import Input, Output, State, callback_context, dcc, html
+from dash import Input, Output, State, dcc, html
 
 from .editor_client import TextEditorClient
 

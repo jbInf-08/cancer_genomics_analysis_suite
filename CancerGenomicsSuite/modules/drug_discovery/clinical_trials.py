@@ -5,39 +5,19 @@ This module provides comprehensive clinical trial matching, analysis, and integr
 capabilities for drug discovery and personalized medicine.
 """
 
-import json
 import logging
 import warnings
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-import pandas as pd
-import requests
 
 warnings.filterwarnings("ignore")
 
-import lightgbm as lgb
 
 # Network Analysis
-import networkx as nx
-import xgboost as xgb
-from networkx.algorithms import centrality, community
 
 # Machine Learning
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.linear_model import ElasticNet, LogisticRegression
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
-from sklearn.model_selection import GridSearchCV, cross_val_score
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.svm import SVC, SVR
 
 logger = logging.getLogger(__name__)
 

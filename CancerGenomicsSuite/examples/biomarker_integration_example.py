@@ -6,7 +6,6 @@ This script shows how to use the unified interface to perform biomarker
 analysis using both CGAS and biomarker_identifier services.
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -88,7 +87,7 @@ def example_unified_interface():
 
     # Check service status
     status = interface.get_service_status()
-    print(f"\nService Status:")
+    print("\nService Status:")
     for service, info in status["gateway_status"].items():
         available = "✅" if info["available"] else "❌"
         print(f"  {available} {service}: {info.get('response_time', 0):.3f}s")
@@ -111,7 +110,7 @@ def example_unified_interface():
 
         # Show summary
         summary = results["summary"]
-        print(f"\nSummary:")
+        print("\nSummary:")
         print(f"  Total biomarkers: {summary['total_biomarkers']}")
         print(f"  Significant (p<0.05): {summary['significant_biomarkers']}")
         print(f"  High effect size: {summary['high_effect_biomarkers']}")
@@ -119,7 +118,7 @@ def example_unified_interface():
 
         # Show top biomarkers
         if results["biomarkers"]:
-            print(f"\nTop 3 biomarkers:")
+            print("\nTop 3 biomarkers:")
             for i, biomarker in enumerate(results["biomarkers"][:3]):
                 print(f"  {i+1}. {biomarker.get('name', 'Unknown')}")
                 print(f"     p-value: {biomarker.get('p_value', 'N/A'):.6f}")
@@ -147,7 +146,7 @@ def example_service_comparison():
         # Compare services
         comparison = interface.compare_services(data, labels)
 
-        print(f"\n✅ Service comparison completed")
+        print("\n✅ Service comparison completed")
 
         # Show results from each service
         service_results = comparison["service_results"]
@@ -163,10 +162,10 @@ def example_service_comparison():
 
         # Show comparison analysis
         comp_analysis = comparison["comparison"]
-        print(f"\nComparison Analysis:")
+        print("\nComparison Analysis:")
         print(f"  Services compared: {comp_analysis['services_compared']}")
         print(f"  Overlapping biomarkers: {comp_analysis['overlapping_biomarkers']}")
-        print(f"  Unique biomarkers per service:")
+        print("  Unique biomarkers per service:")
         for service, count in comp_analysis["unique_biomarkers"].items():
             print(f"    {service}: {count}")
 

@@ -8,18 +8,15 @@ multiple omics data types in cancer genomics research.
 import json
 import logging
 import warnings
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import seaborn as sns
 from plotly.subplots import make_subplots
 from scipy import stats
-from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.cluster.hierarchy import linkage
 from sklearn.cluster import DBSCAN, KMeans
 from sklearn.decomposition import ICA, PCA
 from sklearn.manifold import TSNE, UMAP

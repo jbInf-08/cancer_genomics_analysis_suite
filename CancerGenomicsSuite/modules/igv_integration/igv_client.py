@@ -4,14 +4,13 @@ IGV Integration Client
 Provides functionality to interact with IGV for genomic data visualization.
 """
 
-import json
 import logging
 import os
 import platform
 import shutil
 import subprocess
 import tempfile
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 

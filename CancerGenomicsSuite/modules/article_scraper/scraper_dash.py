@@ -5,22 +5,17 @@ This module provides a comprehensive Dash-based dashboard for article scraping,
 management, and analysis.
 """
 
-import base64
-import io
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 import dash
-import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from dash import Input, Output, State, callback_context, dcc, html
-from plotly.subplots import make_subplots
+from dash import Input, Output, State, dcc, html
 
-from .scraper import Article, ArticleScraper, create_mock_articles
+from .scraper import ArticleScraper, create_mock_articles
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

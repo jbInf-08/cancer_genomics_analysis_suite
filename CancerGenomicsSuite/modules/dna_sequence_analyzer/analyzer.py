@@ -9,8 +9,7 @@ sequence analysis capabilities for the Cancer Genomics Analysis Suite.
 import json
 import logging
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd

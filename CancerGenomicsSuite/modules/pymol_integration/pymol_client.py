@@ -5,16 +5,11 @@ Provides functionality to interact with PyMOL for molecular visualization
 and structure analysis operations.
 """
 
-import base64
-import json
 import logging
 import os
 import subprocess
 import tempfile
-from typing import Any, Dict, List, Optional, Union
-
-import numpy as np
-import pandas as pd
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

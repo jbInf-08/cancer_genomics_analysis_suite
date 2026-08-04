@@ -16,19 +16,15 @@ Author: Cancer Genomics Analysis Suite
 """
 
 import argparse
-import gzip
 import json
 import logging
 import os
-import shutil
 import subprocess
 import sys
-import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
-import pandas as pd
 import requests
 from Bio import SeqIO
 from Bio.Alphabet import generic_dna, generic_protein
@@ -37,8 +33,6 @@ from Bio.SeqRecord import SeqRecord
 
 # Add the parent directory to the path to import modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from tasks.blast_pipeline import BlastConfig, BlastPipeline
 
 
 class BlastDatabaseGenerator:
@@ -575,13 +569,13 @@ class BlastDatabaseGenerator:
 
             for db_name in databases.keys():
                 f.write(f"# {db_name} database\n")
-                f.write(f"config = BlastConfig(\n")
+                f.write("config = BlastConfig(\n")
                 f.write(f"    database_path='{databases[db_name]}',\n")
                 f.write(
                     f"    program='blastn' if '{self.db_configs[db_name]['type']}' == 'nucl' else 'blastp'\n"
                 )
-                f.write(f")\n")
-                f.write(f"pipeline = BlastPipeline(config)\n\n")
+                f.write(")\n")
+                f.write("pipeline = BlastPipeline(config)\n\n")
 
         self.logger.info(f"Summary report saved to: {report_file}")
         return str(report_file)
@@ -596,13 +590,13 @@ def main():
 Examples:
   # Generate all default databases
   python generate_blast_databases.py
-  
+
   # Generate databases in custom directory
   python generate_blast_databases.py --output-dir /path/to/databases
-  
+
   # Generate only using mock data (no API calls)
   python generate_blast_databases.py --no-api --mock-only
-  
+
   # Create custom database from FASTA file
   python generate_blast_databases.py --custom-db my_sequences.fasta --db-name custom_db --db-type nucl
         """,

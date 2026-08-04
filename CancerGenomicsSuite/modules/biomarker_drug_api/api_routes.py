@@ -8,9 +8,8 @@ drug analysis, and integration services.
 import logging
 import traceback
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import List
 
-import numpy as np
 import pandas as pd
 from flask import Blueprint, Flask, jsonify, request
 

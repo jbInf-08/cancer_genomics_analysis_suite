@@ -5,14 +5,13 @@ This module provides intelligent routing of biomarker analysis requests to the
 most appropriate service based on capabilities, availability, and performance.
 """
 
-import json
 import logging
 import os
 import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import requests
 
@@ -420,7 +419,6 @@ class BiomarkerGateway:
     def _convert_to_cgas_format(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Convert data to CGAS format."""
         # This is a simplified conversion - may need enhancement based on actual data formats
-        import numpy as np
         import pandas as pd
 
         if "data" in data and "labels" in data:

@@ -77,7 +77,7 @@ def example_custom_mock_data():
     expression_file = generator.generate_expression_data()
     mutation_file = generator.generate_mutation_data()
 
-    print(f"Generated files:")
+    print("Generated files:")
     print(f"  Clinical: {clinical_file}")
     print(f"  Expression: {expression_file}")
     print(f"  Mutations: {mutation_file}")

@@ -7,29 +7,18 @@ integrates Argo Workflows, Snakemake, Nextflow, and real-time processing
 for cancer genomics analysis workflows.
 """
 
-import asyncio
 import json
 import logging
-import os
-import shutil
-import subprocess
-import tempfile
 import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
-import numpy as np
-import pandas as pd
-import requests
-import yaml
 from kubernetes import client, config
-from kubernetes.client.rest import ApiException
 
 from ..graph_analytics.neo4j_integration import Neo4jGenomicsGraph
 from ..real_time_processing.kafka_stream_processor import (
@@ -871,10 +860,10 @@ class UnifiedPipelineOrchestrator:
         # For now, return a placeholder
         return f"""
         #!/usr/bin/env nextflow
-        
+
         params.input = "{parameters.get('input_fastq', '')}"
         params.output = "{parameters.get('output_dir', '')}"
-        
+
         workflow {{
             // Pipeline steps would go here
         }}
@@ -888,10 +877,10 @@ class UnifiedPipelineOrchestrator:
         # For now, return a placeholder
         return f"""
         # Snakemake pipeline for {pipeline.name}
-        
+
         rule all:
             input: "{parameters.get('output_dir', '')}/results.txt"
-        
+
         rule process_data:
             input: "{parameters.get('input_fastq', '')}"
             output: "{parameters.get('output_dir', '')}/results.txt"

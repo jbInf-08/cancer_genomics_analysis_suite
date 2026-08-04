@@ -5,17 +5,16 @@ Handles email notifications and digest creation for the Cancer Genomics Analysis
 Supports both individual notifications and periodic digest emails.
 """
 
-import json
 import logging
 import os
 import smtplib
-from datetime import datetime, timedelta
+from datetime import datetime
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -105,19 +104,19 @@ class EmailDigest:
         <body>
             <h2>Daily Analysis Digest</h2>
             <p>Here's a summary of your cancer genomics analyses for {date}:</p>
-            
+
             <h3>Completed Analyses ({completed_count})</h3>
             {completed_analyses}
-            
+
             <h3>Failed Analyses ({failed_count})</h3>
             {failed_analyses}
-            
+
             <h3>System Status</h3>
             <ul>
                 <li><strong>Queue Status:</strong> {queue_status}</li>
                 <li><strong>Active Workers:</strong> {active_workers}</li>
             </ul>
-            
+
             <p>Best regards,<br>Cancer Genomics Analysis Suite</p>
         </body>
         </html>
@@ -280,8 +279,8 @@ class EmailDigest:
         completed_html = ""
         for analysis in completed_analyses:
             completed_html += f"""
-            <li><strong>{analysis.get('type', 'Unknown')}</strong> - 
-                {analysis.get('id', 'Unknown ID')} 
+            <li><strong>{analysis.get('type', 'Unknown')}</strong> -
+                {analysis.get('id', 'Unknown ID')}
                 ({analysis.get('completion_time', 'Unknown time')})</li>
             """
 
@@ -289,8 +288,8 @@ class EmailDigest:
         failed_html = ""
         for analysis in failed_analyses:
             failed_html += f"""
-            <li><strong>{analysis.get('type', 'Unknown')}</strong> - 
-                {analysis.get('id', 'Unknown ID')} 
+            <li><strong>{analysis.get('type', 'Unknown')}</strong> -
+                {analysis.get('id', 'Unknown ID')}
                 ({analysis.get('error', 'Unknown error')})</li>
             """
 
@@ -348,7 +347,7 @@ class EmailDigest:
         <html>
         <body>
             <h2>Email Configuration Test</h2>
-            <p>This is a test email to verify the email configuration 
+            <p>This is a test email to verify the email configuration
             for the Cancer Genomics Analysis Suite.</p>
             <p>If you receive this email, the configuration is working correctly.</p>
             <p>Test time: {}</p>

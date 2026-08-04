@@ -5,19 +5,16 @@ This module provides comprehensive metadata management for omics datasets,
 including sample metadata, feature metadata, and experimental design information.
 """
 
-import json
 import logging
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 import yaml
 
-from .omics_registry import OmicsFieldDefinition, OmicsFieldRegistry
+from .omics_registry import OmicsFieldRegistry
 
 logger = logging.getLogger(__name__)
 

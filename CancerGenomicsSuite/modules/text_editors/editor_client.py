@@ -5,14 +5,13 @@ Provides functionality to interact with various text editors for file editing
 and text processing operations.
 """
 
-import json
 import logging
 import os
 import platform
 import shutil
 import subprocess
 import tempfile
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

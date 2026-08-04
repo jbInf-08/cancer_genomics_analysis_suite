@@ -6,10 +6,8 @@ using mocked dependencies.
 """
 
 import time
-from typing import Any, Dict, List
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
-import numpy as np
 import pandas as pd
 import pytest
 

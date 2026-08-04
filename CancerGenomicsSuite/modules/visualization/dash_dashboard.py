@@ -5,27 +5,15 @@ This module provides a comprehensive interactive dashboard using Plotly Dash
 for real-time cancer genomics data visualization and analysis.
 """
 
-import asyncio
-import base64
-import io
-import json
 import logging
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime
 
-import aiohttp
 import dash
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.figure_factory as ff
 import plotly.graph_objs as go
-import psycopg2
 import redis
-import seaborn as sns
-from dash import Input, Output, State, callback_context, dash_table, dcc, html
-from scipy import stats
+from dash import Input, Output, dash_table, dcc, html
 from sqlalchemy import create_engine
 
 # Configure logging
@@ -481,7 +469,7 @@ class CancerGenomicsDashboard:
                 # Query mutation data
                 query = """
                 SELECT timestamp, gene, mutation_type, severity, patient_id
-                FROM mutations 
+                FROM mutations
                 WHERE timestamp >= NOW() - INTERVAL %s
                 """
 
@@ -554,7 +542,7 @@ class CancerGenomicsDashboard:
                 # Query expression data
                 query = """
                 SELECT gene, sample_id, expression_value, tissue_type
-                FROM gene_expression 
+                FROM gene_expression
                 WHERE timestamp >= NOW() - INTERVAL %s
                 """
 
@@ -623,7 +611,7 @@ class CancerGenomicsDashboard:
                 # Query pathway data
                 query = """
                 SELECT pathway_name, gene_count, enrichment_score, pathway_type
-                FROM pathway_analysis 
+                FROM pathway_analysis
                 WHERE timestamp >= NOW() - INTERVAL %s
                 """
 
@@ -685,9 +673,9 @@ class CancerGenomicsDashboard:
                 # Query recent mutations
                 query = """
                 SELECT timestamp, gene, mutation_type, severity, patient_id, pathogenicity_score
-                FROM mutations 
+                FROM mutations
                 WHERE timestamp >= NOW() - INTERVAL %s
-                ORDER BY timestamp DESC 
+                ORDER BY timestamp DESC
                 LIMIT 10
                 """
 
@@ -757,7 +745,7 @@ class CancerGenomicsDashboard:
                 # Query gene network data
                 query = """
                 SELECT gene1, gene2, interaction_type, confidence_score
-                FROM gene_interactions 
+                FROM gene_interactions
                 WHERE gene1 = %s OR gene2 = %s
                 """
 
@@ -882,7 +870,7 @@ class CancerGenomicsDashboard:
                 # Query clinical data
                 query = """
                 SELECT age, gender, diagnosis, stage, treatment_status, survival_months
-                FROM clinical_data 
+                FROM clinical_data
                 WHERE patient_id = %s
                 """
 
@@ -920,8 +908,8 @@ class CancerGenomicsDashboard:
             try:
                 # Get unique genes
                 gene_query = """
-                SELECT DISTINCT gene 
-                FROM mutations 
+                SELECT DISTINCT gene
+                FROM mutations
                 WHERE timestamp >= NOW() - INTERVAL %s
                 ORDER BY gene
                 """
@@ -934,8 +922,8 @@ class CancerGenomicsDashboard:
 
                 # Get unique patients
                 patient_query = """
-                SELECT DISTINCT patient_id 
-                FROM mutations 
+                SELECT DISTINCT patient_id
+                FROM mutations
                 WHERE timestamp >= NOW() - INTERVAL %s
                 ORDER BY patient_id
                 """

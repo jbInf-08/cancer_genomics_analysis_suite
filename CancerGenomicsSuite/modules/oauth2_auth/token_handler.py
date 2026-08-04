@@ -6,13 +6,10 @@ This module provides token management capabilities for OAuth2 authentication
 in the cancer genomics analysis suite.
 """
 
-import hashlib
-import json
 import logging
 import secrets
-import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 try:
     from jose import JWTError, jwt

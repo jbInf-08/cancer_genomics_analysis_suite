@@ -6,14 +6,12 @@ This module provides event handling capabilities for real-time cancer genomics
 data processing workflows.
 """
 
-import json
 import logging
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional
 
 from .kafka_manager import KafkaManager
 

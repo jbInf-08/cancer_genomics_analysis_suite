@@ -8,7 +8,7 @@ pipeline including integration and personalized medicine recommendations.
 import logging
 import os
 import sys
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd

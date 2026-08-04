@@ -10,23 +10,14 @@ import base64
 import io
 import json
 import logging
-from typing import Any, Dict, List, Optional
 
 import dash
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objs as go
 from dash import Input, Output, State, callback_context, dash_table, dcc, html
 
-from .microarray import (
-    ClusteringResult,
-    DifferentialExpressionResult,
-    MicroarrayAnalyzer,
-    MicroarrayData,
-    create_sample_analyzer,
-    create_sample_microarray_data,
-)
+from .microarray import MicroarrayAnalyzer, create_sample_analyzer
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
