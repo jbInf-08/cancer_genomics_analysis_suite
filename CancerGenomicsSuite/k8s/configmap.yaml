@@ -67,7 +67,10 @@ data:
     }
     
     server {
-        listen 80;
+        # 8080, not 80: the pod runs nginx as the unprivileged
+        # nginx user, which cannot bind a port below 1024. The
+        # Service still publishes 80 and forwards to this port.
+        listen 8080;
         server_name _;
         
         # Security headers
@@ -75,6 +78,11 @@ data:
         add_header X-Content-Type-Options "nosniff" always;
         add_header X-XSS-Protection "1; mode=block" always;
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        # Moved here from the ingress configuration-snippet, which was
+        # removed: snippets let an Ingress author inject arbitrary nginx
+        # config (CVE-2021-25742). The other four headers were already
+        # duplicated between the two places.
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         
         # Rate limiting
         limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;

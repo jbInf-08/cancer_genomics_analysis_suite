@@ -18,9 +18,24 @@ spec:
         app: redis
         component: cache
     spec:
+      # redis:7-alpine runs as uid 999 and writes only to /data, which is
+      # the mounted volume, so the root filesystem can be read-only.
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: redis
         image: redis:7-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
         ports:
         - containerPort: 6379
         command:
