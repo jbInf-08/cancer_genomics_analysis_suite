@@ -910,7 +910,7 @@ class BiomarkerValidator:
             else:
                 correlation, _ = pearsonr(feature_data, labels)
                 return (abs(correlation) + 1) / 2
-        except:
+        except Exception:
             return 0.5
 
     def _calculate_sensitivity_specificity(
@@ -933,5 +933,5 @@ class BiomarkerValidator:
             specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
 
             return sensitivity, specificity
-        except:
+        except Exception:
             return 0.5, 0.5

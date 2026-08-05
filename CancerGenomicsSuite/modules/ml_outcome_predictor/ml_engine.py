@@ -286,8 +286,8 @@ class MLOutcomePredictor:
                         )
                     )[:, 1]
                     metrics["roc_auc"] = roc_auc_score(y_true, y_proba)
-                except:
-                    pass
+                except Exception:
+                    logger.debug("roc_auc omitted from metrics", exc_info=True)
 
         else:  # regression
             metrics.update(

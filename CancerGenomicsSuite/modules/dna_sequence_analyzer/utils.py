@@ -138,7 +138,7 @@ class DNAUtils:
         # Molecular weight
         try:
             mol_weight = molecular_weight(sequence, seq_type="DNA")
-        except:
+        except Exception:
             mol_weight = None
 
         # Dinucleotide frequencies
