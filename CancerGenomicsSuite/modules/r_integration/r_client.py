@@ -302,7 +302,7 @@ class RClient:
                 # Try to convert to pandas DataFrame if it's a data.frame
                 try:
                     return pandas2ri.rpy2py(r_obj)
-                except:
+                except Exception:
                     return r_obj
         except Exception as e:
             logger.error(f"Error getting data from R: {e}")

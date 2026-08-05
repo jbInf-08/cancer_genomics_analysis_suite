@@ -512,7 +512,7 @@ class EpigenomicsProcessor(OmicsDataProcessor):
                 # Perform t-test
                 try:
                     t_stat, p_value = ttest_ind(group1_values, group2_values)
-                except:
+                except Exception:
                     p_value = 1.0
 
                 results["feature_id"].append(feature)
@@ -559,7 +559,7 @@ class EpigenomicsProcessor(OmicsDataProcessor):
                     u_stat, p_value = mannwhitneyu(
                         group1_values, group2_values, alternative="two-sided"
                     )
-                except:
+                except Exception:
                     p_value = 1.0
 
                 results["feature_id"].append(feature)
@@ -607,7 +607,7 @@ class EpigenomicsProcessor(OmicsDataProcessor):
                 # Simplified beta-binomial test (using t-test as proxy)
                 try:
                     t_stat, p_value = ttest_ind(group1_values, group2_values)
-                except:
+                except Exception:
                     p_value = 1.0
 
                 results["feature_id"].append(feature)

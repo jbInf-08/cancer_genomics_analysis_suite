@@ -438,7 +438,7 @@ class MicroarrayAnalyzer:
             # Perform t-test
             try:
                 t_stat, p_value = stats.ttest_ind(group1_values, group2_values)
-            except:
+            except Exception:
                 t_stat, p_value = 0.0, 1.0
 
             # Calculate effect size (Cohen's d)

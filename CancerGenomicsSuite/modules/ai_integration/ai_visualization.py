@@ -295,7 +295,7 @@ class AIInsightGenerator:
                                         "time_variable": time_col,
                                     }
                                 )
-                except:
+                except Exception:
                     continue
 
         return insights
@@ -321,7 +321,7 @@ class AIInsightGenerator:
                 if silhouette > best_silhouette:
                     best_silhouette = silhouette
                     best_k = k
-            except:
+            except Exception:
                 continue
 
         if best_silhouette > 0.3:  # Good clustering
@@ -537,7 +537,7 @@ class AutomatedReportBuilder:
                         data, x=time_col, y=num_col, title=f"{num_col} over {time_col}"
                     )
                     plots[f"{num_col}_vs_{time_col}"] = fig.to_dict()
-            except:
+            except Exception:
                 continue
 
         return plots
@@ -947,7 +947,7 @@ class PatternRecognitionEngine:
                                     "strength": abs(r_value),
                                 }
                             )
-            except:
+            except Exception:
                 continue
 
         return patterns
@@ -989,8 +989,10 @@ class PatternRecognitionEngine:
                                 "coordinates": coords.tolist(),
                             }
                         )
-            except:
-                pass
+            except Exception:
+                logger.debug(
+                    "Clustering visualization skipped for this dataset", exc_info=True
+                )
 
         return patterns
 
@@ -1019,7 +1021,7 @@ class PatternRecognitionEngine:
                 if silhouette > best_silhouette:
                     best_silhouette = silhouette
                     best_k = k
-            except:
+            except Exception:
                 continue
 
         patterns["optimal_clusters"] = best_k

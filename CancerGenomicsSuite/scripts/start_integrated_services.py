@@ -224,8 +224,8 @@ class IntegratedServicesManager:
                 )
                 if response.status_code == 200:
                     return True
-            except:
-                pass
+            except Exception:
+                logger.debug("Health check not answering yet; retrying", exc_info=True)
 
             time.sleep(2)
 
