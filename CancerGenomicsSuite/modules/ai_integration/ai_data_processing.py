@@ -442,7 +442,7 @@ class FeatureEngineeringEngine:
                         int
                     )
 
-                except:
+                except Exception:
                     continue
 
         return data

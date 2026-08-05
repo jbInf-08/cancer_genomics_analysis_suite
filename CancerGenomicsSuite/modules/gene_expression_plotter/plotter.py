@@ -519,7 +519,7 @@ class GeneExpressionPlotter:
                         > np.log2(self.config.fold_change_threshold),
                     }
                 )
-            except:
+            except Exception:
                 results.append(
                     {
                         "gene": gene,

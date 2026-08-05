@@ -151,7 +151,7 @@ class TemplateUtils:
                 else:
                     # Simple truthiness check
                     return bool(variables.get(condition.strip()))
-            except:
+            except Exception:
                 return False
 
         # Process {% if condition %} ... {% endif %} blocks
@@ -282,7 +282,7 @@ class TemplateUtils:
         if isinstance(date_value, str):
             try:
                 date_value = datetime.fromisoformat(date_value.replace("Z", "+00:00"))
-            except:
+            except Exception:
                 return date_value
 
         if isinstance(date_value, datetime):
