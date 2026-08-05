@@ -208,8 +208,6 @@ class OAuth2Manager:
             if not self.active_provider:
                 return {"error": "No OAuth2 provider configured"}, 400
 
-            provider = self.providers[self.active_provider]
-
             # Generate state for CSRF protection
             state = secrets.token_urlsafe(32)
             self.state_storage[state] = {
@@ -252,7 +250,6 @@ class OAuth2Manager:
                     return {"error": "Invalid provider"}, 400
 
                 # Exchange code for token
-                provider = self.providers[provider_name]
                 token = self.oauth.__getattr__(provider_name).authorize_access_token()
 
                 # Get user information
@@ -368,7 +365,6 @@ class OAuth2Manager:
         self, provider_name: str, token: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Get user information from provider."""
-        provider = self.providers[provider_name]
 
         if provider_name == "keycloak":
             return self.keycloak_client.get_user_info(token)
@@ -400,7 +396,6 @@ class OAuth2Manager:
         self, provider_name: str, token: Dict[str, Any]
     ) -> Dict[str, Any]:
         """Refresh access token."""
-        provider = self.providers[provider_name]
 
         if provider_name == "keycloak":
             return self.keycloak_client.refresh_token(token)

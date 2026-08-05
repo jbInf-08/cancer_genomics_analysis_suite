@@ -346,7 +346,6 @@ class WorkflowExecutor:
         """
         workflow_name = workflow_info["name"]
         pipeline_info = workflow_info["pipeline_info"]
-        config = workflow_info["config"]
 
         try:
             # Determine orchestration system
@@ -702,17 +701,14 @@ class WorkflowExecutor:
                 script_path = self.nextflow_manager.create_cancer_genomics_pipeline(
                     "variant_calling"
                 )
-                orchestration_system = "nextflow"
             elif workflow_type == "expression_analysis":
                 script_path = self.snakemake_manager.create_cancer_genomics_snakefile(
                     "expression_analysis"
                 )
-                orchestration_system = "snakemake"
             elif workflow_type == "multi_omics":
                 script_path = self.nextflow_manager.create_cancer_genomics_pipeline(
                     "multi_omics"
                 )
-                orchestration_system = "nextflow"
             else:
                 raise ValueError(f"Unknown workflow type: {workflow_type}")
 

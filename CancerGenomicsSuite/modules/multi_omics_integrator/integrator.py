@@ -624,7 +624,6 @@ class MultiOmicsIntegrator:
             raise ValueError("No omics data loaded")
 
         try:
-            n_data_types = len(self.omics_data)
             fig = make_subplots(
                 rows=2,
                 cols=2,
@@ -643,7 +642,6 @@ class MultiOmicsIntegrator:
             # Data dimensions
             data_types = list(self.omics_data.keys())
             n_features = [self.omics_data[dt].shape[0] for dt in data_types]
-            n_samples = [self.omics_data[dt].shape[1] for dt in data_types]
 
             fig.add_trace(
                 go.Bar(
@@ -853,17 +851,13 @@ def main():
         integrator.normalize_data(data_type, method="zscore")
 
     # Integrate data
-    integrated_data = integrator.integrate_omics_data(
-        integration_method="concatenation"
-    )
+    integrator.integrate_omics_data(integration_method="concatenation")
 
     # Perform dimensionality reduction
-    reduced_data = integrator.perform_dimensionality_reduction(
-        method="pca", n_components=2
-    )
+    integrator.perform_dimensionality_reduction(method="pca", n_components=2)
 
     # Perform clustering
-    clustering_results = integrator.perform_clustering(method="kmeans", n_clusters=3)
+    integrator.perform_clustering(method="kmeans", n_clusters=3)
 
     # Get summary
     summary = integrator.get_integration_summary()

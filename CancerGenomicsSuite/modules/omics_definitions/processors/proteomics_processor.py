@@ -372,7 +372,6 @@ class ProteomicsProcessor(OmicsDataProcessor):
 
         # Calculate mean and variance for each protein
         mean_abundance = data.mean(axis=1)
-        variance = data.var(axis=1)
 
         # Simple LOESS-like normalization
         data_normalized = data.copy()
@@ -601,7 +600,6 @@ class ProteomicsProcessor(OmicsDataProcessor):
     def _summarize_dpa_results(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """Summarize differential protein analysis results."""
         if "p_value" in results:
-            p_values = np.array(results["p_value"])
             adjusted_p_values = np.array(results["adjusted_p_value"])
 
             summary = {

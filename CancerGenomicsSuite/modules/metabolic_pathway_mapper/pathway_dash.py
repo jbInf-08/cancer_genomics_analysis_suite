@@ -351,7 +351,7 @@ class PathwayDashboard:
                     pathway_data = create_mock_pathway_data()
 
                     # Create pathway network
-                    network = self.mapper.create_pathway_network(pathway_data)
+                    self.mapper.create_pathway_network(pathway_data)
 
                     # Get summary
                     summary = self.mapper.get_pathway_summary()
@@ -396,7 +396,7 @@ class PathwayDashboard:
                     pathway_data = data["pathway_data"]
 
                     # Recreate network
-                    network = self.mapper.create_pathway_network(pathway_data)
+                    self.mapper.create_pathway_network(pathway_data)
 
                     # Simulate expression data for analysis
                     self.create_mock_expression_data(pathway_data)

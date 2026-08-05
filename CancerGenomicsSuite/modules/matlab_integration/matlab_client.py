@@ -272,7 +272,6 @@ class MATLABClient:
                 """
             elif operation == "filter":
                 # Digital filtering
-                filter_type = kwargs.get("filter_type", "lowpass")
                 cutoff = kwargs.get("cutoff", 0.5)
 
                 result_code = f"""

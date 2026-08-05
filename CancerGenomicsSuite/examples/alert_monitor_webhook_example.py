@@ -329,7 +329,7 @@ def main():
         monitor = demonstrate_webhook_setup()
 
         # Demonstrate alert creation
-        test_alert = demonstrate_alert_creation(monitor)
+        demonstrate_alert_creation(monitor)
 
         # Demonstrate custom alert rules
         demonstrate_custom_alert_rules(monitor)

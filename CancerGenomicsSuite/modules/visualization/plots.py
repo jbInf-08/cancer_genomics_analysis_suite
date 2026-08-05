@@ -430,7 +430,6 @@ class PlotManager:
     ) -> go.Figure:
         """Create survival curve plot."""
         time_col = kwargs.get("time", "time")
-        event_col = kwargs.get("event", "event")
         group_col = kwargs.get("group", "group")
 
         # This is a simplified version - in practice, you'd use lifelines or similar
@@ -548,7 +547,6 @@ class PlotManager:
         """Create pathway enrichment plot."""
         pathway_col = kwargs.get("pathway", "pathway")
         pvalue_col = kwargs.get("pvalue", "pvalue")
-        count_col = kwargs.get("count", "count")
 
         # Sort by p-value
         data = data.sort_values(pvalue_col)
