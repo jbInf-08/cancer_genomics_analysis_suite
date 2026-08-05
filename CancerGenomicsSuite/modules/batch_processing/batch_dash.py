@@ -696,7 +696,6 @@ class BatchDashboard:
 
         # Calculate metrics
         completed_jobs = [job for job in jobs if job.status == JobStatus.COMPLETED]
-        failed_jobs = [job for job in jobs if job.status == JobStatus.FAILED]
 
         success_rate = len(completed_jobs) / len(jobs) * 100 if jobs else 0
 

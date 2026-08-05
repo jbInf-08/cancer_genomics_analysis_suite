@@ -78,15 +78,15 @@ def register_reporting_callbacks(app):
 
             # Generate report based on type
             if report_type == "analysis_summary":
-                report_data = generate_analysis_summary_report(params)
+                generate_analysis_summary_report(params)
             elif report_type == "data_export":
-                report_data = generate_data_export_report(params)
+                generate_data_export_report(params)
             elif report_type == "visualization":
-                report_data = generate_visualization_report(params)
+                generate_visualization_report(params)
             elif report_type == "custom":
-                report_data = generate_custom_report(template, params)
+                generate_custom_report(template, params)
             else:
-                report_data = generate_analysis_summary_report(params)
+                generate_analysis_summary_report(params)
 
             # Create report job
             job = create_report_job(report_type, template, params, format_type)

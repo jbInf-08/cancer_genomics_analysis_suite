@@ -163,7 +163,6 @@ class BiomarkerGateway:
                 # Simple test to verify CGAS is working
                 start_time = time.time()
                 # Create a minimal test to verify functionality
-                test_data = {"test": "data"}
                 end_time = time.time()
 
                 self.service_status[ServiceType.CGAS] = ServiceStatus(

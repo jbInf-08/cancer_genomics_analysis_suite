@@ -1088,14 +1088,12 @@ def main():
     analyzer.preprocess_clinical_data()
 
     # Perform analyses
-    survival_results = analyzer.perform_survival_analysis(group_col="risk_group")
-    correlation_results = analyzer.perform_clinical_correlations()
-    association_results = analyzer.perform_clinical_associations()
+    analyzer.perform_survival_analysis(group_col="risk_group")
+    analyzer.perform_clinical_correlations()
+    analyzer.perform_clinical_associations()
 
     # Build predictive model
-    model_results = analyzer.build_predictive_model(
-        "response", model_type="classification"
-    )
+    analyzer.build_predictive_model("response", model_type="classification")
 
     # Get summary
     summary = analyzer.get_analysis_summary()

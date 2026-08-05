@@ -186,7 +186,6 @@ class Neo4jGenomicsGraph:
             with self.driver.session(database=self.database) as session:
                 # Build Cypher query
                 labels = ":".join(node.labels)
-                properties = json.dumps(node.properties).replace('"', "'")
 
                 query = f"""
                 MERGE (n:{labels} {{id: $id}})

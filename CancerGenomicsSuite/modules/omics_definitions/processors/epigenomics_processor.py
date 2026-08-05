@@ -642,7 +642,6 @@ class EpigenomicsProcessor(OmicsDataProcessor):
     def _summarize_dma_results(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """Summarize differential methylation analysis results."""
         if "p_value" in results:
-            p_values = np.array(results["p_value"])
             adjusted_p_values = np.array(results["adjusted_p_value"])
 
             summary = {

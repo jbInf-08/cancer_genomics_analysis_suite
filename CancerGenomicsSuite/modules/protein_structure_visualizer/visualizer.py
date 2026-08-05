@@ -714,14 +714,11 @@ def create_sample_protein_structure() -> ProteinStructure:
         ProteinStructure object with sample data
     """
     # Create a simple alpha helix structure
-    atoms = []
     residues = []
 
     # Generate coordinates for a simple alpha helix
     for i in range(20):  # 20 residues
         # Alpha helix parameters
-        phi = -60.0  # degrees
-        psi = -45.0  # degrees
 
         # Calculate position (simplified)
         x = i * 1.5

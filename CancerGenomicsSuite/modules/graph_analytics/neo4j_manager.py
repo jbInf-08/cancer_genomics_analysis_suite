@@ -572,7 +572,7 @@ class Neo4jManager:
         CREATE (v)-[:AFFECTS]->(g)
         """
 
-        result = self.execute_cypher_query(query)
+        self.execute_cypher_query(query)
         logger.info("Created gene-variant relationships")
 
     def create_gene_protein_relationships(self):
@@ -586,7 +586,7 @@ class Neo4jManager:
         CREATE (g)-[:ENCODES]->(p)
         """
 
-        result = self.execute_cypher_query(query)
+        self.execute_cypher_query(query)
         logger.info("Created gene-protein relationships")
 
     def get_graph_statistics(self) -> Dict[str, Any]:

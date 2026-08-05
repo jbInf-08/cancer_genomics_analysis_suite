@@ -91,7 +91,6 @@ class UserManager:
         """
         user_id = user_info.get("id")
         username = user_info.get("username")
-        email = user_info.get("email")
 
         if not user_id or not username:
             raise ValueError("User ID and username are required")
