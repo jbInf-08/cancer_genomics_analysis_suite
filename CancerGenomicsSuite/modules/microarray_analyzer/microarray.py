@@ -832,8 +832,8 @@ if __name__ == "__main__":
     analyzer = create_sample_analyzer()
 
     print("Microarray Analyzer Statistics:")
-    stats = analyzer.get_statistics()
-    for key, value in stats.items():
+    analyzer_stats = analyzer.get_statistics()
+    for key, value in analyzer_stats.items():
         print(f"  {key}: {value}")
 
     print("\nTop 10 Differentially Expressed Genes:")

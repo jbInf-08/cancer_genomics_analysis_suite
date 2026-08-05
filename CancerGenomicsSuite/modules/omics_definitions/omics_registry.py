@@ -1553,14 +1553,14 @@ class OmicsFieldRegistry:
         """Search omics fields by name, description, or category."""
         query = query.lower()
         results = []
-        for field in self.fields.values():
+        for field_def in self.fields.values():
             if (
-                query in field.name.lower()
-                or query in field.full_name.lower()
-                or query in field.description.lower()
-                or query in field.category.lower()
+                query in field_def.name.lower()
+                or query in field_def.full_name.lower()
+                or query in field_def.description.lower()
+                or query in field_def.category.lower()
             ):
-                results.append(field)
+                results.append(field_def)
         return results
 
     def export_definitions(self, file_path: str, format: str = "json"):
@@ -1607,23 +1607,23 @@ class OmicsFieldRegistry:
         maturity_levels = {}
         clinical_relevance = {}
 
-        for field in self.fields.values():
+        for field_def in self.fields.values():
             # Count by category
-            categories[field.category] = categories.get(field.category, 0) + 1
+            categories[field_def.category] = categories.get(field_def.category, 0) + 1
 
             # Count by data type
-            data_types[field.data_type.value] = (
-                data_types.get(field.data_type.value, 0) + 1
+            data_types[field_def.data_type.value] = (
+                data_types.get(field_def.data_type.value, 0) + 1
             )
 
             # Count by maturity level
-            maturity_levels[field.maturity_level] = (
-                maturity_levels.get(field.maturity_level, 0) + 1
+            maturity_levels[field_def.maturity_level] = (
+                maturity_levels.get(field_def.maturity_level, 0) + 1
             )
 
             # Count by clinical relevance
-            clinical_relevance[field.clinical_relevance] = (
-                clinical_relevance.get(field.clinical_relevance, 0) + 1
+            clinical_relevance[field_def.clinical_relevance] = (
+                clinical_relevance.get(field_def.clinical_relevance, 0) + 1
             )
 
         return {

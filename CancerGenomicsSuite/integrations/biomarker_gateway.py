@@ -17,7 +17,6 @@ import requests
 
 # Import CGAS biomarker modules with compatibility patches
 try:
-    import os
     import sys
 
     # Add the integrations directory to path to import the patch
