@@ -484,7 +484,7 @@ class ProteomicsProcessor(OmicsDataProcessor):
                 # Perform t-test
                 try:
                     t_stat, p_value = ttest_ind(group1_values, group2_values)
-                except:
+                except Exception:
                     p_value = 1.0
 
                 results["protein_id"].append(protein)
@@ -534,7 +534,7 @@ class ProteomicsProcessor(OmicsDataProcessor):
                     u_stat, p_value = mannwhitneyu(
                         group1_values, group2_values, alternative="two-sided"
                     )
-                except:
+                except Exception:
                     p_value = 1.0
 
                 results["protein_id"].append(protein)

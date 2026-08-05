@@ -527,7 +527,7 @@ class MetabolomicsProcessor(OmicsDataProcessor):
                 # Perform t-test
                 try:
                     t_stat, p_value = ttest_ind(group1_values, group2_values)
-                except:
+                except Exception:
                     p_value = 1.0
 
                 results["metabolite_id"].append(metabolite)
@@ -577,7 +577,7 @@ class MetabolomicsProcessor(OmicsDataProcessor):
                     u_stat, p_value = mannwhitneyu(
                         group1_values, group2_values, alternative="two-sided"
                     )
-                except:
+                except Exception:
                     p_value = 1.0
 
                 results["metabolite_id"].append(metabolite)

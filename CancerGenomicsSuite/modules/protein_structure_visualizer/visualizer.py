@@ -301,18 +301,27 @@ class ProteinStructureVisualizer:
                 elif line.startswith("REMARK   2 RESOLUTION"):
                     try:
                         resolution = float(line.split()[-2])
-                    except:
-                        pass
+                    except Exception:
+                        logger.debug(
+                            "Unparseable RESOLUTION remark; leaving resolution unset",
+                            exc_info=True,
+                        )
                 elif line.startswith("REMARK   3   R VALUE"):
                     try:
                         r_value = float(line.split()[-1])
-                    except:
-                        pass
+                    except Exception:
+                        logger.debug(
+                            "Unparseable R VALUE remark; leaving r_value unset",
+                            exc_info=True,
+                        )
                 elif line.startswith("REMARK   3   FREE R VALUE"):
                     try:
                         r_free = float(line.split()[-1])
-                    except:
-                        pass
+                    except Exception:
+                        logger.debug(
+                            "Unparseable FREE R VALUE remark; leaving r_free unset",
+                            exc_info=True,
+                        )
                 elif line.startswith("ATOM") or line.startswith("HETATM"):
                     # Parse atom line
                     atom_id = int(line[6:11].strip())

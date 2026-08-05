@@ -578,8 +578,8 @@ class ModelValidator:
                     try:
                         y_proba = model.predict_proba(X_test)[:, 1]
                         metrics["roc_auc"] = roc_auc_score(y_test, y_proba)
-                    except:
-                        pass
+                    except Exception:
+                        logger.debug("roc_auc omitted from metrics", exc_info=True)
 
             else:  # regression
                 metrics = {
@@ -1101,7 +1101,7 @@ class FeatureEngineering:
                 try:
                     # Try to convert to datetime
                     X[col] = pd.to_datetime(X[col], errors="coerce")
-                except:
+                except Exception:
                     continue
 
             if pd.api.types.is_datetime64_any_dtype(X[col]):

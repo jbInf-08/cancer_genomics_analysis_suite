@@ -827,8 +827,8 @@ class MLOutcomeDashboard:
                 )
 
                 return fig
-        except:
-            pass
+        except Exception:
+            logger.debug("Feature-importance figure could not be built", exc_info=True)
 
         return {}
 
@@ -926,7 +926,7 @@ class MLOutcomeDashboard:
             )
 
             return fig
-        except:
+        except Exception:
             return {}
 
     def _generate_prediction_results(self, pred_results: Dict[str, Any]) -> html.Div:
