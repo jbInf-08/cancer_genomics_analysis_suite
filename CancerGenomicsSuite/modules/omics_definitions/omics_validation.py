@@ -437,9 +437,11 @@ class OmicsDataValidator:
 
         # Check required metadata fields
         required_fields = ["samples", "features", "data_type"]
-        for field in required_fields:
-            if field not in metadata:
-                result["errors"].append(f"Missing required metadata field: {field}")
+        for field_name in required_fields:
+            if field_name not in metadata:
+                result["errors"].append(
+                    f"Missing required metadata field: {field_name}"
+                )
 
         # Validate data type consistency
         if "data_type" in metadata and metadata["data_type"] != omics_type:

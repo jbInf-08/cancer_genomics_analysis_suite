@@ -144,8 +144,6 @@ def create_biomarker_api() -> Blueprint:
             # Validate each biomarker
             validation_results = []
             for biomarker_data in biomarkers:
-                from ..biomarker_discovery.biomarker_analyzer import BiomarkerResult
-
                 biomarker = BiomarkerResult(**biomarker_data)
 
                 validation_result = validator.validate_biomarker(
