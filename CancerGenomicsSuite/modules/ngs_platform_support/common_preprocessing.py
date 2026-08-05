@@ -22,8 +22,8 @@ import numpy as np
 # Try to import bioinformatics libraries
 try:
     from Bio import SeqIO
-    from Bio.Seq import Seq
-    from Bio.SeqRecord import SeqRecord
+    from Bio.Seq import Seq  # noqa: F401
+    from Bio.SeqRecord import SeqRecord  # noqa: F401
 
     BIOPYTHON_AVAILABLE = True
 except ImportError:

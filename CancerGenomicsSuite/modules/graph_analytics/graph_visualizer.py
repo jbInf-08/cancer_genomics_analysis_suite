@@ -14,10 +14,10 @@ import pandas as pd
 
 try:
     import matplotlib.pyplot as plt
-    import plotly.express as px
+    import plotly.express as px  # noqa: F401
     import plotly.graph_objects as go
-    import seaborn as sns
-    from matplotlib.patches import Circle
+    import seaborn as sns  # noqa: F401
+    from matplotlib.patches import Circle  # noqa: F401
     from plotly.subplots import make_subplots
 
     MATPLOTLIB_AVAILABLE = True

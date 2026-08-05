@@ -25,7 +25,7 @@ importr = None
 default_converter = None
 
 try:
-    import rpy2.rinterface as rinterface
+    import rpy2.rinterface as rinterface  # noqa: F401
     import rpy2.robjects as robjects
     from rpy2.robjects import numpy2ri, pandas2ri
     from rpy2.robjects.conversion import localconverter

@@ -40,7 +40,7 @@ except ImportError:
     # If patch is not available, use standard imports
     def patch_lightgbm_import():
         try:
-            import lightgbm
+            import lightgbm  # noqa: F401
 
             return True
         except ImportError:
@@ -48,7 +48,7 @@ except ImportError:
 
     def patch_xgboost_import():
         try:
-            import xgboost
+            import xgboost  # noqa: F401
 
             return True
         except ImportError:
