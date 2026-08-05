@@ -14,8 +14,8 @@ from typing import Any, Callable, Dict, List, Optional
 
 try:
     from kafka import KafkaAdminClient, KafkaConsumer, KafkaProducer
-    from kafka.admin import ConfigResource, ConfigResourceType, NewTopic
-    from kafka.errors import KafkaError, TopicAlreadyExistsError
+    from kafka.admin import ConfigResource, ConfigResourceType, NewTopic  # noqa: F401
+    from kafka.errors import KafkaError, TopicAlreadyExistsError  # noqa: F401
 
     KAFKA_AVAILABLE = True
 except ImportError:
@@ -24,7 +24,9 @@ except ImportError:
 
 try:
     from confluent_kafka import AdminClient, Consumer, Producer
-    from confluent_kafka.admin import ConfigResource as ConfluentConfigResource
+    from confluent_kafka.admin import (  # noqa: F401
+        ConfigResource as ConfluentConfigResource,
+    )
     from confluent_kafka.admin import NewTopic as ConfluentNewTopic
 
     CONFLUENT_KAFKA_AVAILABLE = True

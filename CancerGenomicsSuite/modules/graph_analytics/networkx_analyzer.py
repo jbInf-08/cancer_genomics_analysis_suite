@@ -14,7 +14,7 @@ import pandas as pd
 
 try:
     import networkx as nx
-    from networkx.algorithms import centrality, community, shortest_paths
+    from networkx.algorithms import centrality, community, shortest_paths  # noqa: F401
     from networkx.algorithms.centrality import (
         betweenness_centrality,
         closeness_centrality,
@@ -24,7 +24,7 @@ try:
         greedy_modularity_communities,
         label_propagation_communities,
     )
-    from networkx.algorithms.shortest_paths import shortest_path_length
+    from networkx.algorithms.shortest_paths import shortest_path_length  # noqa: F401
 
     NETWORKX_AVAILABLE = True
 except ImportError:

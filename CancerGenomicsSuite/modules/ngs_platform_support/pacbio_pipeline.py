@@ -18,7 +18,7 @@ import numpy as np
 
 # Try to import bioinformatics libraries
 try:
-    import pysam
+    import pysam  # noqa: F401
 
     PYSAM_AVAILABLE = True
 except ImportError:
@@ -27,8 +27,8 @@ except ImportError:
 
 try:
     from Bio import SeqIO
-    from Bio.Seq import Seq
-    from Bio.SeqRecord import SeqRecord
+    from Bio.Seq import Seq  # noqa: F401
+    from Bio.SeqRecord import SeqRecord  # noqa: F401
 
     BIOPYTHON_AVAILABLE = True
 except ImportError:

@@ -13,9 +13,9 @@ from typing import Any, Dict, List, Optional
 
 try:
     from authlib.integrations.flask_client import OAuth
-    from authlib.integrations.requests_client import OAuth2Session
-    from authlib.oauth2.rfc6749 import OAuth2Token
-    from jose import JWTError, jwt
+    from authlib.integrations.requests_client import OAuth2Session  # noqa: F401
+    from authlib.oauth2.rfc6749 import OAuth2Token  # noqa: F401
+    from jose import JWTError, jwt  # noqa: F401
 
     OAUTH2_AVAILABLE = True
 except ImportError:

@@ -54,9 +54,12 @@ def long_running_task(*args, **kwargs):
     return celery.task(*args, **kwargs)
 
 
-# Import task modules
+# Importing these registers their @celery.task functions with the app above.
+# Nothing here refers to them by name, so flake8 sees unused imports; dropping
+# them would start the worker with those tasks unregistered, and calls would
+# fail at dispatch with "Received unregistered task".
 try:
-    from celery_worker.tasks import (
+    from celery_worker.tasks import (  # noqa: F401
         data_processing,
         expression_analysis,
         integration_tasks,
