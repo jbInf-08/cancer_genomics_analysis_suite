@@ -20,6 +20,14 @@ exclude =
     *.egg-info,
     node_modules
 
-# Generated migrations are not hand-maintained.
 per-file-ignores =
+    # Package __init__ files re-export names for their callers; pyflakes counts
+    # that as an unused import.
     __init__.py:F401
+
+    # This module writes out a Makefile, held as a triple-quoted f-string. Every
+    # recipe line in it must start with a literal tab -- make rejects spaces
+    # with "missing separator. Stop." W191/E101 are physical-line checks that do
+    # not skip string contents, so they flag the Makefile body as though it were
+    # Python indentation. Converting those tabs would produce a broken Makefile.
+    CancerGenomicsSuite/scripts/setup_auto_generation.py:W191,E101
