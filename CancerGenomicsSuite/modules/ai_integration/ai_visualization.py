@@ -119,7 +119,6 @@ class AIInsightGenerator:
             # Basic statistics
             mean_val = values.mean()
             std_val = values.std()
-            median_val = values.median()
 
             # Skewness and kurtosis
             skewness = values.skew()

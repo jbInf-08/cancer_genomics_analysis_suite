@@ -486,11 +486,11 @@ def main():
     try:
         # Run selected workflow
         if args.workflow == "basic":
-            results = simulator.run_basic_workflow(args.samples, args.genes)
+            simulator.run_basic_workflow(args.samples, args.genes)
         elif args.workflow == "advanced":
-            results = simulator.run_advanced_workflow(args.samples, args.genes)
+            simulator.run_advanced_workflow(args.samples, args.genes)
         elif args.workflow == "full":
-            results = simulator.run_full_workflow(args.samples, args.genes)
+            simulator.run_full_workflow(args.samples, args.genes)
 
         # Print summary
         simulator.print_summary()

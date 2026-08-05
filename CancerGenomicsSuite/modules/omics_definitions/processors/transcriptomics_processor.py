@@ -367,7 +367,6 @@ class TranscriptomicsProcessor(OmicsDataProcessor):
         # Calculate size factors
         size_factors = []
         for sample in data.columns:
-            sample_data = data[sample]
             # Use genes with non-zero geometric mean
             valid_genes = geometric_means > 0
             if valid_genes.sum() > 0:
@@ -619,7 +618,6 @@ class TranscriptomicsProcessor(OmicsDataProcessor):
     def _summarize_de_results(self, results: Dict[str, Any]) -> Dict[str, Any]:
         """Summarize differential expression results."""
         if "p_value" in results:
-            p_values = np.array(results["p_value"])
             adjusted_p_values = np.array(results["adjusted_p_value"])
 
             summary = {

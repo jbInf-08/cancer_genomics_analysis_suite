@@ -502,7 +502,7 @@ def main():
     pathway_data = create_mock_pathway_data()
 
     # Create pathway network
-    network = mapper.create_pathway_network(pathway_data)
+    mapper.create_pathway_network(pathway_data)
 
     # Get pathway summary
     summary = mapper.get_pathway_summary()

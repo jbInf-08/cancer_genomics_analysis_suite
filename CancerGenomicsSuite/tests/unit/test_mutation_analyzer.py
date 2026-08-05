@@ -404,7 +404,7 @@ class TestMutationAnalyzer:
                 }
             )
 
-        result = analyzer.analyze_mutations(large_dataset)
+        analyzer.analyze_mutations(large_dataset)
         final_memory = process.memory_info().rss
 
         # Memory usage should not increase dramatically

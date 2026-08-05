@@ -243,7 +243,7 @@ class NGSPipelineManager:
             self.executions[execution_id] = execution
 
             # Submit to Celery for execution
-            task = self.celery_manager.submit_job(
+            self.celery_manager.submit_job(
                 job_type="pipeline_execution",
                 parameters={
                     "execution_id": execution_id,

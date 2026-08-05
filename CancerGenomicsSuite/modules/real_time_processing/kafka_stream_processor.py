@@ -140,7 +140,7 @@ class Neo4jGraphProcessor:
             RETURN m
             """
 
-            result = self.session.run(query, **asdict(mutation))
+            self.session.run(query, **asdict(mutation))
             NEO4J_OPERATIONS.labels(
                 operation_type="create_mutation", status="success"
             ).inc()
@@ -163,7 +163,7 @@ class Neo4jGraphProcessor:
             RETURN p, s
             """
 
-            result = self.session.run(query, patient_id=patient_id, sample_id=sample_id)
+            self.session.run(query, patient_id=patient_id, sample_id=sample_id)
             NEO4J_OPERATIONS.labels(
                 operation_type="create_patient", status="success"
             ).inc()
@@ -188,9 +188,7 @@ class Neo4jGraphProcessor:
             RETURN m, p
             """
 
-            result = self.session.run(
-                query, mutation_id=mutation_id, patient_id=patient_id
-            )
+            self.session.run(query, mutation_id=mutation_id, patient_id=patient_id)
             NEO4J_OPERATIONS.labels(
                 operation_type="create_relationship", status="success"
             ).inc()

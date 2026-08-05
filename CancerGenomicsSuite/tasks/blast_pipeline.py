@@ -385,7 +385,7 @@ class BlastPipeline:
         self.logger.info(f"Command: {' '.join(cmd)}")
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            subprocess.run(cmd, capture_output=True, text=True, check=True)
             self.logger.info(f"Database created successfully: {db_path}")
             return db_path
 
