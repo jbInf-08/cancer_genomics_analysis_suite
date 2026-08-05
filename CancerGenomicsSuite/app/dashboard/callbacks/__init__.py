@@ -18,10 +18,10 @@ Each callback module should follow these conventions:
 5. Use consistent naming conventions
 """
 
-from .gene_expression_callbacks import *
-from .mutation_effect_callbacks import *
-from .reporting_callbacks import *
-from .sequence_search_callbacks import *
+from .gene_expression_callbacks import register_gene_expression_callbacks
+from .mutation_effect_callbacks import register_mutation_effect_callbacks
+from .reporting_callbacks import register_reporting_callbacks
+from .sequence_search_callbacks import register_sequence_search_callbacks
 
 __all__ = [
     # Gene expression callbacks
