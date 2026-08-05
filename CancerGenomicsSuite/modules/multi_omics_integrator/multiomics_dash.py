@@ -601,7 +601,7 @@ class MultiOmicsDashboard:
             if n_clicks and self.integrator.integrated_data is not None:
                 try:
                     # Perform dimensionality reduction
-                    reduced_data = self.integrator.perform_dimensionality_reduction(
+                    self.integrator.perform_dimensionality_reduction(
                         method=method, n_components=n_components
                     )
 

@@ -272,7 +272,6 @@ class TokenHandler:
             if claims.get("type") != "refresh":
                 raise JWTError("Invalid token type for refresh")
 
-            refresh_token_id = claims.get("jti")
             user_id = claims.get("sub")
             username = claims.get("username")
             roles = claims.get("roles", [])

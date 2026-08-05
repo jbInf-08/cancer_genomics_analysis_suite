@@ -273,7 +273,7 @@ class IntelligentDataPreprocessor:
             selector = SelectKBest(k=self.config.n_features_to_select)
 
         # Fit selector
-        X_selected = selector.fit_transform(data[numeric_columns], np.zeros(len(data)))
+        selector.fit_transform(data[numeric_columns], np.zeros(len(data)))
         selected_features = numeric_columns[selector.get_support()]
 
         # Create new dataframe with selected features

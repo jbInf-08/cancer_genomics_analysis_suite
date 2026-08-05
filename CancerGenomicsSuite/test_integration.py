@@ -207,7 +207,7 @@ def test_error_handling():
 
         # Test with empty data
         try:
-            biomarkers = discover_biomarkers_compatible(pd.DataFrame(), [])
+            discover_biomarkers_compatible(pd.DataFrame(), [])
             print("❌ Should have failed with empty data")
             return False
         except Exception as e:
@@ -217,7 +217,7 @@ def test_error_handling():
         try:
             data = pd.DataFrame(np.random.randn(10, 5))
             labels = [0, 1]  # Wrong length
-            biomarkers = discover_biomarkers_compatible(data, labels)
+            discover_biomarkers_compatible(data, labels)
             print("❌ Should have failed with mismatched data/labels")
             return False
         except Exception as e:

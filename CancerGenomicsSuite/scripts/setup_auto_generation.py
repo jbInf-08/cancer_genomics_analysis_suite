@@ -204,7 +204,7 @@ class AutoGenerationSetup:
         try:
             # Install missing packages
             cmd = [sys.executable, "-m", "pip", "install"] + missing_packages
-            result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+            subprocess.run(cmd, check=True, capture_output=True, text=True)
 
             self.logger.info(f"Successfully installed: {', '.join(missing_packages)}")
             return True
@@ -256,7 +256,7 @@ class AutoGenerationSetup:
             if self.config["blast_databases"]["use_mock"]:
                 cmd.append("--mock-only")
 
-            result = subprocess.run(cmd, cwd=self.project_root, check=True)
+            subprocess.run(cmd, cwd=self.project_root, check=True)
 
             self.logger.info("BLAST database generation completed successfully")
             return True
@@ -301,7 +301,7 @@ class AutoGenerationSetup:
                     ["--cancer-types"] + self.config["mock_data"]["cancer_types"]
                 )
 
-            result = subprocess.run(cmd, cwd=self.project_root, check=True)
+            subprocess.run(cmd, cwd=self.project_root, check=True)
 
             self.logger.info("Mock data generation completed successfully")
             return True
@@ -317,7 +317,7 @@ class AutoGenerationSetup:
         success = True
 
         # Check dependencies
-        deps = self.check_dependencies()
+        self.check_dependencies()
 
         # Install missing Python packages
         if not self.install_dependencies():

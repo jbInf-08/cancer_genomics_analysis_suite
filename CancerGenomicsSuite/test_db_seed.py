@@ -552,7 +552,7 @@ def main():
 
     try:
         # Run seeding
-        counts = seeder.seed_database(
+        seeder.seed_database(
             num_samples=args.samples,
             num_genes=args.genes,
             mutations_per_gene=args.mutations,
