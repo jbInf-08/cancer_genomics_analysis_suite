@@ -6,12 +6,16 @@ This module provides authentication-related routes including login, logout,
 registration, and user management functionality.
 """
 
+import logging
+
 from flask import Blueprint, jsonify, request
 from werkzeug.security import check_password_hash
 
 # Import app components
 from .. import db
 from .models import User
+
+logger = logging.getLogger(__name__)
 
 # Import auth functions and utilities
 try:
@@ -110,7 +114,8 @@ def login():
             200,
         )
 
-    except Exception as e:
+    except Exception:
+        logger.exception("Unhandled error in login")
         return jsonify({"message": "Login failed"}), 500
 
 
@@ -123,7 +128,8 @@ def logout():
 
         return jsonify({"message": "Logout successful"}), 200
 
-    except Exception as e:
+    except Exception:
+        logger.exception("Unhandled error in logout")
         return jsonify({"message": "Logout failed"}), 500
 
 
@@ -175,10 +181,12 @@ def register():
 
         except ValidationError as e:
             return jsonify({"message": str(e)}), 400
-        except Exception as e:
+        except Exception:
+            logger.exception("Registration failed for %r", username)
             return jsonify({"message": "Registration failed"}), 500
 
     except Exception as e:
+        logger.warning("Rejected malformed registration request: %s", e)
         return jsonify({"message": "Invalid request data"}), 400
 
 
@@ -201,5 +209,6 @@ def auth_status():
             200,
         )
 
-    except Exception as e:
+    except Exception:
+        logger.exception("Unhandled error in auth status check")
         return jsonify({"message": "Status check failed"}), 500

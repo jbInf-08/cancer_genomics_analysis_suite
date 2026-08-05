@@ -662,7 +662,8 @@ class MLOutcomeDashboard:
 
                 return fig
 
-            except Exception as e:
+            except Exception:
+                logger.exception("Feature-distribution figure could not be built")
                 return {}
 
     def _generate_data_overview(self, df: pd.DataFrame) -> html.Div:

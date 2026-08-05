@@ -475,7 +475,8 @@ class IonTorrentQualityControl:
 
             return (gc_bases / total_bases * 100) if total_bases > 0 else 0.0
 
-        except Exception as e:
+        except Exception:
+            logger.exception("GC content unavailable for %s; reporting 0.0", file_path)
             return 0.0
 
     def _analyze_homopolymers(self, input_files: Dict[str, str]) -> Dict[str, Any]:
