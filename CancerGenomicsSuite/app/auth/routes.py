@@ -41,9 +41,18 @@ except ImportError:
     create_session = None
     destroy_session = None
     validate_session = None
-    log_auth_event = lambda event, user, details=None: None
-    require_permission = lambda perm: lambda f: f
-    require_admin = lambda f: f
+
+    def log_auth_event(event, user, details=None):
+        return None
+
+    def require_permission(perm):
+        def decorator(f):
+            return f
+
+        return decorator
+
+    def require_admin(f):
+        return f
 
     # Distinct classes, not aliases of Exception. Aliasing turned
     # `except ValidationError` at the /register handler below into a catch-all

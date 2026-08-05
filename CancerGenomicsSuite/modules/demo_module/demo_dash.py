@@ -70,9 +70,16 @@ except ImportError:
     # Use mock components if dash is not available
     html = MockHtml()
     dcc = MockDcc()
-    Input = lambda x: f"input:{x}"
-    Output = lambda x: f"output:{x}"
-    State = lambda x: f"state:{x}"
+
+    def Input(x):
+        return f"input:{x}"
+
+    def Output(x):
+        return f"output:{x}"
+
+    def State(x):
+        return f"state:{x}"
+
 
 # Demo layout
 layout = html.Div(
