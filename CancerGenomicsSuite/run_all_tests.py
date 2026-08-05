@@ -147,7 +147,7 @@ class TestRunner:
 
         # Check if pytest is available
         try:
-            import pytest
+            import pytest  # noqa: F401
 
             print("✅ pytest is available")
         except ImportError:

@@ -35,10 +35,10 @@ class CGASCompatibilityAdapter:
 
             # Import CGAS biomarker modules
             from modules.biomarker_discovery.biomarker_analyzer import BiomarkerAnalyzer
-            from modules.biomarker_discovery.ml_biomarker_discovery import (
+            from modules.biomarker_discovery.ml_biomarker_discovery import (  # noqa: F401,E501
                 MLBiomarkerDiscovery,
             )
-            from modules.biomarker_discovery.statistical_biomarker_discovery import (
+            from modules.biomarker_discovery.statistical_biomarker_discovery import (  # noqa: F401,E501
                 StatisticalBiomarkerDiscovery,
             )
 

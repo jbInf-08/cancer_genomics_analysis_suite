@@ -19,7 +19,7 @@ import pandas as pd
 
 # Try to import bioinformatics libraries
 try:
-    import pysam
+    import pysam  # noqa: F401
 
     PYSAM_AVAILABLE = True
 except ImportError:

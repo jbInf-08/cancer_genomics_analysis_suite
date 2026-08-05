@@ -24,7 +24,7 @@ def test_imports():
     print("🧪 Testing imports...")
 
     try:
-        from CancerGenomicsSuite.integrations import (
+        from CancerGenomicsSuite.integrations import (  # noqa: F401
             BiomarkerAnalysisOptions,
             UnifiedBiomarkerInterface,
             discover_biomarkers_compatible,
