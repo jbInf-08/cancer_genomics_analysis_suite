@@ -21,8 +21,6 @@ warnings.filterwarnings("ignore")
 # Scientific computing
 
 # Deep learning frameworks
-import torch
-import torch.nn as nn
 import torch.optim as optim
 
 # Bioinformatics

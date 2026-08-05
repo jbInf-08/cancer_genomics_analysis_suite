@@ -326,8 +326,8 @@ class NetworkXAnalyzer:
 
         # Create node-to-community mapping
         community_mapping = {}
-        for i, community in enumerate(communities):
-            for node in community:
+        for i, community_nodes in enumerate(communities):
+            for node in community_nodes:
                 community_mapping[node] = i
 
         self.analysis_results["communities"] = community_mapping
