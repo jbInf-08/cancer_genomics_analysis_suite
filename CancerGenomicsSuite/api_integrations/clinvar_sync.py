@@ -733,7 +733,10 @@ def sync_gene_variants(
         sync_client: Optional ClinVarSync instance
 
     Returns:
-        List of synchronized variants
+        The variants this call synchronized successfully. Variants already held
+        locally for the gene are not included unless this call re-synced them,
+        and variants whose sync failed are not included even when an older copy
+        is stored.
     """
     if sync_client is None:
         sync_client = ClinVarSync()
@@ -745,9 +748,16 @@ def sync_gene_variants(
     # Sync all found variants
     results = sync_client.batch_sync_variants(variant_ids)
 
-    # Return successfully synced variants
-    successful_ids = [vid for vid, success in results.items() if success]
-    return sync_client.get_local_variants(gene_symbol)
+    # Return successfully synced variants. get_local_variants returns the whole
+    # local table for the gene, so it is filtered to this run's successes --
+    # without that, a call in which every sync failed still returned a full list
+    # of stale rows and read as success.
+    successful_ids = {vid for vid, success in results.items() if success}
+    return [
+        variant
+        for variant in sync_client.get_local_variants(gene_symbol)
+        if variant.variant_id in successful_ids
+    ]
 
 
 def get_pathogenic_variants(
