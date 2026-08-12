@@ -89,6 +89,33 @@ The following secrets must be configured in your cloud provider's secret managem
 - `GITHUB_CLIENT_ID`: GitHub OAuth client ID
 - `GITHUB_CLIENT_SECRET`: GitHub OAuth client secret
 
+### Cluster Secrets to Create Before Applying Manifests
+
+Two Kubernetes Secrets are referenced by the manifests but intentionally not
+defined in them, because a Secret committed to the repository is a published
+credential. Create both before `kubectl apply`, or the pods that mount them stay
+in `ContainerCreating`:
+
+```bash
+kubectl create secret generic grafana-secrets \
+  --namespace monitoring \
+  --from-literal=admin-password="$(openssl rand -base64 24)"
+
+kubectl create secret generic neo4j-secrets \
+  --namespace neo4j \
+  --from-literal=NEO4J_AUTH="neo4j/$(openssl rand -base64 24)" \
+  --from-literal=GDS_LICENSE_KEY=""
+```
+
+`NEO4J_AUTH` is `user/password` separated by a forward slash. `GDS_LICENSE_KEY`
+is optional and may stay empty.
+
+Both previously shipped with defaults in the manifests — `admin` for Grafana and
+`neo4j:password` for Neo4j. **Any cluster deployed from an earlier revision is
+running those exact credentials and should be rotated**, and because the values
+are in git history, rotating in the cluster is the fix; removing them from the
+current files is not.
+
 ## Infrastructure Setup
 
 ### 1. Clone the Repository
