@@ -227,15 +227,27 @@ spec:
   resources:
     requests:
       storage: 10Gi
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: grafana-secrets
-  namespace: monitoring
-type: Opaque
-data:
-  admin-password: YWRtaW4=  # admin
+
+# The grafana-secrets Secret is deliberately not defined in this file.
+#
+# It used to carry `admin-password: YWRtaW4=`, which is base64 for "admin", so
+# every cluster that applied this manifest published a Grafana admin account
+# with a password stored in the repository. Anyone who could read the repo could
+# sign in to Grafana, and from there reach whatever the datasources reach.
+#
+# Create it before applying this file:
+#
+#   kubectl create secret generic grafana-secrets \
+#     --namespace monitoring \
+#     --from-literal=admin-password="$(openssl rand -base64 24)"
+#
+# The Grafana Deployment above mounts this Secret, so the pod stays in
+# ContainerCreating until it exists. That is deliberate -- a missing credential
+# should stop the rollout, not fall back to a known login.
+#
+# DEPLOYMENT_GUIDE.md -> Required Secrets is the fuller version: secrets belong
+# in the cloud provider's secret manager, and the command above is the minimal
+# direct equivalent for a cluster not wired to one yet.
 ---
 apiVersion: apps/v1
 kind: Deployment

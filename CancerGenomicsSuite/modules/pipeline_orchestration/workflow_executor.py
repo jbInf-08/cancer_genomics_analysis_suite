@@ -7,6 +7,7 @@ using different pipeline orchestration systems (Nextflow, Snakemake).
 """
 
 import concurrent.futures
+import functools
 import json
 import logging
 import os
@@ -388,8 +389,23 @@ class WorkflowExecutor:
 
             workflow_info["execution_id"] = execution_id
 
-            # Submit to executor for monitoring
+            # Submit to executor for monitoring.
+            #
+            # The returned future is not discarded. A ThreadPoolExecutor stores
+            # an escaped exception on the future instead of raising it, so
+            # dropping the reference means nothing ever observes it and the
+            # monitoring thread dies in silence -- the workflow simply stays in
+            # active_workflows forever, looking like it is still running.
+            #
+            # _monitor_workflow catches broadly, but not everywhere: it reads
+            # active_workflows and workflow_info before entering its try, and
+            # its own handler ends with a del that raises KeyError if another
+            # monitor removed the entry first. Both are reachable, since
+            # max_workers permits several monitors at once.
             future = self.executor.submit(self._monitor_workflow, workflow_name)
+            future.add_done_callback(
+                functools.partial(self._report_monitor_exit, workflow_name)
+            )
 
             logger.info(f"Workflow {workflow_name} started with {orchestration_system}")
 
@@ -605,6 +621,34 @@ class WorkflowExecutor:
             job_name=workflow_info["name"],
         )
         return result["name"]
+
+    @staticmethod
+    def _report_monitor_exit(
+        workflow_name: str, future: "concurrent.futures.Future"
+    ) -> None:
+        """Log an exception that escaped _monitor_workflow.
+
+        Runs as a done-callback on the monitoring future. Without it an escaped
+        exception is stored on the future and never looked at, so the thread
+        dies with no record anywhere.
+
+        Args:
+            workflow_name: Name of the workflow that was being monitored
+            future: The completed future for that monitoring call
+        """
+        if future.cancelled():
+            return
+
+        # The future is finished here, so this returns immediately rather than
+        # blocking, and re-raises nothing.
+        error = future.exception()
+        if error is not None:
+            logger.error(
+                "Monitoring thread for workflow %s exited on an unhandled "
+                "exception; its status will no longer be updated",
+                workflow_name,
+                exc_info=error,
+            )
 
     def _monitor_workflow(self, workflow_name: str):
         """

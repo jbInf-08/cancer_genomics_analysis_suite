@@ -75,17 +75,30 @@ data:
     dbms.clustering.read_replica.advertised_address=neo4j-read-replica-0.neo4j-headless:6000
     dbms.clustering.read_replica.listen_address=:6001
     dbms.clustering.read_replica.advertised_listen_address=neo4j-read-replica-0.neo4j-headless:6001
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: neo4j-secrets
-  namespace: neo4j
-type: Opaque
-data:
-  # Base64 encoded values - replace with actual values
-  NEO4J_AUTH: bmVvNGo6cGFzc3dvcmQ=  # neo4j:password
-  GDS_LICENSE_KEY: ""  # Add your GDS license key here
+
+# The neo4j-secrets Secret is deliberately not defined in this file.
+#
+# It used to carry `NEO4J_AUTH: bmVvNGo6cGFzc3dvcmQ=`, which is base64 for
+# "neo4j:password" -- Neo4j's own default login, committed to the repository.
+# The comment above it said to replace the values, but nothing enforced that,
+# so applying the manifest unchanged stood up the graph database holding the
+# genomics data with a publicly known username and password.
+#
+# Create it before applying this file:
+#
+#   kubectl create secret generic neo4j-secrets \
+#     --namespace neo4j \
+#     --from-literal=NEO4J_AUTH="neo4j/$(openssl rand -base64 24)" \
+#     --from-literal=GDS_LICENSE_KEY=""
+#
+# NEO4J_AUTH is user/password separated by a forward slash, not a colon.
+# GDS_LICENSE_KEY is optional and may stay empty.
+#
+# The pods that mount this Secret stay in ContainerCreating until it exists,
+# which is deliberate: a missing credential should stop the rollout rather than
+# fall back to the vendor default.
+#
+# See DEPLOYMENT_GUIDE.md -> Required Secrets.
 ---
 apiVersion: v1
 kind: Service

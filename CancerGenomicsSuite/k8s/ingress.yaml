@@ -63,12 +63,23 @@ metadata:
     nginx.ingress.kubernetes.io/rate-limit: "200"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
     # The controller's own CORS handling, replacing a configuration-snippet
-    # (CVE-2021-25742). Values are carried across unchanged -- note that
-    # allow-origin is "*" while allow-headers includes Authorization, which is
-    # worth revisiting separately, but tightening it here would change who can
-    # call the API.
+    # (CVE-2021-25742).
+    #
+    # allow-origin is the UI's origin, not "*". It was "*" alongside an
+    # allow-headers list containing Authorization, which told any site on the
+    # internet it could send authenticated calls here and read the replies.
+    #
+    # The wildcard was also self-defeating: ingress-nginx defaults
+    # cors-allow-credentials to true, and browsers reject
+    # "Access-Control-Allow-Origin: *" together with credentials, so
+    # cookie-bearing cross-origin calls were failing anyway.
+    #
+    # This matches helm/values-production.yaml, which already pins the origin
+    # and sets credentials explicitly. Change it with the hosts below; for more
+    # than one origin the annotation takes a comma-separated list.
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://cancer-genomics.yourdomain.com"  # Change with the hosts below
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
     nginx.ingress.kubernetes.io/cors-expose-headers: "Content-Length,Content-Range"
