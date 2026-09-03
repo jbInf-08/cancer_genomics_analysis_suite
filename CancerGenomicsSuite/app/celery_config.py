@@ -320,19 +320,50 @@ def purge_all_queues():
         return False
 
 
+def _routing_key_of(entry):
+    """Queue name for one entry returned by a worker inspection.
+
+    active() and reserved() hand back the task dict itself. scheduled() wraps it
+    as {"eta": ..., "priority": ..., "request": {...}}, so delivery_info sits one
+    level down; reading it at the top level finds nothing and files every
+    scheduled task under "default".
+    """
+    if not isinstance(entry, dict):
+        return "default"
+    task = entry.get("request") if isinstance(entry.get("request"), dict) else entry
+    return (task.get("delivery_info") or {}).get("routing_key") or "default"
+
+
 def get_queue_lengths():
-    """Get the length of all task queues."""
+    """Count the tasks each queue is holding, by state.
+
+    Returns a mapping of queue name to {"active", "reserved", "scheduled",
+    "total"}. All three states are counted: active is executing right now,
+    reserved is prefetched by a worker and waiting its turn, and scheduled is
+    held for a later eta or countdown. Counting only the active ones, as this
+    did, reports a busy queue as empty -- the backlog is precisely the part that
+    is not yet running.
+    """
     try:
         inspect = celery_app.control.inspect()
-        active_tasks = inspect.active()
-        scheduled_tasks = inspect.scheduled()
-        reserved_tasks = inspect.reserved()
+        # Each of these is None, not {}, when no worker answers the broadcast.
+        by_state = {
+            "active": inspect.active(),
+            "reserved": inspect.reserved(),
+            "scheduled": inspect.scheduled(),
+        }
 
         queue_lengths = {}
-        for worker, tasks in active_tasks.items():
-            for task in tasks:
-                queue = task.get("delivery_info", {}).get("routing_key", "default")
-                queue_lengths[queue] = queue_lengths.get(queue, 0) + 1
+        for state, workers in by_state.items():
+            for tasks in (workers or {}).values():
+                for entry in tasks or []:
+                    queue = _routing_key_of(entry)
+                    counts = queue_lengths.setdefault(
+                        queue,
+                        {"active": 0, "reserved": 0, "scheduled": 0, "total": 0},
+                    )
+                    counts[state] += 1
+                    counts["total"] += 1
 
         return queue_lengths
     except Exception as e:
