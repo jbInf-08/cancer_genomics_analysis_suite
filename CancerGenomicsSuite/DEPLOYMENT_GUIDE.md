@@ -110,6 +110,26 @@ kubectl create secret generic neo4j-secrets \
 `NEO4J_AUTH` is `user/password` separated by a forward slash. `GDS_LICENSE_KEY`
 is optional and may stay empty.
 
+If you sync `argocd/monitoring-application.yaml`, that stack's Grafana needs two
+more Secrets in the same namespace. It will not start without them:
+
+```bash
+kubectl create secret generic grafana-admin \
+  --namespace monitoring \
+  --from-literal=admin-user=admin \
+  --from-literal=admin-password="$(openssl rand -base64 24)"
+
+kubectl create secret generic grafana-oauth \
+  --namespace monitoring \
+  --from-literal=GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET="<from Keycloak>"
+```
+
+That Application previously carried `adminPassword: "admin"`, repeated it under
+`grafana.ini`'s `security` section, and set the Keycloak OAuth `client_secret`
+to the literal `grafana-secret`. **Rotate all three anywhere it was synced**,
+including the Keycloak client secret, which is regenerated in Keycloak rather
+than in the cluster.
+
 Both previously shipped with defaults in the manifests — `admin` for Grafana and
 `neo4j:password` for Neo4j. **Any cluster deployed from an earlier revision is
 running those exact credentials and should be rotated**, and because the values
