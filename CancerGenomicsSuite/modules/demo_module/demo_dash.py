@@ -3,6 +3,8 @@ Demo module to showcase the dashboard functionality
 This module provides a simple example of how to create a dashboard module.
 """
 
+import sys
+
 
 # Mock dash components for demonstration
 class MockHtml:
@@ -46,8 +48,6 @@ class MockDcc:
 
 
 # Only mock dash modules if they're not already available
-import sys
-
 if "dash" not in sys.modules:
     sys.modules["dash"] = type("MockDash", (), {})()
     sys.modules["dash.html"] = MockHtml()
