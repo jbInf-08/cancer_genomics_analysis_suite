@@ -148,14 +148,14 @@ async def demonstrate_alert_monitoring():
     monitor = AlertMonitor()
 
     # Set up Slack notification (example - replace with real webhook URL)
-    slack_webhook_url = "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
-    # monitor.setup_slack_notification(slack_webhook_url)
+    # monitor.setup_slack_notification(
+    #     "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    # )
 
     # Set up Teams notification (example - replace with real webhook URL)
-    teams_webhook_url = (
-        "https://your-org.webhook.office.com/webhookb2/YOUR-TEAMS-WEBHOOK"
-    )
-    # monitor.setup_teams_notification(teams_webhook_url)
+    # monitor.setup_teams_notification(
+    #     "https://your-org.webhook.office.com/webhookb2/YOUR-TEAMS-WEBHOOK"
+    # )
 
     # Set up email notification (example - replace with real SMTP settings)
     # monitor.setup_email_notification(
