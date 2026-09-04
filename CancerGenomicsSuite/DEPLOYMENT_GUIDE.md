@@ -116,6 +116,77 @@ running those exact credentials and should be rotated**, and because the values
 are in git history, rotating in the cluster is the fix; removing them from the
 current files is not.
 
+### Local Files to Create Before `kubectl apply -k k8s/`
+
+The kustomize overlay reads two files that are gitignored, so they are not in a
+fresh clone. Copy each example and fill it in:
+
+```bash
+cd CancerGenomicsSuite/k8s
+cp secrets.env.example   secrets.env      # SECRET_KEY, JWT_SECRET_KEY, DATABASE_PASSWORD
+cp secrets.yaml.example  secrets.yaml     # postgres-secrets
+```
+
+Generate every value; both examples ship with the fields empty on purpose, so
+copying them unedited fails at startup rather than deploying something usable
+but known:
+
+```bash
+openssl rand -base64 48
+```
+
+`DATABASE_PASSWORD` in `secrets.env` must match `POSTGRES_PASSWORD` in
+`secrets.yaml`, or the application authenticates against a database expecting a
+different one.
+
+Verify the overlay builds before applying:
+
+```bash
+kubectl kustomize CancerGenomicsSuite/k8s/
+```
+
+Without `secrets.env` the build stops with an `evalsymlink failure` naming the
+missing file — that is the intended failure, not a bug.
+
+**`SECRET_KEY` and `JWT_SECRET_KEY` previously had committed values** (in the
+kustomize `secretGenerator`, and duplicated into `configmap.yaml`). They signed
+Flask sessions and JWTs, so anyone with repo access could mint a valid session
+or token. **Rotate them on any cluster deployed from an earlier revision**;
+existing sessions and tokens are invalidated by the rotation, which is the point.
+
+### Helm Chart Secrets
+
+Every credential in the committed `values*.yaml` files is now `""`. Supply them
+at install time, either inline or through a local file copied from
+`values-secrets.example.yaml` (gitignored):
+
+```bash
+cd CancerGenomicsSuite/helm/cancer-genomics-analysis-suite
+
+helm upgrade --install cancer-genomics . \
+  -f values-production.yaml \
+  --set secrets.app.data.SECRET_KEY="$(openssl rand -base64 48)" \
+  --set secrets.app.data.JWT_SECRET_KEY="$(openssl rand -base64 48)" \
+  --set secrets.database.data.POSTGRES_PASSWORD="$(openssl rand -base64 32)"
+```
+
+`SECRET_KEY`, `JWT_SECRET_KEY` and `POSTGRES_PASSWORD` are wrapped in Helm's
+`required`, so an install that leaves any of them empty **stops with a message
+naming the missing value** rather than rendering a release with a blank or
+well-known credential. The Bitnami `postgresql` and `redis` subchart passwords
+are left empty deliberately — those charts generate a random password on first
+install and reuse it on upgrade.
+
+**If you deploy through ArgoCD**, the Application renders this chart from
+`values.yaml` plus the per-namespace file, so a sync will now fail until the
+secret values are supplied — add them under the existing `helm.parameters` in
+`argocd/argocd-app.yaml`, or better, reference them from a source ArgoCD can
+read that is not this repository.
+
+`values*.yaml` previously carried working values for all of these, including
+`SECRET_KEY` and `JWT_SECRET_KEY` in `values.yaml`, `values-staging.yaml` and
+`values-production.yaml`. **Rotate anything deployed from an earlier revision.**
+
 ## Infrastructure Setup
 
 ### 1. Clone the Repository

@@ -6,6 +6,10 @@ namespace: cancer-genomics
 resources:
   - namespace.yaml
   - configmap.yaml
+  # Gitignored and supplied by the operator -- see secrets.yaml.example. It has
+  # to define postgres-secrets, which the deployments read but nothing in the
+  # repo creates. Without the file `kubectl kustomize` stops with an
+  # evalsymlink failure that does not say what is missing or why.
   - secrets.yaml
   - postgres.yaml
   - redis.yaml
@@ -37,15 +41,34 @@ patchesStrategicMerge:
           - name: web
             image: cancer-genomics:latest
 
-configMapGenerator:
-  - name: cancer-genomics-config
-    literals:
-      - ENVIRONMENT=production
-      - LOG_LEVEL=INFO
+# No configMapGenerator. There was one generating cancer-genomics-config, which
+# configmap.yaml already defines, and kustomize refuses to build two resources
+# with the same id:
+#
+#   error: namespace transformation produces ID conflict
+#
+# Its two keys are accounted for: LOG_LEVEL was already in configmap.yaml, and
+# ENVIRONMENT has been moved there, so nothing is lost by dropping the
+# generator.
 
 secretGenerator:
+  # Values come from secrets.env, which is gitignored and created from
+  # secrets.env.example. They used to be literals here:
+  #
+  #   SECRET_KEY=your-production-secret-key-change-this
+  #   JWT_SECRET_KEY=your-jwt-secret-key-change-this
+  #
+  # Those read as placeholders but kustomize applies them verbatim, so a
+  # deployment signed its Flask sessions and its JWTs with two strings printed
+  # in this repository. Anyone with the repo could mint a valid session cookie
+  # or token, which is an authentication bypass rather than a weak password.
+  #
+  # DATABASE_PASSWORD is included because deployments read it from this secret
+  # and the literals never defined it.
+  #
+  # If secrets.env is missing, `kubectl kustomize` fails instead of generating
+  # a secret nobody meant to ship.
   - name: cancer-genomics-secrets
-    literals:
-      - SECRET_KEY=your-production-secret-key-change-this
-      - JWT_SECRET_KEY=your-jwt-secret-key-change-this
+    envs:
+      - secrets.env
     type: Opaque

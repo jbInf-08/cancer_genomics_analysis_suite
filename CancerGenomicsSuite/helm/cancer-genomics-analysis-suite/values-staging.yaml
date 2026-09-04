@@ -46,9 +46,9 @@ celery:
 postgresql:
   enabled: true
   auth:
-    postgresPassword: "staging-password"
+    postgresPassword: ""
     username: "postgres"
-    password: "staging-password"
+    password: ""
     database: "genomics_db"
   primary:
     persistence:
@@ -172,13 +172,13 @@ secrets:
     create: true
     data:
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "staging-password"
+      POSTGRES_PASSWORD: ""
       POSTGRES_DB: "genomics_db"
   app:
     create: true
     data:
-      SECRET_KEY: "staging-secret-key-change-in-production"
-      JWT_SECRET_KEY: "staging-jwt-secret-key-change-in-production"
+      SECRET_KEY: ""
+      JWT_SECRET_KEY: ""
 
 # Enable autoscaling in staging
 autoscaling:
