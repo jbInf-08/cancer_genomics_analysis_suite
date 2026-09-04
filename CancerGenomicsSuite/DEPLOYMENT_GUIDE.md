@@ -116,6 +116,44 @@ running those exact credentials and should be rotated**, and because the values
 are in git history, rotating in the cluster is the fix; removing them from the
 current files is not.
 
+### Local Files to Create Before `kubectl apply -k k8s/`
+
+The kustomize overlay reads two files that are gitignored, so they are not in a
+fresh clone. Copy each example and fill it in:
+
+```bash
+cd CancerGenomicsSuite/k8s
+cp secrets.env.example   secrets.env      # SECRET_KEY, JWT_SECRET_KEY, DATABASE_PASSWORD
+cp secrets.yaml.example  secrets.yaml     # postgres-secrets
+```
+
+Generate every value; both examples ship with the fields empty on purpose, so
+copying them unedited fails at startup rather than deploying something usable
+but known:
+
+```bash
+openssl rand -base64 48
+```
+
+`DATABASE_PASSWORD` in `secrets.env` must match `POSTGRES_PASSWORD` in
+`secrets.yaml`, or the application authenticates against a database expecting a
+different one.
+
+Verify the overlay builds before applying:
+
+```bash
+kubectl kustomize CancerGenomicsSuite/k8s/
+```
+
+Without `secrets.env` the build stops with an `evalsymlink failure` naming the
+missing file — that is the intended failure, not a bug.
+
+**`SECRET_KEY` and `JWT_SECRET_KEY` previously had committed values** (in the
+kustomize `secretGenerator`, and duplicated into `configmap.yaml`). They signed
+Flask sessions and JWTs, so anyone with repo access could mint a valid session
+or token. **Rotate them on any cluster deployed from an earlier revision**;
+existing sessions and tokens are invalidated by the rotation, which is the point.
+
 ## Infrastructure Setup
 
 ### 1. Clone the Repository
