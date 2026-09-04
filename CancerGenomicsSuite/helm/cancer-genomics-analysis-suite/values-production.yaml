@@ -272,9 +272,9 @@ nginx:
 postgresql:
   enabled: true
   auth:
-    postgresPassword: "postgres-password"
+    postgresPassword: ""
     username: "postgres"
-    password: "postgres-password"
+    password: ""
     database: "genomics_db"
   
   primary:
@@ -304,7 +304,7 @@ redis:
   enabled: true
   auth:
     enabled: true
-    password: "redis-password"
+    password: ""
   
   master:
     persistence:
@@ -567,7 +567,7 @@ secrets:
     name: "postgres-secrets"
     data:
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres-password"
+      POSTGRES_PASSWORD: ""
       POSTGRES_DB: "genomics_db"
   
   # Application secrets
@@ -575,17 +575,17 @@ secrets:
     create: true
     name: "app-secrets"
     data:
-      SECRET_KEY: "your-production-secret-key-change-this"
-      JWT_SECRET_KEY: "your-jwt-secret-key-change-this"
+      SECRET_KEY: ""
+      JWT_SECRET_KEY: ""
   
   # External API keys
   apis:
     create: true
     name: "api-secrets"
     data:
-      ENSEMBL_API_KEY: "your-ensembl-api-key"
-      UNIPROT_API_KEY: "your-uniprot-api-key"
-      CLINVAR_API_KEY: "your-clinvar-api-key"
+      ENSEMBL_API_KEY: ""
+      UNIPROT_API_KEY: ""
+      CLINVAR_API_KEY: ""
 
 # Autoscaling configuration
 autoscaling:
@@ -644,7 +644,7 @@ config:
     host: "redis-master"
     port: 6379
     db: 0
-    password: "redis-password"
+    password: ""
   
   # Celery configuration
   celery:
