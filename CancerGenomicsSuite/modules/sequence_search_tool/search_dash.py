@@ -8,6 +8,8 @@ through a web-based interface.
 
 import base64
 import logging
+import os
+import tempfile
 from typing import Any, Dict
 
 import dash
@@ -412,20 +414,26 @@ class SearchDashboard:
                     else:
                         file_format = "fasta"  # default
 
-                    # Save to temporary file
-                    temp_file = f"temp_{filename}"
-                    with open(temp_file, "wb") as f:
-                        f.write(decoded)
+                    # Write to a path this code chooses, not one the uploader
+                    # supplies. This was f"temp_{filename}" interpolated
+                    # straight from the upload, so a filename containing ../
+                    # walked out of the working directory -- on the write, and
+                    # again on the remove afterwards.
+                    #
+                    # No suffix is needed: unlike the tree viewer, the format is
+                    # passed to the loader explicitly as file_format above, so
+                    # nothing here dispatches on the extension.
+                    fd, temp_file = tempfile.mkstemp()
+                    try:
+                        with os.fdopen(fd, "wb") as f:
+                            f.write(decoded)
 
-                    # Load sequences
-                    result = self.aligner.load_sequences_from_file(
-                        temp_file, file_format
-                    )
-
-                    # Clean up temp file
-                    import os
-
-                    os.remove(temp_file)
+                        # Load sequences
+                        result = self.aligner.load_sequences_from_file(
+                            temp_file, file_format
+                        )
+                    finally:
+                        os.remove(temp_file)
 
                     if result["success"]:
                         self.logger.info(
