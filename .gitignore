@@ -227,6 +227,7 @@ config.yaml
 config.yml
 secrets.yaml
 secrets.yml
+secrets.env
 .secrets
 .env.local
 .env.production
