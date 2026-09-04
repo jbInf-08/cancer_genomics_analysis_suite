@@ -46,9 +46,9 @@ celery:
 postgresql:
   enabled: true
   auth:
-    postgresPassword: "dev-password"
+    postgresPassword: ""
     username: "postgres"
-    password: "dev-password"
+    password: ""
     database: "genomics_db"
   primary:
     persistence:
@@ -153,10 +153,10 @@ secrets:
     create: true
     data:
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "dev-password"
+      POSTGRES_PASSWORD: ""
       POSTGRES_DB: "genomics_db"
   app:
     create: true
     data:
-      SECRET_KEY: "dev-secret-key-not-for-production"
-      JWT_SECRET_KEY: "dev-jwt-secret-key-not-for-production"
+      SECRET_KEY: ""
+      JWT_SECRET_KEY: ""
