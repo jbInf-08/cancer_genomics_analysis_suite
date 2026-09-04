@@ -8,9 +8,9 @@ services:
       - .:/app
     environment:
       - FLASK_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/genomics_db
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env -- see .env.example}@db:5432/genomics_db
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-secret-key
+      - SECRET_KEY=${SECRET_KEY:?set SECRET_KEY in .env -- see .env.example}
     depends_on:
       - db
       - redis
@@ -21,7 +21,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env -- see .env.example}
       POSTGRES_DB: genomics_db
     volumes:
       - pgdata:/var/lib/postgresql/data
