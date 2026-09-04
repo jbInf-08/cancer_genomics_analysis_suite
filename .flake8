@@ -4,11 +4,29 @@
 # E501s -- the two tools were formatting to different targets.
 max-line-length = 88
 
-# Both are black-incompatible by design and black's own documentation
+# E203 and W503 are black-incompatible by design and black's own documentation
 # recommends disabling them:
 #   E203 whitespace before ':'   -- black puts it there in slices
 #   W503 line break before binary operator -- black prefers breaking before
-extend-ignore = E203, W503
+#
+# E402 module level import not at top of file. Of the 170 it reported, 169 were
+# imports that have to sit where they are:
+#
+#   109  below a warnings.filterwarnings("ignore") that exists to silence those
+#        imports. Hoisting them past it un-silences the warnings, which is a
+#        behaviour change dressed up as a lint fix.
+#    57  below a sys.path.insert that makes the import resolvable at all.
+#        Hoisting them breaks the import outright.
+#     3  deliberate deferrals: two in app/auth/__init__.py, which imports .models
+#        and .routes at the bottom to break a circular import that routes.py has
+#        an explicit fallback for, and one after a pytest.importorskip, which
+#        must run before the module it guards is imported.
+#
+# The one genuine case -- an `import sys` sitting below a class definition in
+# modules/demo_module/demo_dash.py -- is fixed rather than ignored. A rule
+# firing 169 times out of 170 on correct code reports nothing useful, so it is
+# off; a misplaced import is caught in review instead.
+extend-ignore = E203, W503, E402
 
 exclude =
     .git,
