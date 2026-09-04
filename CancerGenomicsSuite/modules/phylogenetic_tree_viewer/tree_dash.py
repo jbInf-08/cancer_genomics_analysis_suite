@@ -8,6 +8,8 @@ parameters, and visualize results through a web-based interface.
 
 import base64
 import logging
+import os
+import tempfile
 from typing import Any, Dict
 
 import dash
@@ -336,18 +338,43 @@ class TreeDashboard:
                     # the value was discarded, the loader's behaviour is what
                     # actually ran.
 
-                    # Save to temporary file
-                    temp_file = f"temp_{filename}"
-                    with open(temp_file, "wb") as f:
-                        f.write(decoded)
+                    # Write to a path this code chooses, not one the uploader
+                    # supplies. This was f"temp_{filename}" interpolated
+                    # straight from the upload, so a filename containing ../
+                    # walked out of the working directory -- on the write, and
+                    # again on the remove afterwards.
+                    #
+                    # load_sequences dispatches on the extension, so the suffix
+                    # has to survive. It is matched against the set that method
+                    # accepts instead of being carried over from the upload,
+                    # which also means an unsupported type is reported here
+                    # rather than as a ValueError from inside the loader.
+                    suffix = os.path.splitext(os.path.basename(filename or ""))[
+                        1
+                    ].lower()
+                    if suffix not in {".fasta", ".fa", ".phylip", ".clustal"}:
+                        return (
+                            html.Div(
+                                [
+                                    html.P(
+                                        "Unsupported file type. Upload .fasta, "
+                                        ".fa, .phylip or .clustal.",
+                                        className="text-danger",
+                                    )
+                                ]
+                            ),
+                            html.Div(),
+                        )
 
-                    # Load sequences
-                    result = self.builder.load_sequences(temp_file)
+                    fd, temp_file = tempfile.mkstemp(suffix=suffix)
+                    try:
+                        with os.fdopen(fd, "wb") as f:
+                            f.write(decoded)
 
-                    # Clean up temp file
-                    import os
-
-                    os.remove(temp_file)
+                        # Load sequences
+                        result = self.builder.load_sequences(temp_file)
+                    finally:
+                        os.remove(temp_file)
 
                     if result["success"]:
                         # Create alignment preview
