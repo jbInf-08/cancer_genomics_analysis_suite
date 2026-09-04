@@ -88,6 +88,18 @@ data:
   # URL configuration
   url: https://argocd.cancer-genomics.yourdomain.com
   
-  # Admin password (should be changed in production)
-  admin.password: "$2a$10$rRyBsGSHK6.uc8fntPwVFOBqQylyibP5QK4rXvW8kjHXk0hdQb7y2"
-  admin.passwordMtime: "2023-01-01T00:00:00Z"
+  # No admin.password here. It carried a bcrypt hash, which is published the
+  # moment it is committed -- bcrypt slows an offline guess, it does not stop
+  # one, and the hash was fixed for every install of this file.
+  #
+  # It also did nothing. Argo CD reads admin.password from the argocd-secret
+  # Secret, not from a ConfigMap, so the entry never took effect and the
+  # password stayed whatever argocd-initial-admin-secret generated. The
+  # accompanying admin.passwordMtime is gone with it; Argo CD uses it to expire
+  # sessions issued before a password change, and a fixed date is meaningless
+  # without the password it refers to.
+  #
+  # The intended flow is already in DEPLOYMENT_GUIDE.md: read the generated
+  # password out of argocd-initial-admin-secret, then change it with
+  # `argocd account update-password`, which writes the new hash into
+  # argocd-secret where Argo CD actually looks.
