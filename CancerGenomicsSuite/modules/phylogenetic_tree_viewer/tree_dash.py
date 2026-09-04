@@ -328,15 +328,13 @@ class TreeDashboard:
                     content_type, content_string = contents.split(",")
                     decoded = base64.b64decode(content_string)
 
-                    # Determine file format
-                    if filename.endswith(".fasta") or filename.endswith(".fa"):
-                        file_format = "fasta"
-                    elif filename.endswith(".phylip"):
-                        file_format = "phylip"
-                    elif filename.endswith(".clustal"):
-                        file_format = "clustal"
-                    else:
-                        file_format = "fasta"  # default
+                    # No format detection here. load_sequences below runs the
+                    # same extension check itself, and this copy assigned
+                    # file_format without passing it anywhere. The two also
+                    # disagreed on an unrecognised extension: this defaulted to
+                    # "fasta" while load_sequences raises ValueError, and since
+                    # the value was discarded, the loader's behaviour is what
+                    # actually ran.
 
                     # Save to temporary file
                     temp_file = f"temp_{filename}"
