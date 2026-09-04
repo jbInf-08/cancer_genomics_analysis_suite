@@ -116,6 +116,39 @@ running those exact credentials and should be rotated**, and because the values
 are in git history, rotating in the cluster is the fix; removing them from the
 current files is not.
 
+### Helm Chart Secrets
+
+Every credential in the committed `values*.yaml` files is now `""`. Supply them
+at install time, either inline or through a local file copied from
+`values-secrets.example.yaml` (gitignored):
+
+```bash
+cd CancerGenomicsSuite/helm/cancer-genomics-analysis-suite
+
+helm upgrade --install cancer-genomics . \
+  -f values-production.yaml \
+  --set secrets.app.data.SECRET_KEY="$(openssl rand -base64 48)" \
+  --set secrets.app.data.JWT_SECRET_KEY="$(openssl rand -base64 48)" \
+  --set secrets.database.data.POSTGRES_PASSWORD="$(openssl rand -base64 32)"
+```
+
+`SECRET_KEY`, `JWT_SECRET_KEY` and `POSTGRES_PASSWORD` are wrapped in Helm's
+`required`, so an install that leaves any of them empty **stops with a message
+naming the missing value** rather than rendering a release with a blank or
+well-known credential. The Bitnami `postgresql` and `redis` subchart passwords
+are left empty deliberately — those charts generate a random password on first
+install and reuse it on upgrade.
+
+**If you deploy through ArgoCD**, the Application renders this chart from
+`values.yaml` plus the per-namespace file, so a sync will now fail until the
+secret values are supplied — add them under the existing `helm.parameters` in
+`argocd/argocd-app.yaml`, or better, reference them from a source ArgoCD can
+read that is not this repository.
+
+`values*.yaml` previously carried working values for all of these, including
+`SECRET_KEY` and `JWT_SECRET_KEY` in `values.yaml`, `values-staging.yaml` and
+`values-production.yaml`. **Rotate anything deployed from an earlier revision.**
+
 ## Infrastructure Setup
 
 ### 1. Clone the Repository
