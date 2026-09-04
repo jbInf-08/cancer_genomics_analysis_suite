@@ -313,9 +313,9 @@ nginx:
 postgresql:
   enabled: true
   auth:
-    postgresPassword: "postgres-password"
+    postgresPassword: ""
     username: "postgres"
-    password: "postgres-password"
+    password: ""
     database: "genomics_db"
   
   primary:
@@ -633,7 +633,7 @@ secrets:
     name: "postgres-secrets"
     data:
       POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres-password"
+      POSTGRES_PASSWORD: ""
       POSTGRES_DB: "genomics_db"
   
   # Application secrets
@@ -641,8 +641,8 @@ secrets:
     create: true
     name: "app-secrets"
     data:
-      SECRET_KEY: "your-production-secret-key-change-this"
-      JWT_SECRET_KEY: "your-jwt-secret-key-change-this"
+      SECRET_KEY: ""
+      JWT_SECRET_KEY: ""
   
   # External API keys
   apis:
@@ -840,7 +840,7 @@ kafka:
   sasl:
     enabled: false
     username: "kafka"
-    password: "kafka-password"
+    password: ""
   
   env: []
   
@@ -891,7 +891,7 @@ neo4j:
   
   auth:
     username: "neo4j"
-    password: "neo4j-password"
+    password: ""
   
   database:
     name: "genomics"
@@ -1240,29 +1240,29 @@ secretsManagement:
         namespace: "cancer-genomics"
         data:
           POSTGRES_USER: "postgres"
-          POSTGRES_PASSWORD: "postgres-password"
+          POSTGRES_PASSWORD: ""
           POSTGRES_DB: "genomics_db"
       
       app:
         name: "app-sealed-secret"
         namespace: "cancer-genomics"
         data:
-          SECRET_KEY: "your-production-secret-key-change-this"
-          JWT_SECRET_KEY: "your-jwt-secret-key-change-this"
-          FLASK_SECRET_KEY: "your-flask-secret-key-change-this"
+          SECRET_KEY: ""
+          JWT_SECRET_KEY: ""
+          FLASK_SECRET_KEY: ""
       
       redis:
         name: "redis-sealed-secret"
         namespace: "cancer-genomics"
         data:
-          REDIS_PASSWORD: "redis-password"
+          REDIS_PASSWORD: ""
       
       neo4j:
         name: "neo4j-sealed-secret"
         namespace: "cancer-genomics"
         data:
           NEO4J_USERNAME: "neo4j"
-          NEO4J_PASSWORD: "neo4j-password"
+          NEO4J_PASSWORD: ""
           NEO4J_GDS_LICENSE_KEY: ""
       
       kafka:
@@ -1270,7 +1270,7 @@ secretsManagement:
         namespace: "cancer-genomics"
         data:
           KAFKA_USERNAME: "kafka"
-          KAFKA_PASSWORD: "kafka-password"
+          KAFKA_PASSWORD: ""
           KAFKA_JAAS_CONFIG: ""
       
       apis:
