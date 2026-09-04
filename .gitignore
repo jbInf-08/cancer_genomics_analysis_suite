@@ -228,6 +228,7 @@ config.yml
 secrets.yaml
 secrets.yml
 secrets.env
+values-secrets.yaml
 .secrets
 .env.local
 .env.production
