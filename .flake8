@@ -26,7 +26,38 @@ max-line-length = 88
 # modules/demo_module/demo_dash.py -- is fixed rather than ignored. A rule
 # firing 169 times out of 170 on correct code reports nothing useful, so it is
 # off; a misplaced import is caught in review instead.
-extend-ignore = E203, W503, E402
+#
+# E501 line too long. black is the formatter of record here and targets 88, so
+# every line E501 reports is a line black produced and chose not to split.
+# black splits everything it can; what it cannot split is string content and
+# comment text. That means E501 only ever fires where black has already given
+# up, and turning it off loses no coverage black is not already providing.
+#
+# Measured across the 814 it reported, in 177 files:
+#
+#   767  (94.2%)  inside a string literal. Many are embedded documents -- CSS,
+#                 a Snakefile, a Makefile, docker-compose YAML, LLM prompts,
+#                 tab-delimited BED and GFF records built with f-strings.
+#                 Wrapping those changes the file the program writes out, not
+#                 just the source. The Makefile in scripts/ already needed a
+#                 per-file-ignore below for the same reason.
+#    23  ( 2.8%)  comment text. Editable, but reflowing prose in 20 files buys
+#                 nothing once the rule is off.
+#    24  ( 2.9%)  code, and none of it reformattable:
+#                   21  in omics_definitions/omics_dashboard.py, where the
+#                       content is a bare "{" or "}," and the *indentation*
+#                       is 88 columns on its own -- 22 levels of nesting in a
+#                       Dash layout. Only restructuring that function shortens
+#                       them, which is a refactor of working UI code.
+#                    3  `from CancerGenomicsSuite.modules.pipeline_orchestration
+#                       .md_workflow_dash_display import (` -- the module path
+#                       alone is 75 characters, so the statement cannot fit in
+#                       88 without renaming the module.
+#
+# So nothing here is fixable by formatting. max-line-length stays at 88 above
+# because that is what black is told to target; this only stops flake8
+# re-reporting black's own output.
+extend-ignore = E203, W503, E402, E501
 
 exclude =
     .git,
