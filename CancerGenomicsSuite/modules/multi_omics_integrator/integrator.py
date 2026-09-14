@@ -18,10 +18,23 @@ from plotly.subplots import make_subplots
 from scipy import stats
 from scipy.cluster.hierarchy import linkage
 from sklearn.cluster import DBSCAN, KMeans
-from sklearn.decomposition import ICA, PCA
-from sklearn.manifold import TSNE, UMAP
+from sklearn.decomposition import PCA, FastICA
+from sklearn.manifold import TSNE
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
+try:
+    # UMAP ships in umap-learn, not scikit-learn. This module used to do
+    # `from sklearn.manifold import TSNE, UMAP`, which raises ImportError at
+    # import time -- so the whole module was unimportable and PCA and t-SNE went
+    # down with it. Optional because umap-learn pulls in numba; see the [umap]
+    # extra in pyproject.toml.
+    from umap import UMAP
+
+    UMAP_AVAILABLE = True
+except ImportError:
+    UMAP = None
+    UMAP_AVAILABLE = False
 
 warnings.filterwarnings("ignore")
 
@@ -295,7 +308,7 @@ class MultiOmicsIntegrator:
         concatenated_data = concatenated_data.fillna(concatenated_data.mean())
 
         # Perform ICA
-        ica = ICA(
+        ica = FastICA(
             n_components=min(50, concatenated_data.shape[0], concatenated_data.shape[1])
         )
         ica_result = ica.fit_transform(concatenated_data.T)
@@ -346,6 +359,13 @@ class MultiOmicsIntegrator:
                 reduced_data = reducer.fit_transform(data.T)
 
             elif method == "umap":
+                if not UMAP_AVAILABLE:
+                    raise ImportError(
+                        "The 'umap' reduction method needs umap-learn, which is "
+                        "not installed. Install it with: pip install "
+                        "'cancer-genomics-analysis-suite[umap]'. The 'pca' and "
+                        "'tsne' methods work without it."
+                    )
                 reducer = UMAP(n_components=n_components, random_state=42)
                 reduced_data = reducer.fit_transform(data.T)
 
