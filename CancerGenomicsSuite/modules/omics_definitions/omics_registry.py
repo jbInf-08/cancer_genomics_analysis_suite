@@ -43,6 +43,17 @@ class OmicsAnalysisType(Enum):
     PATHWAY = "pathway"
     CORRELATION = "correlation"
     PREDICTION = "prediction"
+    # The registry below already asks for these three by name in its
+    # analysis_types lists, and _initialize_core_omics runs at import, so their
+    # absence raised AttributeError before this module could finish loading.
+    #
+    # They are analysis types, not data types. OmicsDataType happens to define
+    # STRUCTURE and KINETIC as well, but those describe what a field measures,
+    # whereas these describe what is done with it -- proteomics has
+    # data_type=ABUNDANCE and is analysed structurally.
+    STRUCTURE = "structure"  # proteomics, glycomics
+    KINETIC = "kinetic"  # degradomics, fluxomics, kinomics
+    DOSE_RESPONSE = "dose_response"  # toxicogenomics, pharmacoproteomics
 
 
 @dataclass
