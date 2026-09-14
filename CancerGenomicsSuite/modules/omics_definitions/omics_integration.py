@@ -19,14 +19,27 @@ import networkx as nx
 from scipy import stats
 from sklearn.cluster import DBSCAN, AgglomerativeClustering, KMeans
 from sklearn.cross_decomposition import CCA, PLSCanonical
-from sklearn.decomposition import ICA, PCA
+from sklearn.decomposition import PCA, FastICA
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import ElasticNet, Lasso, Ridge
-from sklearn.manifold import TSNE, UMAP
+from sklearn.manifold import TSNE
 from sklearn.metrics import silhouette_score
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
+
+try:
+    # UMAP ships in umap-learn, not scikit-learn. This module used to do
+    # `from sklearn.manifold import TSNE, UMAP`, which raises ImportError at
+    # import time -- so the whole module was unimportable and PCA and t-SNE went
+    # down with it. Optional because umap-learn pulls in numba; see the [umap]
+    # extra in pyproject.toml.
+    from umap import UMAP
+
+    UMAP_AVAILABLE = True
+except ImportError:
+    UMAP = None
+    UMAP_AVAILABLE = False
 
 from .omics_metadata import OmicsMetadataManager
 from .omics_registry import OmicsFieldRegistry
@@ -527,7 +540,9 @@ class OmicsIntegrationEngine:
         scaler = StandardScaler()
         scaled_data = scaler.fit_transform(concat_result.integrated_data.T)
 
-        ica = ICA(n_components=min(n_components, scaled_data.shape[1]), random_state=42)
+        ica = FastICA(
+            n_components=min(n_components, scaled_data.shape[1]), random_state=42
+        )
         ica_result = ica.fit_transform(scaled_data)
 
         # Create integrated data
@@ -743,6 +758,13 @@ class OmicsIntegrationEngine:
             elif method == "tsne":
                 reducer = TSNE(n_components=n_components, random_state=42, **kwargs)
             elif method == "umap":
+                if not UMAP_AVAILABLE:
+                    raise ImportError(
+                        "The 'umap' reduction method needs umap-learn, which is "
+                        "not installed. Install it with: pip install "
+                        "'cancer-genomics-analysis-suite[umap]'. The 'pca' and "
+                        "'tsne' methods work without it."
+                    )
                 reducer = UMAP(n_components=n_components, random_state=42, **kwargs)
             else:
                 raise ValueError(
