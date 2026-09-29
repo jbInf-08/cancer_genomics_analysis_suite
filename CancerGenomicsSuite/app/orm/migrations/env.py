@@ -1,29 +1,46 @@
 import os
 import sys
 from logging.config import fileConfig
+from pathlib import Path
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-# Add the parent directory to the path so we can import our models
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+# Alembic executes this file as a script, not as a module inside a package, so a
+# relative import such as `from ..models import ...` has no parent package to
+# resolve against and cannot work here. The project is imported by its full
+# name instead, which needs the repository root on sys.path: four levels up,
+# through migrations -> orm -> app -> CancerGenomicsSuite.
+_repo_root = Path(__file__).resolve().parents[4]
+if str(_repo_root) not in sys.path:
+    sys.path.insert(0, str(_repo_root))
 
-from config.settings import DATABASE_URL
+from CancerGenomicsSuite.app import db  # noqa: E402
 
-from ..models import Base
+# Imported for its side effect: each db.Model subclass registers its table on
+# db.metadata when the module loads. The models are Flask-SQLAlchemy models,
+# so there is no declarative `Base` here -- db.metadata is the equivalent.
+from CancerGenomicsSuite.app.orm import models  # noqa: E402,F401
+from CancerGenomicsSuite.config.settings import settings  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
+#
+# disable_existing_loggers=False matters here. fileConfig's default disables
+# every logger that already exists and is not named in alembic.ini -- and by
+# this point the imports above have created the application's loggers, so the
+# default would silence them for the rest of the process. Any warning the app
+# emitted during a migration would vanish, and anything running migrations
+# in-process (the test suite does) loses its logging from then on.
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = Base.metadata
+target_metadata = db.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -32,8 +49,23 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    """Get database URL from environment or config."""
-    return DATABASE_URL or config.get_main_option("sqlalchemy.url")
+    """The database the application itself connects to.
+
+    DATABASE_URL in the environment wins, so a one-off target reads plainly:
+    `DATABASE_URL=... alembic upgrade head`. Otherwise this is
+    settings.get_database_url(), which is exactly what app/__init__.py hands to
+    Flask-SQLAlchemy -- so migrations and the running app cannot quietly point
+    at different databases. The ini's sqlalchemy.url is left empty on purpose
+    and only consulted if both of those are unset.
+
+    This used to import DATABASE_URL from config.settings, a name that module
+    has never defined, so the file failed before any of it ran.
+    """
+    return (
+        os.environ.get("DATABASE_URL")
+        or settings.get_database_url()
+        or config.get_main_option("sqlalchemy.url")
+    )
 
 
 def run_migrations_offline() -> None:
