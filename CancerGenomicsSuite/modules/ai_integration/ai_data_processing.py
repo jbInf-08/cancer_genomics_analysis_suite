@@ -29,6 +29,12 @@ import xgboost as xgb
 # Bioinformatics
 from sklearn.cluster import DBSCAN
 from sklearn.ensemble import IsolationForest, RandomForestRegressor
+
+# IterativeImputer is still experimental in scikit-learn and cannot be imported
+# until this enabler has run -- without it, `from sklearn.impute import
+# IterativeImputer` raises ImportError at module load. It is imported for that
+# side effect only, and has to stay above the sklearn.impute line below.
+from sklearn.experimental import enable_iterative_imputer  # noqa: F401
 from sklearn.feature_selection import SelectFromModel, SelectKBest
 from sklearn.impute import IterativeImputer, KNNImputer
 
