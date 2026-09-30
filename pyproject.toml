@@ -246,6 +246,16 @@ ngs = [
 umap = [
     "umap-learn>=0.5.5",
 ]
+# Cloud storage SDKs, one per provider, so using one never requires the other.
+# modules/cloud_storage imports without either and names the missing extra when
+# a client is constructed. Neither was declared anywhere before, though the
+# clients import them.
+s3 = [
+    "boto3>=1.28.0",
+]
+gcs = [
+    "google-cloud-storage>=2.10.0",
+]
 docs = [
     "sphinx>=7.1.2",
     "sphinx-rtd-theme>=1.3.0",
@@ -253,7 +263,7 @@ docs = [
     "sphinx-autodoc-typehints>=1.24.0",
 ]
 all = [
-    "cancer-genomics-analysis-suite[dev,test,docs,galaxy,experiment-tracking,r-integration,ngs,umap]"
+    "cancer-genomics-analysis-suite[dev,test,docs,galaxy,experiment-tracking,r-integration,ngs,umap,s3,gcs]"
 ]
 
 [project.urls]

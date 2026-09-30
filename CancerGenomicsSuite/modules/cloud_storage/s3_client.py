@@ -5,8 +5,28 @@ AWS S3 Storage Client
 import os
 from typing import BinaryIO, List, Optional
 
-import boto3
-from botocore.exceptions import ClientError, NoCredentialsError
+try:
+    import boto3
+    from botocore.exceptions import ClientError, NoCredentialsError
+
+    S3_AVAILABLE = True
+except ImportError:
+    # boto3 is an optional extra ([s3]), for the same reason the Google SDK is
+    # one in gcs_client.py: neither provider's SDK should be required to use the
+    # other provider, or to import the package at all.
+    boto3 = None
+    S3_AVAILABLE = False
+
+    class ClientError(Exception):
+        """Stand-in so the except clauses below still name a real class.
+
+        Deliberately a distinct class rather than an alias of Exception, which
+        would turn every `except ClientError` into a catch-all.
+        """
+
+    class NoCredentialsError(Exception):
+        """Stand-in for botocore.exceptions.NoCredentialsError."""
+
 
 from .base_storage import BaseStorageClient, StorageObject, UploadResult
 
@@ -20,6 +40,12 @@ class S3StorageClient(BaseStorageClient):
         region: str = "us-west-2",
         credentials: Optional[dict] = None,
     ):
+        if not S3_AVAILABLE:
+            raise ImportError(
+                "S3StorageClient needs the boto3 package, which is not installed. "
+                "Install it with: pip install 'cancer-genomics-analysis-suite[s3]'"
+            )
+
         super().__init__(bucket_name, region)
 
         # Initialize S3 client
