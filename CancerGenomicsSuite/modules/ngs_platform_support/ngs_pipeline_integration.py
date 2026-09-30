@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import yaml
 
-from ..config.settings import settings
+from ...config.settings import settings
 from .workflow_dispatcher import DockerManager, WorkflowDispatcher
 
 logger = logging.getLogger(__name__)
