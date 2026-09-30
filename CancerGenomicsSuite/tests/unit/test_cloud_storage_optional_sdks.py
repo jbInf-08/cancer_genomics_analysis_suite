@@ -128,3 +128,50 @@ def test_stand_in_exceptions_are_not_catch_alls(blocked, module, names):
     )
     assert proc.returncode == 0, proc.stderr[-2000:]
     assert "ok" in proc.stdout
+
+
+@pytest.fixture
+def default_chain(monkeypatch, tmp_path):
+    """Point boto3's default credential chain at a known fake key, offline."""
+    monkeypatch.setenv("AWS_ACCESS_KEY_ID", "DEFAULTKEY")
+    monkeypatch.setenv("AWS_SECRET_ACCESS_KEY", "default-secret")
+    empty = tmp_path / "empty"
+    empty.write_text("")
+    monkeypatch.setenv("AWS_CONFIG_FILE", str(empty))
+    monkeypatch.setenv("AWS_SHARED_CREDENTIALS_FILE", str(empty))
+    monkeypatch.delenv("AWS_PROFILE", raising=False)
+    monkeypatch.delenv("AWS_SESSION_TOKEN", raising=False)
+
+
+def _access_key(client):
+    return client._request_signer._credentials.access_key
+
+
+def test_s3_client_and_resource_share_the_supplied_identity(default_chain):
+    """Explicit credentials must reach the resource (and self.bucket), not just the client.
+
+    They used to go to boto3.client only; boto3.resource was built from the
+    default chain whatever the caller passed. Nothing used self.bucket yet, so
+    this was latent -- but the first method written against it would have run
+    as the wrong identity without any sign of it.
+    """
+    pytest.importorskip("boto3")
+    from CancerGenomicsSuite.modules.cloud_storage.s3_client import S3StorageClient
+
+    client = S3StorageClient(
+        "b",
+        region="eu-west-1",
+        credentials={"access_key_id": "EXPLICITKEY", "secret_access_key": "s"},
+    )
+    assert _access_key(client.s3_client) == "EXPLICITKEY"
+    assert _access_key(client.s3_resource.meta.client) == "EXPLICITKEY"
+    assert client.s3_resource.meta.client.meta.region_name == "eu-west-1"
+
+
+def test_s3_client_without_credentials_uses_the_default_chain(default_chain):
+    pytest.importorskip("boto3")
+    from CancerGenomicsSuite.modules.cloud_storage.s3_client import S3StorageClient
+
+    client = S3StorageClient("b", region="eu-west-1")
+    assert _access_key(client.s3_client) == "DEFAULTKEY"
+    assert _access_key(client.s3_resource.meta.client) == "DEFAULTKEY"
