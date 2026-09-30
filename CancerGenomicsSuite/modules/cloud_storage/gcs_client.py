@@ -6,8 +6,30 @@ import os
 from datetime import datetime, timedelta
 from typing import BinaryIO, List, Optional
 
-from google.cloud import storage
-from google.cloud.exceptions import GoogleCloudError, NotFound
+try:
+    from google.cloud import storage
+    from google.cloud.exceptions import GoogleCloudError, NotFound
+
+    GCS_AVAILABLE = True
+except ImportError:
+    # google-cloud-storage is an optional extra ([gcs]). It used to be imported
+    # unconditionally, and the package __init__ imports this module first -- so
+    # without the Google SDK nothing in cloud_storage loaded, including the S3
+    # client and base_storage, which does not use it at all. Now this module
+    # always imports, and GCSStorageClient says what is missing when built.
+    storage = None
+    GCS_AVAILABLE = False
+
+    class GoogleCloudError(Exception):
+        """Stand-in so the except clauses below still name a real class.
+
+        Deliberately a distinct class rather than an alias of Exception, which
+        would turn every `except GoogleCloudError` into a catch-all.
+        """
+
+    class NotFound(GoogleCloudError):
+        """Stand-in for google.cloud.exceptions.NotFound."""
+
 
 from .base_storage import BaseStorageClient, StorageObject, UploadResult
 
@@ -21,6 +43,13 @@ class GCSStorageClient(BaseStorageClient):
         region: str = "us-central1",
         credentials: Optional[dict] = None,
     ):
+        if not GCS_AVAILABLE:
+            raise ImportError(
+                "GCSStorageClient needs the google-cloud-storage package, which is "
+                "not installed. Install it with: "
+                "pip install 'cancer-genomics-analysis-suite[gcs]'"
+            )
+
         super().__init__(bucket_name, region)
 
         # Initialize GCS client
