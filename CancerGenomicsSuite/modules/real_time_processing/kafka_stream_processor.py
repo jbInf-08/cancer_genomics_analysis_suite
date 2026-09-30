@@ -9,8 +9,9 @@ import asyncio
 import json
 import logging
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -102,6 +103,45 @@ class AlertData:
     def __post_init__(self):
         if self.metadata is None:
             self.metadata = {}
+
+
+class StreamEventType(Enum):
+    """Kinds of event published through KafkaStreamProcessor.produce_event.
+
+    pipeline_orchestration/unified_orchestrator.py imported this, StreamEvent
+    and produce_event from here, but none of the three had ever been defined --
+    so the orchestrator module could not import at all. Only the member it
+    uses is declared; add others when something produces them.
+    """
+
+    WORKFLOW_EVENT = "workflow_event"
+
+
+@dataclass
+class StreamEvent:
+    """A generic event for publishing to a Kafka topic.
+
+    The fields are exactly those the orchestrator's workflow and execution
+    notifications construct.
+    """
+
+    event_id: str
+    event_type: StreamEventType
+    timestamp: datetime
+    source: str
+    data: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """JSON-ready form for the producer.
+
+        The producer's value_serializer is json.dumps, which cannot encode a
+        datetime or an Enum, so both are converted -- the same treatment
+        send_alert gives AlertData.timestamp.
+        """
+        payload = asdict(self)
+        payload["event_type"] = self.event_type.value
+        payload["timestamp"] = self.timestamp.isoformat()
+        return payload
 
 
 class Neo4jGraphProcessor:
@@ -588,6 +628,29 @@ class KafkaStreamProcessor:
 
         except Exception as e:
             logger.error(f"Error sending alert: {e}")
+
+    def produce_event(self, topic: str, event: StreamEvent) -> None:
+        """Publish a StreamEvent to a Kafka topic.
+
+        Synchronous because its caller, the pipeline orchestrator, invokes it
+        without awaiting. KafkaProducer.send is itself non-blocking, so nothing
+        is lost by that.
+
+        Unlike send_alert, failures are raised rather than logged here: the
+        orchestrator already wraps each call and logs, and swallowing a second
+        time would leave it no way to tell a sent event from a dropped one.
+
+        Raises:
+            RuntimeError: if initialize() has not created the producer yet.
+        """
+        if self.producer is None:
+            raise RuntimeError(
+                "KafkaStreamProcessor.produce_event called before initialize(); "
+                "there is no producer to send with"
+            )
+        self.producer.send(topic, value=event.to_dict())
+        KAFKA_MESSAGES_PRODUCED.labels(topic=topic).inc()
+        logger.debug(f"Event {event.event_id} ({event.event_type.value}) -> {topic}")
 
     async def run(self):
         """Main processing loop"""

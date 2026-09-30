@@ -92,6 +92,12 @@ dependencies = [
     # Real-time Processing
     "kafka-python>=2.0.2",
     "confluent-kafka>=2.3.0",
+    # Imported unconditionally, for metrics, by
+    # real_time_processing/kafka_stream_processor.py and
+    # graph_analytics/neo4j_mutation_analyzer.py. It was never declared, so a
+    # clean install could import neither -- nor the pipeline orchestrator,
+    # which imports the stream processor.
+    "prometheus-client>=0.17.0",
     
     # OAuth2 Authentication
     "authlib>=1.6.11",
