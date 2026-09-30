@@ -27,7 +27,13 @@ from typing import Dict, List, Optional
 
 import requests
 from Bio import SeqIO
-from Bio.Alphabet import generic_dna, generic_protein
+
+# Sequences are built as plain Seq(sequence). Bio.Alphabet (generic_dna,
+# generic_protein) was removed in Biopython 1.78 -- importing it raises -- and
+# Seq's second positional parameter is now `length`, so Seq(sequence,
+# generic_dna) would be wrong even with the import restored. Nothing here needs
+# the molecule type on the record: output is FASTA, and makeblastdb is told nucl
+# or prot through its own -dbtype argument.
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
@@ -248,7 +254,7 @@ class BlastDatabaseGenerator:
 
             # Create SeqRecord
             record = SeqRecord(
-                Seq(sequence, generic_dna),
+                Seq(sequence),
                 id=gene_symbol,
                 description=f"{gene_symbol} gene sequence from {species}",
             )
@@ -305,7 +311,7 @@ class BlastDatabaseGenerator:
 
             # Create SeqRecord
             record = SeqRecord(
-                Seq(sequence, generic_protein),
+                Seq(sequence),
                 id=gene_symbol,
                 description=f"{gene_symbol} protein sequence from {species}",
             )
@@ -341,7 +347,6 @@ class BlastDatabaseGenerator:
 
                 length = random.randint(1000, 5000)
                 sequence = "".join(random.choices("ATCG", k=length))
-                alphabet = generic_dna
                 description = f"{gene} mock gene sequence"
             else:
                 # Generate mock protein sequence (200-1000 aa)
@@ -349,12 +354,9 @@ class BlastDatabaseGenerator:
 
                 length = random.randint(200, 1000)
                 sequence = "".join(random.choices("ACDEFGHIKLMNPQRSTVWY", k=length))
-                alphabet = generic_protein
                 description = f"{gene} mock protein sequence"
 
-            record = SeqRecord(
-                Seq(sequence, alphabet), id=gene, description=description
-            )
+            record = SeqRecord(Seq(sequence), id=gene, description=description)
             records.append(record)
 
         self.logger.info(f"Generated {len(records)} mock {seq_type} sequences")
