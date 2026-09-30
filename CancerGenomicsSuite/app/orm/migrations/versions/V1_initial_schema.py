@@ -853,58 +853,72 @@ def upgrade() -> None:
     op.create_index("idx_data_lineage_created_at", "data_lineage", ["created_at"])
 
     # Create check constraints
-    op.create_check_constraint(
-        "check_positive_expression", "gene_expression", "expression_value >= 0"
-    )
-    op.create_check_constraint(
-        "check_allele_frequency",
-        "mutation_records",
-        "allele_frequency >= 0 AND allele_frequency <= 1",
-    )
-    op.create_check_constraint(
-        "check_positive_read_depth", "mutation_records", "read_depth >= 0"
-    )
-    op.create_check_constraint(
-        "check_progress_range", "analysis_jobs", "progress >= 0 AND progress <= 100"
-    )
-    op.create_check_constraint(
-        "check_priority_range", "analysis_jobs", "priority >= 1 AND priority <= 10"
-    )
-    op.create_check_constraint(
-        "check_positive_file_size", "data_files", "file_size >= 0"
-    )
-    op.create_check_constraint(
-        "check_quality_score_range",
-        "data_files",
-        "quality_score >= 0 AND quality_score <= 1",
-    )
-    op.create_check_constraint(
-        "check_ngs_priority_range", "ngs_jobs", "priority >= 1 AND priority <= 10"
-    )
-    op.create_check_constraint(
-        "check_queue_priority_range", "queue_jobs", "priority >= 1 AND priority <= 10"
-    )
-    op.create_check_constraint(
-        "check_positive_metric_value", "system_metrics", "value >= 0"
-    )
-    op.create_check_constraint(
-        "check_positive_response_time", "health_checks", "response_time_ms >= 0"
-    )
+    #
+    # Through batch_alter_table rather than op.create_check_constraint. SQLite
+    # cannot ALTER a table to add a constraint -- it raises NotImplementedError --
+    # and SQLite is the application's default database, so the plain form made
+    # this migration fail there after creating the tables but before recording
+    # the revision. Batch mode rebuilds the table on SQLite and emits an ordinary
+    # ALTER TABLE ... ADD CONSTRAINT everywhere else, so the PostgreSQL DDL is
+    # unchanged.
+    with op.batch_alter_table("gene_expression") as batch_op:
+        batch_op.create_check_constraint(
+            "check_positive_expression", "expression_value >= 0"
+        )
+    with op.batch_alter_table("mutation_records") as batch_op:
+        batch_op.create_check_constraint(
+            "check_allele_frequency", "allele_frequency >= 0 AND allele_frequency <= 1"
+        )
+        batch_op.create_check_constraint("check_positive_read_depth", "read_depth >= 0")
+    with op.batch_alter_table("analysis_jobs") as batch_op:
+        batch_op.create_check_constraint(
+            "check_progress_range", "progress >= 0 AND progress <= 100"
+        )
+        batch_op.create_check_constraint(
+            "check_priority_range", "priority >= 1 AND priority <= 10"
+        )
+    with op.batch_alter_table("data_files") as batch_op:
+        batch_op.create_check_constraint("check_positive_file_size", "file_size >= 0")
+        batch_op.create_check_constraint(
+            "check_quality_score_range", "quality_score >= 0 AND quality_score <= 1"
+        )
+    with op.batch_alter_table("ngs_jobs") as batch_op:
+        batch_op.create_check_constraint(
+            "check_ngs_priority_range", "priority >= 1 AND priority <= 10"
+        )
+    with op.batch_alter_table("queue_jobs") as batch_op:
+        batch_op.create_check_constraint(
+            "check_queue_priority_range", "priority >= 1 AND priority <= 10"
+        )
+    with op.batch_alter_table("system_metrics") as batch_op:
+        batch_op.create_check_constraint("check_positive_metric_value", "value >= 0")
+    with op.batch_alter_table("health_checks") as batch_op:
+        batch_op.create_check_constraint(
+            "check_positive_response_time", "response_time_ms >= 0"
+        )
 
 
 def downgrade() -> None:
-    # Drop check constraints
-    op.drop_constraint("check_positive_response_time", "health_checks", type_="check")
-    op.drop_constraint("check_positive_metric_value", "system_metrics", type_="check")
-    op.drop_constraint("check_queue_priority_range", "queue_jobs", type_="check")
-    op.drop_constraint("check_ngs_priority_range", "ngs_jobs", type_="check")
-    op.drop_constraint("check_quality_score_range", "data_files", type_="check")
-    op.drop_constraint("check_positive_file_size", "data_files", type_="check")
-    op.drop_constraint("check_priority_range", "analysis_jobs", type_="check")
-    op.drop_constraint("check_progress_range", "analysis_jobs", type_="check")
-    op.drop_constraint("check_positive_read_depth", "mutation_records", type_="check")
-    op.drop_constraint("check_allele_frequency", "mutation_records", type_="check")
-    op.drop_constraint("check_positive_expression", "gene_expression", type_="check")
+    # Drop check constraints (batch form for the same reason as in upgrade)
+    with op.batch_alter_table("health_checks") as batch_op:
+        batch_op.drop_constraint("check_positive_response_time", type_="check")
+    with op.batch_alter_table("system_metrics") as batch_op:
+        batch_op.drop_constraint("check_positive_metric_value", type_="check")
+    with op.batch_alter_table("queue_jobs") as batch_op:
+        batch_op.drop_constraint("check_queue_priority_range", type_="check")
+    with op.batch_alter_table("ngs_jobs") as batch_op:
+        batch_op.drop_constraint("check_ngs_priority_range", type_="check")
+    with op.batch_alter_table("data_files") as batch_op:
+        batch_op.drop_constraint("check_quality_score_range", type_="check")
+        batch_op.drop_constraint("check_positive_file_size", type_="check")
+    with op.batch_alter_table("analysis_jobs") as batch_op:
+        batch_op.drop_constraint("check_priority_range", type_="check")
+        batch_op.drop_constraint("check_progress_range", type_="check")
+    with op.batch_alter_table("mutation_records") as batch_op:
+        batch_op.drop_constraint("check_positive_read_depth", type_="check")
+        batch_op.drop_constraint("check_allele_frequency", type_="check")
+    with op.batch_alter_table("gene_expression") as batch_op:
+        batch_op.drop_constraint("check_positive_expression", type_="check")
 
     # Drop indexes for new tables
     op.drop_index("idx_data_lineage_created_at", "data_lineage")
