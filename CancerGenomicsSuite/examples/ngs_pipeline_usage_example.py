@@ -11,10 +11,19 @@ import logging
 import sys
 from pathlib import Path
 
-# Add the parent directory to the path to import modules
-sys.path.append(str(Path(__file__).parent.parent))
+# Repository root on the path, so the project is imported by its full name.
+#
+# This used to add CancerGenomicsSuite/ and import `modules.ngs_platform_support`,
+# which makes `modules` the top-level package. The NGS modules climb above it
+# with relative imports (`from ...config.settings import settings`), and Python
+# refuses a relative import that reaches past the top-level package -- so the
+# example could not import what it demonstrates.
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from modules.ngs_platform_support import EnhancedWorkflowDispatcher, PipelineStatus
+from CancerGenomicsSuite.modules.ngs_platform_support import (  # noqa: E402
+    EnhancedWorkflowDispatcher,
+    PipelineStatus,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -142,7 +151,10 @@ async def demonstrate_alert_monitoring():
     """Demonstrate alert monitoring with webhook notifications."""
     logger.info("\n=== Alert Monitoring Example ===")
 
-    from modules.notifications.alert_monitor import AlertMonitor, AlertSeverity
+    from CancerGenomicsSuite.modules.notifications.alert_monitor import (
+        AlertMonitor,
+        AlertSeverity,
+    )
 
     # Initialize alert monitor
     monitor = AlertMonitor()
