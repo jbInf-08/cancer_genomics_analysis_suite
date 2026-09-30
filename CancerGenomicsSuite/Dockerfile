@@ -17,6 +17,12 @@ RUN apt-get update && apt-get install -y \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# rpy2-rinterface has no Linux wheel and is built here, where R is not
+# installed. Its default mode demands R at build time and fails without it; ABI
+# mode needs no R to build and loads libR at runtime from the r-base installed in
+# the production stage.
+ENV RPY2_CFFI_MODE=ABI
+
 # Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \

@@ -35,11 +35,35 @@ jobs:
           pip install pip-audit
 
       # Safety 3.x removed support for `--output <filename>`; pip-audit stays stable for CI.
+      #
+      # pip-audit exits non-zero both when it finds vulnerabilities and when it
+      # cannot resolve the requirements at all. Findings stay advisory. Failing
+      # to resolve does not: this step used to replace a missing report with an
+      # empty one, so for as long as requirements.txt pinned versions that were
+      # never published, the scan audited nothing and still reported success.
       - name: Run dependency vulnerability check
+        env:
+          # pip-audit resolves by asking pip to prepare each package, and
+          # rpy2-rinterface (sdist only on Linux) refuses to prepare without R
+          # unless told to build its ABI interface -- as the compose Dockerfile
+          # does for the same reason.
+          RPY2_CFFI_MODE: ABI
         run: |
-          pip-audit -r CancerGenomicsSuite/requirements.txt --format json --output safety-report.json \
-            || echo '{"dependencies":[],"vulnerabilities":[]}' > safety-report.json
-          pip-audit -r CancerGenomicsSuite/requirements.txt --desc || true
+          pip-audit -r CancerGenomicsSuite/requirements.txt --format json --output safety-report.json || true
+          python - <<'EOF'
+          import json, sys
+          try:
+              deps = json.load(open("safety-report.json"))["dependencies"]
+          except (OSError, ValueError, KeyError):
+              sys.exit("pip-audit wrote no report: requirements.txt could not be resolved (errors above)")
+          if not deps:
+              sys.exit("pip-audit audited no dependencies")
+          found = [(d["name"], d["version"], v) for d in deps for v in d.get("vulns", [])]
+          print(f"Audited {len(deps)} packages; {len(found)} known vulnerabilities")
+          for name, version, v in found:
+              fixes = ", ".join(v.get("fix_versions", [])) or "none"
+              print(f"  {name}=={version}  {v['id']}  fixed in: {fixes}")
+          EOF
 
       - name: Upload safety report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
