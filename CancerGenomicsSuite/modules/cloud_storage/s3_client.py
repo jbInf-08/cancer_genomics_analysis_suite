@@ -48,20 +48,27 @@ class S3StorageClient(BaseStorageClient):
 
         super().__init__(bucket_name, region)
 
-        # Initialize S3 client
+        # One session for both the client and the resource, so they always act
+        # under the same identity. Previously explicit credentials went to
+        # boto3.client only; boto3.resource -- and so self.bucket -- was built
+        # from the default credential chain regardless. No method here uses
+        # self.bucket today, so nothing ran under the wrong identity yet, but
+        # the first one written against it would have, silently.
+        #
+        # Without explicit credentials the session falls back to the default
+        # chain (environment variables, shared config, IAM roles), as before.
         if credentials:
-            self.s3_client = boto3.client(
-                "s3",
-                region_name=region,
+            session = boto3.session.Session(
                 aws_access_key_id=credentials.get("access_key_id"),
                 aws_secret_access_key=credentials.get("secret_access_key"),
                 aws_session_token=credentials.get("session_token"),
+                region_name=region,
             )
         else:
-            # Use default credentials (environment variables, IAM roles, etc.)
-            self.s3_client = boto3.client("s3", region_name=region)
+            session = boto3.session.Session(region_name=region)
 
-        self.s3_resource = boto3.resource("s3", region_name=region)
+        self.s3_client = session.client("s3")
+        self.s3_resource = session.resource("s3")
         self.bucket = self.s3_resource.Bucket(bucket_name)
 
     def upload_file(
