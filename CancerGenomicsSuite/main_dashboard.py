@@ -528,8 +528,8 @@ def main():
     """Entry point for the `cancer-genomics` console script (see pyproject.toml)."""
     print(f"DEBUG: Starting Dash server on {settings.host}:{settings.port}")
     print(f"DEBUG: Plugins loaded: {list(plugins.keys()) if plugins else 'None'}")
-    print(f"DEBUG: Settings object: {settings}")
-    print(f"DEBUG: Settings type: {type(settings)}")
+    # The settings object is deliberately not printed: its repr includes the
+    # Flask secret key, the JWT signing key and service passwords.
     try:
         print("DEBUG: About to call app.run()")
         app.run(debug=settings.dash_debug_mode, host=settings.host, port=settings.port)
