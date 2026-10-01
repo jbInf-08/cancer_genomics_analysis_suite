@@ -7,7 +7,7 @@ data integration, analysis, and visualization.
 
 import json
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import pandas as pd
@@ -26,16 +26,20 @@ class MultiOmicsDashboard:
     A comprehensive dashboard for multi-omics data integration and analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the multi-omics dashboard.
 
         Args:
-            app: Dash application instance
+            app: Dash application to register callbacks on. Without one, the
+                instance only builds the layout -- no services, no callbacks --
+                which is how the module-level `layout` is made.
         """
         self.app = app
-        self.integrator = MultiOmicsIntegrator()
         self.current_data = None
+        if app is None:
+            return
+        self.integrator = MultiOmicsIntegrator()
         self.setup_callbacks()
 
     def create_layout(self) -> html.Div:
@@ -158,7 +162,7 @@ class MultiOmicsDashboard:
                                     [
                                         html.Button(
                                             "Load Mock Data",
-                                            id="load-mock-data",
+                                            id="multiomics-load-mock-data",
                                             className="btn btn-primary me-2",
                                         ),
                                         html.Button(
@@ -173,7 +177,7 @@ class MultiOmicsDashboard:
                                         ),
                                         html.Button(
                                             "Export Results",
-                                            id="export-results",
+                                            id="multiomics-export-results",
                                             className="btn btn-warning",
                                         ),
                                     ],
@@ -190,7 +194,7 @@ class MultiOmicsDashboard:
                     [
                         # Tabs for different views
                         dcc.Tabs(
-                            id="main-tabs",
+                            id="multiomics-main-tabs",
                             value="overview",
                             children=[
                                 dcc.Tab(label="Data Overview", value="overview"),
@@ -221,7 +225,7 @@ class MultiOmicsDashboard:
                 html.Div(id="multiomics-analysis-results", style={"display": "none"}),
                 # Download components
                 dcc.Download(id="multiomics-download-results"),
-                dcc.Download(id="download-data"),
+                dcc.Download(id="multiomics-download-data"),
             ]
         )
 
@@ -345,7 +349,7 @@ class MultiOmicsDashboard:
                                 ),
                                 html.Label("Number of Clusters:"),
                                 dcc.Slider(
-                                    id="n-clusters",
+                                    id="multiomics-n-clusters",
                                     min=2,
                                     max=10,
                                     step=1,
@@ -382,7 +386,7 @@ class MultiOmicsDashboard:
                 html.Div(
                     [
                         html.H4("Inter-Omics Correlations"),
-                        dcc.Graph(id="correlation-heatmap"),
+                        dcc.Graph(id="multiomics-correlation-heatmap"),
                     ],
                     className="card mb-4",
                 ),
@@ -457,7 +461,7 @@ class MultiOmicsDashboard:
 
         @self.app.callback(
             [Output("omics-data", "children"), Output("data-type-config", "children")],
-            [Input("load-mock-data", "n_clicks")],
+            [Input("multiomics-load-mock-data", "n_clicks")],
         )
         def load_mock_data(n_clicks):
             """Load mock data and create configuration interface."""
@@ -572,7 +576,8 @@ class MultiOmicsDashboard:
             )
 
         @self.app.callback(
-            Output("multiomics-tab-content", "children"), [Input("main-tabs", "value")]
+            Output("multiomics-tab-content", "children"),
+            [Input("multiomics-main-tabs", "value")],
         )
         def render_tab_content(active_tab):
             """Render content based on active tab."""
@@ -623,7 +628,10 @@ class MultiOmicsDashboard:
                 Output("clustering-results", "children"),
             ],
             [Input("run-clustering", "n_clicks")],
-            [State("clustering-method", "value"), State("n-clusters", "value")],
+            [
+                State("clustering-method", "value"),
+                State("multiomics-n-clusters", "value"),
+            ],
         )
         def run_clustering(n_clicks, method, n_clusters):
             """Run clustering analysis and create plots."""
@@ -655,7 +663,7 @@ class MultiOmicsDashboard:
             )
 
         @self.app.callback(
-            Output("correlation-heatmap", "figure"),
+            Output("multiomics-correlation-heatmap", "figure"),
             [Input("integration-results", "children")],
         )
         def update_correlation_heatmap(integration_results_json):
@@ -743,6 +751,16 @@ def create_multiomics_dashboard(app: dash.Dash) -> MultiOmicsDashboard:
     """
     dashboard = MultiOmicsDashboard(app)
     return dashboard
+
+
+# Plugin interface read by plugin_registry: the layout, built without
+# services or callbacks, and a function registering the callbacks on the
+# main app.
+layout = MultiOmicsDashboard().create_layout()
+
+
+def register_callbacks(app: dash.Dash) -> MultiOmicsDashboard:
+    return create_multiomics_dashboard(app)
 
 
 def main():

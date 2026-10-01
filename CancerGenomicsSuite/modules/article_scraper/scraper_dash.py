@@ -8,7 +8,7 @@ management, and analysis.
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import plotly.express as px
@@ -27,16 +27,20 @@ class ScraperDashboard:
     A comprehensive dashboard for article scraping and management.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the scraper dashboard.
 
         Args:
-            app: Dash application instance
+            app: Dash application to register callbacks on. Without one, the
+                instance only builds the layout -- no services, no callbacks --
+                which is how the module-level `layout` is made.
         """
         self.app = app
-        self.scraper = ArticleScraper()
         self.current_articles = []
+        if app is None:
+            return
+        self.scraper = ArticleScraper()
         self.setup_callbacks()
 
     def create_layout(self) -> html.Div:
@@ -160,7 +164,7 @@ class ScraperDashboard:
                                     [
                                         html.Button(
                                             "Load Mock Data",
-                                            id="load-mock-data",
+                                            id="scraper-load-mock-data",
                                             className="btn btn-primary me-2",
                                         ),
                                         html.Button(
@@ -197,7 +201,7 @@ class ScraperDashboard:
                     [
                         # Tabs for different views
                         dcc.Tabs(
-                            id="main-tabs",
+                            id="scraper-main-tabs",
                             value="articles",
                             children=[
                                 dcc.Tab(label="Articles", value="articles"),
@@ -582,7 +586,7 @@ class ScraperDashboard:
                 Output("scraped-articles", "children", allow_duplicate=True),
                 Output("scraping-progress", "children", allow_duplicate=True),
             ],
-            [Input("load-mock-data", "n_clicks")],
+            [Input("scraper-load-mock-data", "n_clicks")],
             prevent_initial_call=True,
         )
         def load_mock_data(n_clicks):
@@ -612,7 +616,8 @@ class ScraperDashboard:
             )
 
         @self.app.callback(
-            Output("scraper-tab-content", "children"), [Input("main-tabs", "value")]
+            Output("scraper-tab-content", "children"),
+            [Input("scraper-main-tabs", "value")],
         )
         def render_tab_content(active_tab):
             """Render content based on active tab."""
@@ -671,7 +676,7 @@ class ScraperDashboard:
                 Output("publication-trends-chart", "figure"),
                 Output("top-journals-chart", "figure"),
             ],
-            [Input("main-tabs", "value")],
+            [Input("scraper-main-tabs", "value")],
         )
         def update_statistics_charts(active_tab):
             """Update statistics charts."""
@@ -780,6 +785,16 @@ def create_scraper_dashboard(app: dash.Dash) -> ScraperDashboard:
     """
     dashboard = ScraperDashboard(app)
     return dashboard
+
+
+# Plugin interface read by plugin_registry: the layout, built without
+# services or callbacks, and a function registering the callbacks on the
+# main app.
+layout = ScraperDashboard().create_layout()
+
+
+def register_callbacks(app: dash.Dash) -> ScraperDashboard:
+    return create_scraper_dashboard(app)
 
 
 def main():

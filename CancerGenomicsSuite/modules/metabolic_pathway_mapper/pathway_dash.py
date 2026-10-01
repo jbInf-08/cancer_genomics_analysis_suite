@@ -7,7 +7,7 @@ analysis and visualization.
 
 import json
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import dash
 import numpy as np
@@ -28,17 +28,21 @@ class PathwayDashboard:
     A comprehensive dashboard for metabolic pathway analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the pathway dashboard.
 
         Args:
-            app: Dash application instance
+            app: Dash application to register callbacks on. Without one, the
+                instance only builds the layout -- no services, no callbacks --
+                which is how the module-level `layout` is made.
         """
         self.app = app
+        self.current_data = None
+        if app is None:
+            return
         self.mapper = MetabolicPathwayMapper()
         self.kegg_overlay = KEGGPathwayOverlay()
-        self.current_data = None
         self.setup_callbacks()
 
     def create_layout(self) -> html.Div:
@@ -77,7 +81,7 @@ class PathwayDashboard:
                                 html.Div(
                                     [
                                         dcc.Upload(
-                                            id="upload-expression-data",
+                                            id="pathway-upload-expression-data",
                                             children=html.Div(
                                                 [
                                                     "Drag and Drop or ",
@@ -147,7 +151,7 @@ class PathwayDashboard:
                                     [
                                         html.Button(
                                             "Load Mock Data",
-                                            id="load-mock-data",
+                                            id="pathway-load-mock-data",
                                             className="btn btn-primary me-2",
                                         ),
                                         html.Button(
@@ -157,7 +161,7 @@ class PathwayDashboard:
                                         ),
                                         html.Button(
                                             "Export Results",
-                                            id="export-results",
+                                            id="pathway-export-results",
                                             className="btn btn-info",
                                         ),
                                     ],
@@ -174,7 +178,7 @@ class PathwayDashboard:
                     [
                         # Tabs for different views
                         dcc.Tabs(
-                            id="main-tabs",
+                            id="pathway-main-tabs",
                             value="overview",
                             children=[
                                 dcc.Tab(label="Overview", value="overview"),
@@ -341,7 +345,7 @@ class PathwayDashboard:
 
         @self.app.callback(
             [Output("pathway-data", "children"), Output("network-summary", "children")],
-            [Input("load-mock-data", "n_clicks")],
+            [Input("pathway-load-mock-data", "n_clicks")],
         )
         def load_mock_data(n_clicks):
             """Load mock data and create pathway network."""
@@ -425,7 +429,8 @@ class PathwayDashboard:
             return "", go.Figure(), go.Figure()
 
         @self.app.callback(
-            Output("pathway-tab-content", "children"), [Input("main-tabs", "value")]
+            Output("pathway-tab-content", "children"),
+            [Input("pathway-main-tabs", "value")],
         )
         def render_tab_content(active_tab):
             """Render content based on active tab."""
@@ -654,6 +659,16 @@ def create_pathway_dashboard(app: dash.Dash) -> PathwayDashboard:
     """
     dashboard = PathwayDashboard(app)
     return dashboard
+
+
+# Plugin interface read by plugin_registry: the layout, built without
+# services or callbacks, and a function registering the callbacks on the
+# main app.
+layout = PathwayDashboard().create_layout()
+
+
+def register_callbacks(app: dash.Dash) -> PathwayDashboard:
+    return create_pathway_dashboard(app)
 
 
 def main():

@@ -7,7 +7,7 @@ analysis, survival analysis, and visualization.
 
 import json
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import numpy as np
@@ -31,16 +31,20 @@ class ClinicalDashboard:
     A comprehensive dashboard for clinical data analysis and survival analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the clinical dashboard.
 
         Args:
-            app: Dash application instance
+            app: Dash application to register callbacks on. Without one, the
+                instance only builds the layout -- no services, no callbacks --
+                which is how the module-level `layout` is made.
         """
         self.app = app
-        self.analyzer = ClinicalDataAnalyzer()
         self.current_data = None
+        if app is None:
+            return
+        self.analyzer = ClinicalDataAnalyzer()
         self.setup_callbacks()
 
     def create_layout(self) -> html.Div:
@@ -174,7 +178,7 @@ class ClinicalDashboard:
                                     [
                                         html.Button(
                                             "Load Mock Data",
-                                            id="load-mock-data",
+                                            id="clinical-load-mock-data",
                                             className="btn btn-primary me-2",
                                         ),
                                         html.Button(
@@ -194,7 +198,7 @@ class ClinicalDashboard:
                                         ),
                                         html.Button(
                                             "Export Results",
-                                            id="export-results",
+                                            id="clinical-export-results",
                                             className="btn btn-secondary",
                                         ),
                                     ],
@@ -211,7 +215,7 @@ class ClinicalDashboard:
                     [
                         # Tabs for different views
                         dcc.Tabs(
-                            id="main-tabs",
+                            id="clinical-main-tabs",
                             value="overview",
                             children=[
                                 dcc.Tab(label="Data Overview", value="overview"),
@@ -237,7 +241,7 @@ class ClinicalDashboard:
                 html.Div(id="clinical-analysis-results", style={"display": "none"}),
                 # Download components
                 dcc.Download(id="clinical-download-results"),
-                dcc.Download(id="download-data"),
+                dcc.Download(id="clinical-download-data"),
             ]
         )
 
@@ -349,7 +353,7 @@ class ClinicalDashboard:
                 html.Div(
                     [
                         html.H4("Correlation Heatmap"),
-                        dcc.Graph(id="correlation-heatmap"),
+                        dcc.Graph(id="clinical-correlation-heatmap"),
                     ],
                     className="card mb-4",
                 ),
@@ -527,7 +531,7 @@ class ClinicalDashboard:
                 Output("survival-data", "children"),
                 Output("data-summary", "children"),
             ],
-            [Input("load-mock-data", "n_clicks")],
+            [Input("clinical-load-mock-data", "n_clicks")],
         )
         def load_mock_data(n_clicks):
             """Load mock data and create summary."""
@@ -606,7 +610,7 @@ class ClinicalDashboard:
 
         @self.app.callback(
             [
-                Output("correlation-heatmap", "figure"),
+                Output("clinical-correlation-heatmap", "figure"),
                 Output("correlation-results", "children"),
             ],
             [Input("run-correlation", "n_clicks")],
@@ -651,7 +655,8 @@ class ClinicalDashboard:
             )
 
         @self.app.callback(
-            Output("clinical-tab-content", "children"), [Input("main-tabs", "value")]
+            Output("clinical-tab-content", "children"),
+            [Input("clinical-main-tabs", "value")],
         )
         def render_tab_content(active_tab):
             """Render content based on active tab."""
@@ -876,6 +881,16 @@ def create_clinical_dashboard(app: dash.Dash) -> ClinicalDashboard:
     """
     dashboard = ClinicalDashboard(app)
     return dashboard
+
+
+# Plugin interface read by plugin_registry: the layout, built without
+# services or callbacks, and a function registering the callbacks on the
+# main app.
+layout = ClinicalDashboard().create_layout()
+
+
+def register_callbacks(app: dash.Dash) -> ClinicalDashboard:
+    return create_clinical_dashboard(app)
 
 
 def main():

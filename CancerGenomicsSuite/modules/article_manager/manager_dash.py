@@ -8,7 +8,7 @@ search, analysis, and visualization.
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import dash
 import plotly.express as px
@@ -27,17 +27,23 @@ class ManagerDashboard:
     A comprehensive dashboard for article management and analysis.
     """
 
-    def __init__(self, app: dash.Dash, db_path: str = "article_manager.db"):
+    def __init__(
+        self, app: Optional[dash.Dash] = None, db_path: str = "article_manager.db"
+    ):
         """
         Initialize the manager dashboard.
 
         Args:
-            app: Dash application instance
+            app: Dash application to register callbacks on. Without one, the
+                instance only builds the layout -- no services, no callbacks --
+                which is how the module-level `layout` is made.
             db_path: Path to SQLite database file
         """
         self.app = app
-        self.db_manager = ArticleDatabaseManager(db_path)
         self.current_articles = []
+        if app is None:
+            return
+        self.db_manager = ArticleDatabaseManager(db_path)
         self.setup_callbacks()
 
     def create_layout(self) -> html.Div:
@@ -83,7 +89,7 @@ class ManagerDashboard:
                                         ),
                                         html.Button(
                                             "Export Articles",
-                                            id="export-articles",
+                                            id="manager-export-articles",
                                             className="btn btn-success me-2",
                                         ),
                                         html.Button(
@@ -110,7 +116,7 @@ class ManagerDashboard:
                                                     [
                                                         html.Label("Source:"),
                                                         dcc.Dropdown(
-                                                            id="filter-source",
+                                                            id="manager-filter-source",
                                                             options=[
                                                                 {
                                                                     "label": "All Sources",
@@ -244,10 +250,10 @@ class ManagerDashboard:
                     className="container-fluid",
                 ),
                 # Hidden divs for storing data
-                html.Div(id="search-results", style={"display": "none"}),
+                html.Div(id="manager-search-results", style={"display": "none"}),
                 html.Div(id="current-article", style={"display": "none"}),
                 # Download components
-                dcc.Download(id="download-export"),
+                dcc.Download(id="manager-download-export"),
                 # Modals
                 self.create_article_modal(),
                 self.create_collection_modal(),
@@ -304,7 +310,7 @@ class ManagerDashboard:
             ],
             className="modal fade",
             id="article-modal",
-            tabindex="-1",
+            tabIndex="-1",
         )
 
     def create_collection_modal(self) -> html.Div:
@@ -352,7 +358,7 @@ class ManagerDashboard:
             ],
             className="modal fade",
             id="collection-modal",
-            tabindex="-1",
+            tabIndex="-1",
         )
 
     def create_tag_modal(self) -> html.Div:
@@ -396,7 +402,7 @@ class ManagerDashboard:
             ],
             className="modal fade",
             id="tag-modal",
-            tabindex="-1",
+            tabIndex="-1",
         )
 
     def create_articles_tab(self) -> html.Div:
@@ -424,7 +430,7 @@ class ManagerDashboard:
                             ],
                             className="mb-3",
                         ),
-                        html.Div(id="articles-list"),
+                        html.Div(id="manager-articles-list"),
                     ],
                     className="card",
                 )
@@ -488,12 +494,15 @@ class ManagerDashboard:
                 html.Div(
                     [
                         html.H4("Publication Trends"),
-                        dcc.Graph(id="publication-trends-chart"),
+                        dcc.Graph(id="manager-publication-trends-chart"),
                     ],
                     className="card mb-4",
                 ),
                 html.Div(
-                    [html.H4("Top Journals"), dcc.Graph(id="top-journals-chart")],
+                    [
+                        html.H4("Top Journals"),
+                        dcc.Graph(id="manager-top-journals-chart"),
+                    ],
                     className="card mb-4",
                 ),
                 html.Div(
@@ -577,7 +586,10 @@ class ManagerDashboard:
         """Set up all dashboard callbacks."""
 
         @self.app.callback(
-            [Output("search-results", "children"), Output("articles-list", "children")],
+            [
+                Output("manager-search-results", "children"),
+                Output("manager-articles-list", "children"),
+            ],
             [
                 Input("search-button", "n_clicks"),
                 Input("load-mock-data", "n_clicks"),
@@ -585,7 +597,7 @@ class ManagerDashboard:
             ],
             [
                 State("search-input", "value"),
-                State("filter-source", "value"),
+                State("manager-filter-source", "value"),
                 State("filter-read-status", "value"),
                 State("filter-rating", "value"),
                 State("filter-date-range", "start_date"),
@@ -680,8 +692,8 @@ class ManagerDashboard:
         @self.app.callback(
             [
                 Output("analytics-chart", "figure"),
-                Output("publication-trends-chart", "figure"),
-                Output("top-journals-chart", "figure"),
+                Output("manager-publication-trends-chart", "figure"),
+                Output("manager-top-journals-chart", "figure"),
                 Output("source-distribution-chart", "figure"),
             ],
             [Input("main-tabs", "value")],
@@ -1030,6 +1042,16 @@ def create_manager_dashboard(
     """
     dashboard = ManagerDashboard(app, db_path)
     return dashboard
+
+
+# Plugin interface read by plugin_registry: the layout, built without
+# services or callbacks, and a function registering the callbacks on the
+# main app.
+layout = ManagerDashboard().create_layout()
+
+
+def register_callbacks(app: dash.Dash) -> ManagerDashboard:
+    return create_manager_dashboard(app)
 
 
 def main():
