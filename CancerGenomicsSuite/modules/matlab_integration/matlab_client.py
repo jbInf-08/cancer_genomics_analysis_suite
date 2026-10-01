@@ -11,10 +11,23 @@ import subprocess
 import tempfile
 from typing import Any, Dict, List, Optional, Union
 
-import matlab
-import matlab.engine
 import numpy as np
 import pandas as pd
+
+# The MATLAB Engine API for Python (PyPI: matlabengine) installs only against a
+# local MATLAB, so it cannot be a declared dependency. Importing it
+# unconditionally made this module -- and the MATLAB dashboard and
+# cli_bioinformatics_tools, which import it -- fail everywhere MATLAB is not
+# installed. Without it the client starts with no engine, which every method
+# already handles. `import matlab.engine` is checked as well as `import matlab`
+# because an unrelated PyPI project is also named `matlab`.
+try:
+    import matlab
+    import matlab.engine
+except ImportError:
+    matlab = None
+
+MATLAB_AVAILABLE = matlab is not None
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +43,13 @@ class MATLABClient:
 
     def _initialize_matlab(self):
         """Initialize MATLAB engine"""
+        if not MATLAB_AVAILABLE:
+            logger.warning(
+                "MATLAB Engine API for Python is not installed; MATLAB features "
+                "are unavailable. It installs from a local MATLAB (pip install "
+                "matlabengine, matching the MATLAB release)."
+            )
+            return
         try:
             # Start MATLAB engine
             self.engine = matlab.engine.start_matlab()
