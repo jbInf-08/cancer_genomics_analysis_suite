@@ -15,7 +15,7 @@ import json
 import logging
 from typing import Any, Dict, List, Optional, Tuple
 
-from CancerGenomicsSuite.modules.gene_annotation.ensembl_api_utils import (
+from .ensembl_api_utils import (
     build_ensembl_error_payload,
     ensembl_rest_base,
     http_get_with_errors,

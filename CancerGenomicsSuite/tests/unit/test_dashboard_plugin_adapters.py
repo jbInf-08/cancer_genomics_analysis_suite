@@ -7,6 +7,13 @@ registry skipped all five. The app is now optional: without one, an instance
 only builds the layout, creating no services and registering no callbacks
 (the article manager would otherwise create its SQLite file at import). Each
 module exposes that layout and register_callbacks(app).
+
+The genome browser, mutation effect, microarray, protein structure and ML
+outcome dashboards went further: each created its own Dash app and assigned
+that app's layout. Their layout now comes from a static build_layout(), and
+given an app they register their callbacks on it without touching its layout or
+title. That app is the main dashboard's, and setting its layout would replace
+the whole page.
 """
 
 from __future__ import annotations
@@ -72,3 +79,39 @@ def test_module_exposes_layout_and_register_callbacks(
         assert hasattr(dashboard, name)
     # The layout the registry serves is the one the callbacks were written for.
     assert _ids(dashboard.create_layout()) == _ids(mod.layout)
+
+
+SELF_CONTAINED = [
+    ("genome_browser.browser_dash", "GenomeBrowserDashboard"),
+    ("mutation_effect_predictor.mutation_dash", "MutationEffectDashboard"),
+    ("microarray_analyzer.microarray_dash", "MicroarrayDashboard"),
+    ("protein_structure_visualizer.structure_dash", "ProteinStructureDashboard"),
+    ("ml_outcome_predictor.ml_dash", "MLOutcomeDashboard"),
+]
+
+
+@pytest.mark.parametrize(("module", "cls"), SELF_CONTAINED)
+def test_self_contained_dashboard_leaves_a_given_app_alone(
+    module, cls, tmp_path, monkeypatch
+):
+    # Their services create working directories (e.g. workflow_work/).
+    monkeypatch.chdir(tmp_path)
+    mod = importlib.import_module(f"{PKG}.{module}")
+    dashboard_class = getattr(mod, cls)
+    expected = _ids(dashboard_class.build_layout())
+    assert expected and _ids(mod.layout) == expected
+
+    app = dash.Dash(__name__, suppress_callback_exceptions=True, title="Main")
+    main_layout = dash.html.Div(id="main-app-layout")
+    app.layout = main_layout
+    dashboard = mod.register_callbacks(app)
+    assert isinstance(dashboard, dashboard_class)
+    assert dashboard.app is app
+    assert app.callback_map, "register_callbacks registered no callbacks"
+    assert app.layout is main_layout, "the main app's layout was replaced"
+    assert app.title == "Main"
+
+    # Standalone use is unchanged: its own app, with the dashboard's layout.
+    standalone = dashboard_class()
+    assert standalone.app is not app
+    assert _ids(standalone.app.layout) == expected

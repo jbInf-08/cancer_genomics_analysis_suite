@@ -9,7 +9,7 @@ import base64
 import io
 import json
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import numpy as np
@@ -40,14 +40,18 @@ class MLOutcomeDashboard:
     Main dashboard class for ML outcome prediction.
     """
 
-    def __init__(self, app: dash.Dash = None):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the ML outcome prediction dashboard.
 
         Args:
             app: Dash app instance (optional)
+            app: Register callbacks on this app instead of creating one.
+                Its layout and title are left alone; plugin_registry serves
+                the module-level `layout`.
         """
-        self.app = app or dash.Dash(__name__)
+        standalone = app is None
+        self.app = dash.Dash(__name__) if standalone else app
         self.data = None
         self.target = None
         self.models = {}
@@ -57,12 +61,15 @@ class MLOutcomeDashboard:
         self.trainer = ModelTrainer()
         self.pipeline = PredictionPipeline()
 
-        self._setup_layout()
+        # A given app is the main dashboard's: its layout is not ours to set.
+        if standalone:
+            self._setup_layout()
         self._setup_callbacks()
 
-    def _setup_layout(self):
-        """Setup the dashboard layout."""
-        self.app.layout = html.Div(
+    @staticmethod
+    def build_layout() -> html.Div:
+        """The dashboard layout: static components, needing no app or services."""
+        return html.Div(
             [
                 # Header
                 html.Div(
@@ -90,7 +97,7 @@ class MLOutcomeDashboard:
                                             "Data Upload", className="section-title"
                                         ),
                                         dcc.Upload(
-                                            id="upload-data",
+                                            id="ml-upload-data",
                                             children=html.Div(
                                                 [
                                                     "Drag and Drop or ",
@@ -248,8 +255,8 @@ class MLOutcomeDashboard:
                                                 ),
                                                 html.Button(
                                                     "Make Predictions",
-                                                    id="predict-button",
-                                                    className="predict-button",
+                                                    id="ml-predict-button",
+                                                    className="ml-predict-button",
                                                 ),
                                             ],
                                             className="button-group",
@@ -278,7 +285,7 @@ class MLOutcomeDashboard:
                             [
                                 # Tabs
                                 dcc.Tabs(
-                                    id="main-tabs",
+                                    id="ml-main-tabs",
                                     value="data-tab",
                                     children=[
                                         # Data Tab
@@ -402,6 +409,10 @@ class MLOutcomeDashboard:
             ]
         )
 
+    def _setup_layout(self):
+        """Setup the dashboard layout."""
+        self.app.layout = self.build_layout()
+
     def _setup_callbacks(self):
         """Setup dashboard callbacks."""
 
@@ -412,8 +423,8 @@ class MLOutcomeDashboard:
                 Output("data-overview", "children"),
                 Output("data-quality", "children"),
             ],
-            [Input("upload-data", "contents")],
-            [State("upload-data", "filename")],
+            [Input("ml-upload-data", "contents")],
+            [State("ml-upload-data", "filename")],
         )
         def handle_data_upload(contents, filename):
             if contents is None:
@@ -564,7 +575,7 @@ class MLOutcomeDashboard:
                 Output("prediction-visualization", "figure"),
             ],
             [
-                Input("predict-button", "n_clicks"),
+                Input("ml-predict-button", "n_clicks"),
                 Input("upload-prediction-data", "contents"),
             ],
             [State("upload-prediction-data", "filename"), State("task-type", "value")],
@@ -621,7 +632,8 @@ class MLOutcomeDashboard:
 
         # Feature distribution callback
         @self.app.callback(
-            Output("feature-distribution", "figure"), [Input("upload-data", "contents")]
+            Output("feature-distribution", "figure"),
+            [Input("ml-upload-data", "contents")],
         )
         def update_feature_distribution(contents):
             if contents is None or self.data is None:
@@ -1141,6 +1153,17 @@ dashboard_styles = """
 """
 
 # Add styles to the app
+
+
+# Plugin interface read by plugin_registry: the static layout, and a
+# function creating the dashboard on the main app.
+layout = MLOutcomeDashboard.build_layout()
+
+
+def register_callbacks(app: dash.Dash) -> MLOutcomeDashboard:
+    return MLOutcomeDashboard(app=app)
+
+
 if __name__ == "__main__":
     app = dash.Dash(__name__)
     app.index_string = f"""

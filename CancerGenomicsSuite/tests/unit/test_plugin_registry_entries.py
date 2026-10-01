@@ -28,11 +28,6 @@ REPO = Path(__file__).resolve().parents[3]
 SUITE = REPO / "CancerGenomicsSuite"
 
 PENDING_ADAPTERS = {
-    "modules.mutation_effect_predictor.mutation_dash",
-    "modules.microarray_analyzer.microarray_dash",
-    "modules.ml_outcome_predictor.ml_dash",
-    "modules.protein_structure_visualizer.structure_dash",
-    "modules.genome_browser.browser_dash",
     "modules.batch_processing.batch_dash",
     "modules.reporting.report_dash",
 }
