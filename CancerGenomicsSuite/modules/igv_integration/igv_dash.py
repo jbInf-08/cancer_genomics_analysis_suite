@@ -67,12 +67,129 @@ layout = html.Div(
                     id="igv-tabs",
                     value="genome",
                     children=[
-                        dcc.Tab(label="Load Genome", value="genome"),
-                        dcc.Tab(label="Load Tracks", value="tracks"),
-                        dcc.Tab(label="Navigate", value="navigate"),
+                        dcc.Tab(
+                            label="Load Genome",
+                            value="genome",
+                            children=html.Div(
+                                [
+                                    html.H4("Load Genome"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Genome ID:", className="input-label"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="genome-id",
+                                                options=[
+                                                    {"label": "hg38", "value": "hg38"},
+                                                    {"label": "hg19", "value": "hg19"},
+                                                    {"label": "mm10", "value": "mm10"},
+                                                    {"label": "mm9", "value": "mm9"},
+                                                ],
+                                                value="hg38",
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Load Genome",
+                                        id="load-genome",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="genome-results", className="genome-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Load Tracks",
+                            value="tracks",
+                            children=html.Div(
+                                [
+                                    html.H4("Load Data Tracks"),
+                                    dcc.Upload(
+                                        id="track-file-upload",
+                                        children=html.Div(
+                                            [
+                                                "Drag and Drop or ",
+                                                html.A("Select Track Files"),
+                                            ]
+                                        ),
+                                        style={
+                                            "width": "100%",
+                                            "height": "60px",
+                                            "lineHeight": "60px",
+                                            "borderWidth": "1px",
+                                            "borderStyle": "dashed",
+                                            "borderRadius": "5px",
+                                            "textAlign": "center",
+                                            "margin": "10px",
+                                        },
+                                        multiple=True,
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Track Name (optional):",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="track-name",
+                                                type="text",
+                                                placeholder="My Track",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Load Track",
+                                        id="load-track",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="track-results", className="track-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Navigate",
+                            value="navigate",
+                            children=html.Div(
+                                [
+                                    html.H4("Navigate to Locus"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Genomic Locus:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="genomic-locus",
+                                                type="text",
+                                                placeholder="chr1:1000000-2000000",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Go to Locus",
+                                        id="goto-locus",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="navigation-results",
+                                        className="navigation-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
                 ),
-                html.Div(id="igv-content", className="igv-content"),
             ],
             className="igv-section",
         ),
@@ -104,101 +221,6 @@ def register_callbacks(app):
             version = "Not available"
 
         return status, version
-
-    @app.callback(Output("igv-content", "children"), [Input("igv-tabs", "value")])
-    def update_igv_content(active_tab):
-        if active_tab == "genome":
-            return html.Div(
-                [
-                    html.H4("Load Genome"),
-                    html.Div(
-                        [
-                            html.Label("Genome ID:", className="input-label"),
-                            dcc.Dropdown(
-                                id="genome-id",
-                                options=[
-                                    {"label": "hg38", "value": "hg38"},
-                                    {"label": "hg19", "value": "hg19"},
-                                    {"label": "mm10", "value": "mm10"},
-                                    {"label": "mm9", "value": "mm9"},
-                                ],
-                                value="hg38",
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Load Genome", id="load-genome", className="button primary"
-                    ),
-                    html.Div(id="genome-results", className="genome-results"),
-                ]
-            )
-
-        elif active_tab == "tracks":
-            return html.Div(
-                [
-                    html.H4("Load Data Tracks"),
-                    dcc.Upload(
-                        id="track-file-upload",
-                        children=html.Div(
-                            ["Drag and Drop or ", html.A("Select Track Files")]
-                        ),
-                        style={
-                            "width": "100%",
-                            "height": "60px",
-                            "lineHeight": "60px",
-                            "borderWidth": "1px",
-                            "borderStyle": "dashed",
-                            "borderRadius": "5px",
-                            "textAlign": "center",
-                            "margin": "10px",
-                        },
-                        multiple=True,
-                    ),
-                    html.Div(
-                        [
-                            html.Label(
-                                "Track Name (optional):", className="input-label"
-                            ),
-                            dcc.Input(
-                                id="track-name",
-                                type="text",
-                                placeholder="My Track",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Load Track", id="load-track", className="button primary"
-                    ),
-                    html.Div(id="track-results", className="track-results"),
-                ]
-            )
-
-        elif active_tab == "navigate":
-            return html.Div(
-                [
-                    html.H4("Navigate to Locus"),
-                    html.Div(
-                        [
-                            html.Label("Genomic Locus:", className="input-label"),
-                            dcc.Input(
-                                id="genomic-locus",
-                                type="text",
-                                placeholder="chr1:1000000-2000000",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Go to Locus", id="goto-locus", className="button primary"
-                    ),
-                    html.Div(id="navigation-results", className="navigation-results"),
-                ]
-            )
 
     @app.callback(
         Output("genome-results", "children"),

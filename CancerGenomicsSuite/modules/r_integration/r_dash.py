@@ -135,12 +135,120 @@ layout = html.Div(
                     id="analysis-tabs",
                     value="deseq2",
                     children=[
-                        dcc.Tab(label="DESeq2", value="deseq2"),
-                        dcc.Tab(label="Limma", value="limma"),
-                        dcc.Tab(label="GO Enrichment", value="go"),
+                        dcc.Tab(
+                            label="DESeq2",
+                            value="deseq2",
+                            children=html.Div(
+                                [
+                                    html.H4("DESeq2 Differential Expression Analysis"),
+                                    html.P(
+                                        "Upload count data and metadata to run DESeq2 analysis"
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Design Formula:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="deseq2-design",
+                                                value="~ condition",
+                                                placeholder="~ condition",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Run DESeq2",
+                                        id="run-deseq2",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="deseq2-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Limma",
+                            value="limma",
+                            children=html.Div(
+                                [
+                                    html.H4("Limma Differential Expression Analysis"),
+                                    html.P(
+                                        "Upload expression data and metadata to run limma analysis"
+                                    ),
+                                    html.Button(
+                                        "Run Limma",
+                                        id="run-limma",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="limma-results", className="analysis-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="GO Enrichment",
+                            value="go",
+                            children=html.Div(
+                                [
+                                    html.H4("GO Enrichment Analysis"),
+                                    html.P(
+                                        "Enter gene list for GO enrichment analysis"
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Gene List (one per line):",
+                                                className="input-label",
+                                            ),
+                                            dcc.Textarea(
+                                                id="gene-list",
+                                                placeholder="TP53\nBRCA1\nBRCA2\n...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "150px",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "P-value Cutoff:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="pvalue-cutoff",
+                                                type="number",
+                                                value=0.05,
+                                                min=0.001,
+                                                max=0.1,
+                                                step=0.001,
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Run GO Enrichment",
+                                        id="run-go",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="go-results", className="analysis-results"
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
                 ),
-                html.Div(id="r-analysis-content", className="analysis-content"),
             ],
             className="statistical-analysis-section",
         ),
@@ -338,87 +446,6 @@ print(summary_stats)
         except Exception as e:
             logger.error(f"Error installing package: {e}")
             return f"❌ Error: {str(e)}", ""
-
-    @app.callback(
-        Output("r-analysis-content", "children"), [Input("analysis-tabs", "value")]
-    )
-    def update_analysis_content(active_tab):
-        if active_tab == "deseq2":
-            return html.Div(
-                [
-                    html.H4("DESeq2 Differential Expression Analysis"),
-                    html.P("Upload count data and metadata to run DESeq2 analysis"),
-                    html.Div(
-                        [
-                            html.Label("Design Formula:", className="input-label"),
-                            dcc.Input(
-                                id="deseq2-design",
-                                value="~ condition",
-                                placeholder="~ condition",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Run DESeq2", id="run-deseq2", className="button primary"
-                    ),
-                    html.Div(id="deseq2-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "limma":
-            return html.Div(
-                [
-                    html.H4("Limma Differential Expression Analysis"),
-                    html.P("Upload expression data and metadata to run limma analysis"),
-                    html.Button(
-                        "Run Limma", id="run-limma", className="button primary"
-                    ),
-                    html.Div(id="limma-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "go":
-            return html.Div(
-                [
-                    html.H4("GO Enrichment Analysis"),
-                    html.P("Enter gene list for GO enrichment analysis"),
-                    html.Div(
-                        [
-                            html.Label(
-                                "Gene List (one per line):", className="input-label"
-                            ),
-                            dcc.Textarea(
-                                id="gene-list",
-                                placeholder="TP53\nBRCA1\nBRCA2\n...",
-                                style={"width": "100%", "height": "150px"},
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("P-value Cutoff:", className="input-label"),
-                            dcc.Input(
-                                id="pvalue-cutoff",
-                                type="number",
-                                value=0.05,
-                                min=0.001,
-                                max=0.1,
-                                step=0.001,
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Run GO Enrichment", id="run-go", className="button primary"
-                    ),
-                    html.Div(id="go-results", className="analysis-results"),
-                ]
-            )
 
     @app.callback(
         Output("deseq2-results", "children"),

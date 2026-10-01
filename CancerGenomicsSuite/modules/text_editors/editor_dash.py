@@ -73,14 +73,291 @@ layout = html.Div(
                     id="file-operations-tabs",
                     value="open",
                     children=[
-                        dcc.Tab(label="Open File", value="open"),
-                        dcc.Tab(label="Create File", value="create"),
-                        dcc.Tab(label="Edit Content", value="edit"),
-                        dcc.Tab(label="Search & Replace", value="search"),
+                        dcc.Tab(
+                            label="Open File",
+                            value="open",
+                            children=html.Div(
+                                [
+                                    html.H4("Open File with Editor"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "File Path:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="open-file-path",
+                                                type="text",
+                                                placeholder="/path/to/file.txt",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Editor:", className="input-label"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="open-editor",
+                                                options=[
+                                                    {"label": editor, "value": editor}
+                                                    for editor in editor_client.get_available_editors()
+                                                ],
+                                                value=editor_client.get_available_editors()[
+                                                    0
+                                                ]
+                                                if editor_client.get_available_editors()
+                                                else None,
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Line Number (optional):",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="open-line-number",
+                                                type="number",
+                                                placeholder="1",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Open File",
+                                        id="open-file",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="open-file-results",
+                                        className="operation-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Create File",
+                            value="create",
+                            children=html.Div(
+                                [
+                                    html.H4("Create New File"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "File Path:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="create-file-path",
+                                                type="text",
+                                                placeholder="/path/to/newfile.txt",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Initial Content:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Textarea(
+                                                id="create-file-content",
+                                                placeholder="Enter initial content here...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "200px",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Editor:", className="input-label"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="create-editor",
+                                                options=[
+                                                    {"label": editor, "value": editor}
+                                                    for editor in editor_client.get_available_editors()
+                                                ],
+                                                value=editor_client.get_available_editors()[
+                                                    0
+                                                ]
+                                                if editor_client.get_available_editors()
+                                                else None,
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Create and Open",
+                                        id="create-file",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="create-file-results",
+                                        className="operation-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Edit Content",
+                            value="edit",
+                            children=html.Div(
+                                [
+                                    html.H4("Edit File Content"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "File Path:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="edit-file-path",
+                                                type="text",
+                                                placeholder="/path/to/file.txt",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "New Content:", className="input-label"
+                                            ),
+                                            dcc.Textarea(
+                                                id="edit-file-content",
+                                                placeholder="Enter new content here...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "300px",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            dcc.Checklist(
+                                                id="edit-backup",
+                                                options=[
+                                                    {
+                                                        "label": "Create backup",
+                                                        "value": "backup",
+                                                    }
+                                                ],
+                                                value=["backup"],
+                                                className="checkbox",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Save Changes",
+                                        id="edit-file",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="edit-file-results",
+                                        className="operation-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Search & Replace",
+                            value="search",
+                            children=html.Div(
+                                [
+                                    html.H4("Search and Replace"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "File Path:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="search-file-path",
+                                                type="text",
+                                                placeholder="/path/to/file.txt",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Search Term:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="search-term",
+                                                type="text",
+                                                placeholder="text to search for",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Replace With:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="replace-term",
+                                                type="text",
+                                                placeholder="replacement text",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            dcc.Checklist(
+                                                id="search-options",
+                                                options=[
+                                                    {
+                                                        "label": "Case sensitive",
+                                                        "value": "case_sensitive",
+                                                    },
+                                                    {
+                                                        "label": "Create backup",
+                                                        "value": "backup",
+                                                    },
+                                                ],
+                                                value=["backup"],
+                                                className="checkbox",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Replace All",
+                                        id="replace-text",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="replace-results",
+                                        className="operation-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
-                ),
-                html.Div(
-                    id="file-operations-content", className="file-operations-content"
                 ),
             ],
             className="file-operations-section",
@@ -135,14 +412,131 @@ layout = html.Div(
                     id="text-processing-tabs",
                     value="info",
                     children=[
-                        dcc.Tab(label="File Info", value="info"),
-                        dcc.Tab(label="Search", value="search"),
-                        dcc.Tab(label="Replace", value="replace"),
-                        dcc.Tab(label="Preview", value="preview"),
+                        dcc.Tab(
+                            label="File Info",
+                            value="info",
+                            children=html.Div(
+                                [
+                                    html.H4("File Information"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "File Path:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="info-file-path",
+                                                type="text",
+                                                placeholder="/path/to/file.txt",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Get File Info",
+                                        id="get-file-info",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="file-info-results", className="info-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Search",
+                            value="search",
+                            children=html.Div(
+                                [
+                                    html.H4("Search in File"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "File Path:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="search-file-path-info",
+                                                type="text",
+                                                placeholder="/path/to/file.txt",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Search Term:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="search-term-info",
+                                                type="text",
+                                                placeholder="text to search for",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            dcc.Checklist(
+                                                id="search-case-sensitive",
+                                                options=[
+                                                    {
+                                                        "label": "Case sensitive",
+                                                        "value": "case_sensitive",
+                                                    }
+                                                ],
+                                                value=[],
+                                                className="checkbox",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Search",
+                                        id="search-in-file",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="search-results", className="search-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Preview",
+                            value="preview",
+                            children=html.Div(
+                                [
+                                    html.H4("File Preview"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "File Path:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="preview-file-path",
+                                                type="text",
+                                                placeholder="/path/to/file.txt",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Preview File",
+                                        id="preview-file",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="preview-results",
+                                        className="preview-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
-                ),
-                html.Div(
-                    id="text-processing-content", className="text-processing-content"
                 ),
             ],
             className="text-processing-section",
@@ -206,227 +600,6 @@ def register_callbacks(app):
                 editor_cards.append(card)
 
         return system, available, editor_cards
-
-    @app.callback(
-        Output("file-operations-content", "children"),
-        [Input("file-operations-tabs", "value")],
-    )
-    def update_file_operations_content(active_tab):
-        if active_tab == "open":
-            return html.Div(
-                [
-                    html.H4("Open File with Editor"),
-                    html.Div(
-                        [
-                            html.Label("File Path:", className="input-label"),
-                            dcc.Input(
-                                id="open-file-path",
-                                type="text",
-                                placeholder="/path/to/file.txt",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Editor:", className="input-label"),
-                            dcc.Dropdown(
-                                id="open-editor",
-                                options=[
-                                    {"label": editor, "value": editor}
-                                    for editor in editor_client.get_available_editors()
-                                ],
-                                value=editor_client.get_available_editors()[0]
-                                if editor_client.get_available_editors()
-                                else None,
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label(
-                                "Line Number (optional):", className="input-label"
-                            ),
-                            dcc.Input(
-                                id="open-line-number",
-                                type="number",
-                                placeholder="1",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Open File", id="open-file", className="button primary"
-                    ),
-                    html.Div(id="open-file-results", className="operation-results"),
-                ]
-            )
-
-        elif active_tab == "create":
-            return html.Div(
-                [
-                    html.H4("Create New File"),
-                    html.Div(
-                        [
-                            html.Label("File Path:", className="input-label"),
-                            dcc.Input(
-                                id="create-file-path",
-                                type="text",
-                                placeholder="/path/to/newfile.txt",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Initial Content:", className="input-label"),
-                            dcc.Textarea(
-                                id="create-file-content",
-                                placeholder="Enter initial content here...",
-                                style={"width": "100%", "height": "200px"},
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Editor:", className="input-label"),
-                            dcc.Dropdown(
-                                id="create-editor",
-                                options=[
-                                    {"label": editor, "value": editor}
-                                    for editor in editor_client.get_available_editors()
-                                ],
-                                value=editor_client.get_available_editors()[0]
-                                if editor_client.get_available_editors()
-                                else None,
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Create and Open", id="create-file", className="button primary"
-                    ),
-                    html.Div(id="create-file-results", className="operation-results"),
-                ]
-            )
-
-        elif active_tab == "edit":
-            return html.Div(
-                [
-                    html.H4("Edit File Content"),
-                    html.Div(
-                        [
-                            html.Label("File Path:", className="input-label"),
-                            dcc.Input(
-                                id="edit-file-path",
-                                type="text",
-                                placeholder="/path/to/file.txt",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("New Content:", className="input-label"),
-                            dcc.Textarea(
-                                id="edit-file-content",
-                                placeholder="Enter new content here...",
-                                style={"width": "100%", "height": "300px"},
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            dcc.Checklist(
-                                id="edit-backup",
-                                options=[{"label": "Create backup", "value": "backup"}],
-                                value=["backup"],
-                                className="checkbox",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Save Changes", id="edit-file", className="button primary"
-                    ),
-                    html.Div(id="edit-file-results", className="operation-results"),
-                ]
-            )
-
-        elif active_tab == "search":
-            return html.Div(
-                [
-                    html.H4("Search and Replace"),
-                    html.Div(
-                        [
-                            html.Label("File Path:", className="input-label"),
-                            dcc.Input(
-                                id="search-file-path",
-                                type="text",
-                                placeholder="/path/to/file.txt",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Search Term:", className="input-label"),
-                            dcc.Input(
-                                id="search-term",
-                                type="text",
-                                placeholder="text to search for",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Replace With:", className="input-label"),
-                            dcc.Input(
-                                id="replace-term",
-                                type="text",
-                                placeholder="replacement text",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            dcc.Checklist(
-                                id="search-options",
-                                options=[
-                                    {
-                                        "label": "Case sensitive",
-                                        "value": "case_sensitive",
-                                    },
-                                    {"label": "Create backup", "value": "backup"},
-                                ],
-                                value=["backup"],
-                                className="checkbox",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Replace All", id="replace-text", className="button primary"
-                    ),
-                    html.Div(id="replace-results", className="operation-results"),
-                ]
-            )
 
     @app.callback(
         Output("open-file-results", "children"),
@@ -679,108 +852,6 @@ def register_callbacks(app):
         except Exception as e:
             logger.error(f"Error browsing directory: {e}")
             return html.P(f"❌ Error: {str(e)}")
-
-    @app.callback(
-        Output("text-processing-content", "children"),
-        [Input("text-processing-tabs", "value")],
-    )
-    def update_text_processing_content(active_tab):
-        if active_tab == "info":
-            return html.Div(
-                [
-                    html.H4("File Information"),
-                    html.Div(
-                        [
-                            html.Label("File Path:", className="input-label"),
-                            dcc.Input(
-                                id="info-file-path",
-                                type="text",
-                                placeholder="/path/to/file.txt",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Get File Info", id="get-file-info", className="button primary"
-                    ),
-                    html.Div(id="file-info-results", className="info-results"),
-                ]
-            )
-
-        elif active_tab == "search":
-            return html.Div(
-                [
-                    html.H4("Search in File"),
-                    html.Div(
-                        [
-                            html.Label("File Path:", className="input-label"),
-                            dcc.Input(
-                                id="search-file-path-info",
-                                type="text",
-                                placeholder="/path/to/file.txt",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Search Term:", className="input-label"),
-                            dcc.Input(
-                                id="search-term-info",
-                                type="text",
-                                placeholder="text to search for",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            dcc.Checklist(
-                                id="search-case-sensitive",
-                                options=[
-                                    {
-                                        "label": "Case sensitive",
-                                        "value": "case_sensitive",
-                                    }
-                                ],
-                                value=[],
-                                className="checkbox",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Search", id="search-in-file", className="button primary"
-                    ),
-                    html.Div(id="search-results", className="search-results"),
-                ]
-            )
-
-        elif active_tab == "preview":
-            return html.Div(
-                [
-                    html.H4("File Preview"),
-                    html.Div(
-                        [
-                            html.Label("File Path:", className="input-label"),
-                            dcc.Input(
-                                id="preview-file-path",
-                                type="text",
-                                placeholder="/path/to/file.txt",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Preview File", id="preview-file", className="button primary"
-                    ),
-                    html.Div(id="preview-results", className="preview-results"),
-                ]
-            )
 
     @app.callback(
         Output("file-info-results", "children"),

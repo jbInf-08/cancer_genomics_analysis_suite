@@ -96,26 +96,14 @@ def test_registry_loads_every_entry_except_the_pending_adapters(tmp_path):
     assert not now_loading, f"now load; remove from PENDING_ADAPTERS: {now_loading}"
 
 
-# Component ids already shared between loaded plugins before any adapter work.
-# They are not duplicate outputs (registration would fail), but each is still a
-# shared name in one app; to be removed, not added to.
-KNOWN_SHARED_IDS = {
-    "analysis-options",
-    "analysis-tabs",
-    "clear-data-btn",
-    "run-workflow",
-    "upload-data",
-}
-
-
 def test_no_component_id_is_shared_between_plugins(tmp_path):
     """All plugins' callbacks are registered on one app, as main_dashboard does.
 
     An id used by two plugins (or by a plugin and the main app's own layout)
     either collides at registration or lets one plugin's input fire another's
-    callback. The first adapted dashboards brought fourteen such ids -- four
-    of them each had their own `main-tabs` and `load-mock-data` -- now
-    prefixed.
+    callback. Adapting dashboards brought dozens of such ids (four had their
+    own `main-tabs` and `load-mock-data`), and five were shared before that;
+    all are now prefixed per plugin, so none may be shared.
     """
     body = f"""
         import ast, contextlib, io, json, logging, pathlib, sys, warnings
@@ -177,81 +165,19 @@ def test_no_component_id_is_shared_between_plugins(tmp_path):
     assert proc.returncode == 0, proc.stderr[-3000:]
     shared = json.loads(proc.stdout.strip().splitlines()[-1])
 
-    new = {i: p for i, p in shared.items() if i not in KNOWN_SHARED_IDS}
-    assert not new, f"component ids shared between plugins: {new}"
-    resolved = sorted(KNOWN_SHARED_IDS - set(shared))
-    assert not resolved, f"no longer shared; remove from KNOWN_SHARED_IDS: {resolved}"
-
-
-# Callbacks whose outputs are rendered later by another callback (a sub-tab or
-# a results area), in plugins not yet converted. Each such output is missing
-# whenever its container is not showing, and Dash then drops the callback's
-# whole update ("A nonexistent object was used in an Output"). To be removed,
-# not added to.
-KNOWN_OUTPUTS_OUTSIDE_LAYOUT = {
-    "A Plasmid Editor (APE)": {
-        "cloning-results",
-        "create-plasmid-results",
-        "load-plasmid-results",
-        "primer-results",
-        "restriction-results",
-    },
-    "DNA Sequence Analyzer": {
-        "dna-analysis-results",
-        "dna-sequence-input",
-        "dna-visualizations",
-        "sequence-name",
-    },
-    "Gene Expression Plotter": {
-        "expression-analysis-results",
-        "expression-data-preview",
-        "expression-upload-status",
-        "expression-visualizations",
-        "upload-expression-data",
-        "upload-metadata",
-    },
-    "IGV Integration": {"genome-results", "navigation-results", "track-results"},
-    "MATLAB Integration": {"descriptive-results", "fft-results"},
-    "Phylogenetic Tree Viewer": {
-        "tree-alignment-preview",
-        "tree-comparison-results",
-        "tree-results",
-        "tree-upload-status",
-        "tree-visualization",
-        "tree1-select",
-        "tree2-select",
-        "upload-alignment",
-    },
-    "Protein Sequence Viewer": {
-        "protein-analysis-results",
-        "protein-sequence-input",
-        "protein-sequence-name",
-        "protein-visualizations",
-    },
-    "PyMOL Integration": {
-        "alignment-results",
-        "file-load-results",
-        "pdb-fetch-results",
-    },
-    "R Integration": {"deseq2-results", "go-results"},
-    "Text Editors": {
-        "create-file-results",
-        "edit-file-results",
-        "file-info-results",
-        "open-file-results",
-        "preview-results",
-        "replace-results",
-        "search-results",
-    },
-}
+    assert not shared, f"component ids shared between plugins: {shared}"
 
 
 def test_every_callback_output_is_in_its_plugins_layout(tmp_path):
-    """The clinical, multi-omics, pathway, article manager and scraper
-    dashboards rendered each sub-tab from a callback. Seventeen of their
-    callbacks wrote into sub-tabs, so they failed whenever another sub-tab was
-    showing: at tab open, and when an action was taken from the wrong sub-tab.
-    Their sub-tab content is now Tab children, always in the layout.
+    """Dash drops a callback whose output is missing from the page, including
+    the outputs that are there ("A nonexistent object was used in an Output").
+
+    Eleven plugins rendered each sub-tab from a callback, so every callback
+    writing into another sub-tab failed: at tab open, and whenever an action
+    was taken from the wrong sub-tab. Their sub-tab content is now dcc.Tab
+    children, always in the layout. Four more (DNA, gene expression,
+    phylogenetic tree, protein sequence) served a placeholder layout that
+    lacked their callbacks' inputs and outputs entirely.
     """
     body = f"""
         import contextlib, io, json, logging, sys, warnings
@@ -302,17 +228,4 @@ def test_every_callback_output_is_in_its_plugins_layout(tmp_path):
         k: set(v) for k, v in json.loads(proc.stdout.strip().splitlines()[-1]).items()
     }
 
-    new = {
-        name: sorted(ids - KNOWN_OUTPUTS_OUTSIDE_LAYOUT.get(name, set()))
-        for name, ids in outside.items()
-    }
-    new = {k: v for k, v in new.items() if v}
-    assert not new, f"callback outputs missing from the plugin's layout: {new}"
-    fixed = {
-        name: sorted(ids - outside.get(name, set()))
-        for name, ids in KNOWN_OUTPUTS_OUTSIDE_LAYOUT.items()
-    }
-    fixed = {k: v for k, v in fixed.items() if v}
-    assert (
-        not fixed
-    ), f"now in the layout; remove from KNOWN_OUTPUTS_OUTSIDE_LAYOUT: {fixed}"
+    assert not outside, f"callback outputs missing from the plugin's layout: {outside}"

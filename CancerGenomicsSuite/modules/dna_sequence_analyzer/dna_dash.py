@@ -7,7 +7,7 @@ visualize results through a web-based interface.
 """
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import plotly.graph_objects as go
@@ -25,7 +25,7 @@ class DNADashboard:
     web-based dashboard for DNA sequence analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the DNA dashboard.
 
@@ -34,6 +34,10 @@ class DNADashboard:
         """
         self.app = app
         self.logger = logging.getLogger(__name__)
+        if app is None:
+            # Layout only: plugin_registry's module-level `layout` is built
+            # this way, with no services and no callbacks.
+            return
         self.analyzer = DNAAnalyzer()
         self.utils = DNAUtils()
 
@@ -115,7 +119,7 @@ class DNADashboard:
                                         html.Div(
                                             [
                                                 dcc.Checklist(
-                                                    id="analysis-options",
+                                                    id="dna-analysis-options",
                                                     options=[
                                                         {
                                                             "label": "Calculate Statistics",
@@ -205,7 +209,7 @@ class DNADashboard:
             [
                 State("dna-sequence-input", "value"),
                 State("sequence-name", "value"),
-                State("analysis-options", "value"),
+                State("dna-analysis-options", "value"),
                 State("min-orf-length", "value"),
             ],
         )
@@ -454,22 +458,8 @@ def register_callbacks(app):
     return dashboard
 
 
-# Legacy layout for backward compatibility
-layout = html.Div(
-    [
-        html.H1("DNA Sequence Analyzer"),
-        html.P("This module provides comprehensive DNA sequence analysis tools."),
-        html.Div(
-            [
-                html.Label("Input DNA Sequence:"),
-                dcc.Textarea(
-                    id="dna-input",
-                    placeholder="Enter DNA sequence here...",
-                    style={"width": "100%", "height": 200},
-                ),
-                html.Button("Analyze", id="analyze-btn", n_clicks=0),
-                html.Div(id="dna-output"),
-            ]
-        ),
-    ]
-)
+# The layout plugin_registry serves: the dashboard's real one, which its
+# callbacks are written against. It used to be a placeholder form that lacked
+# the inputs and outputs those callbacks use, so in the app the dashboard did
+# nothing.
+layout = DNADashboard().get_layout()

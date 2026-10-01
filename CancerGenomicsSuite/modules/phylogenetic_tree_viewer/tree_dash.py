@@ -10,7 +10,7 @@ import base64
 import logging
 import os
 import tempfile
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 from dash import Input, Output, State, dash_table, dcc, html
@@ -26,7 +26,7 @@ class TreeDashboard:
     web-based dashboard for phylogenetic analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the tree dashboard.
 
@@ -35,6 +35,10 @@ class TreeDashboard:
         """
         self.app = app
         self.logger = logging.getLogger(__name__)
+        if app is None:
+            # Layout only: plugin_registry's module-level `layout` is built
+            # this way, with no services and no callbacks.
+            return
         self.builder = PhylogeneticTreeBuilder()
 
         # Register callbacks
@@ -233,7 +237,7 @@ class TreeDashboard:
                                         ),
                                         html.Button(
                                             "Clear Data",
-                                            id="clear-data-btn",
+                                            id="tree-clear-data-btn",
                                             className="btn btn-secondary",
                                         ),
                                     ],
@@ -558,7 +562,7 @@ class TreeDashboard:
 
         @self.app.callback(
             [Output("upload-alignment", "contents")],
-            [Input("clear-data-btn", "n_clicks")],
+            [Input("tree-clear-data-btn", "n_clicks")],
         )
         def clear_data(n_clicks):
             """Clear uploaded data."""
@@ -765,32 +769,8 @@ def register_callbacks(app):
     return dashboard
 
 
-# Legacy layout for backward compatibility
-layout = html.Div(
-    [
-        html.H1("Phylogenetic Tree Viewer"),
-        html.P(
-            "This module provides phylogenetic tree construction and visualization tools."
-        ),
-        html.Div(
-            [
-                html.Label("Upload Multiple Sequence Alignment:"),
-                dcc.Upload(
-                    id="upload-data",
-                    children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
-                    style={
-                        "width": "100%",
-                        "height": "60px",
-                        "lineHeight": "60px",
-                        "borderWidth": "1px",
-                        "borderStyle": "dashed",
-                        "borderRadius": "5px",
-                        "textAlign": "center",
-                    },
-                    multiple=False,
-                ),
-                html.Div(id="tree-output"),
-            ]
-        ),
-    ]
-)
+# The layout plugin_registry serves: the dashboard's real one, which its
+# callbacks are written against. It used to be a placeholder form that lacked
+# the inputs and outputs those callbacks use, so in the app the dashboard did
+# nothing.
+layout = TreeDashboard().get_layout()
