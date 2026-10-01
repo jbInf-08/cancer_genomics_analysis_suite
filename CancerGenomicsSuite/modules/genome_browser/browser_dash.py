@@ -750,7 +750,7 @@ class GenomeBrowserDashboard:
             port: Port to run the app on
         """
         logger.info(f"Starting Genome Browser Dashboard on port {port}")
-        self.app.run_server(debug=debug, port=port)
+        self.app.run(debug=debug, port=port)
 
 
 # CSS Styles

@@ -752,7 +752,7 @@ def main():
     app.layout = dashboard.create_layout()
 
     if __name__ == "__main__":
-        app.run_server(debug=True)
+        app.run(debug=True)
 
 
 if __name__ == "__main__":

@@ -74,7 +74,7 @@ def test_dashboard_import():
 
                 return decorator
 
-            def run_server(self, *args, **kwargs):
+            def run(self, *args, **kwargs):
                 print("Mock server would start here")
 
         class MockHtml:

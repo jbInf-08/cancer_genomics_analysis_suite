@@ -1444,7 +1444,7 @@ class MutationEffectDashboard:
             port: Port to run the app on
         """
         logger.info(f"Starting Mutation Effect Predictor Dashboard on port {port}")
-        self.app.run_server(debug=debug, port=port)
+        self.app.run(debug=debug, port=port)
 
 
 # CSS Styles

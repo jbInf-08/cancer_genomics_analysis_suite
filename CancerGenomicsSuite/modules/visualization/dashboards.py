@@ -743,4 +743,4 @@ class DashboardBuilder:
             self.set_current_layout("default")
 
         logger.info(f"Starting dashboard on {host}:{port}")
-        self.app.run_server(host=host, port=port, debug=debug)
+        self.app.run(host=host, port=port, debug=debug)
