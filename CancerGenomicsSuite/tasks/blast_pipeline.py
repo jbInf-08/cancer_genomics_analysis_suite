@@ -16,7 +16,12 @@ from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from Bio.Blast import NCBIXML
-from Bio.Blast.Applications import NcbiblastnCommandline, NcbiblastpCommandline
+
+# Biopython removed its command-line wrappers (Bio.Application, and with it
+# Bio.Blast.Applications), so this module -- and the whole tasks package, which
+# imports it -- failed to import on current releases. The wrappers only turned
+# keyword arguments into `-name value` flags and ran the program; BlastPipeline
+# builds the same argument list itself and runs it with subprocess.
 
 
 @dataclass
@@ -56,6 +61,40 @@ class BlastResult:
     query_sequence: str
     subject_sequence: str
     alignment: str
+
+
+def blast_command(config: BlastConfig, query_path: str, output_path: str) -> List[str]:
+    """
+    Build the BLAST+ command line for a configuration.
+
+    Produces the same flags the old Biopython wrappers did: each option becomes
+    `-name value`, and penalty/reward apply only to blastn.
+
+    Raises:
+        ValueError: for a program other than blastn or blastp.
+    """
+    options = {
+        "query": query_path,
+        "db": config.database_path,
+        "evalue": config.evalue,
+        "outfmt": config.outfmt,
+        "out": output_path,
+        "num_threads": config.num_threads,
+        "max_target_seqs": config.max_target_seqs,
+        "word_size": config.word_size,
+        "gapopen": config.gapopen,
+        "gapextend": config.gapextend,
+    }
+    if config.program == "blastn":
+        options["penalty"] = config.penalty
+        options["reward"] = config.reward
+    elif config.program != "blastp":
+        raise ValueError(f"Unsupported BLAST program: {config.program}")
+
+    command = [config.program]
+    for name, value in options.items():
+        command += [f"-{name}", str(value)]
+    return command
 
 
 class BlastPipeline:
@@ -139,46 +178,19 @@ class BlastPipeline:
             output_file.close()
 
         # Build BLAST command
-        if self.config.program == "blastn":
-            blast_cmd = NcbiblastnCommandline(
-                query=query_path,
-                db=self.config.database_path,
-                evalue=self.config.evalue,
-                outfmt=self.config.outfmt,
-                out=output_path,
-                num_threads=self.config.num_threads,
-                max_target_seqs=self.config.max_target_seqs,
-                word_size=self.config.word_size,
-                gapopen=self.config.gapopen,
-                gapextend=self.config.gapextend,
-                penalty=self.config.penalty,
-                reward=self.config.reward,
-            )
-        elif self.config.program == "blastp":
-            blast_cmd = NcbiblastpCommandline(
-                query=query_path,
-                db=self.config.database_path,
-                evalue=self.config.evalue,
-                outfmt=self.config.outfmt,
-                out=output_path,
-                num_threads=self.config.num_threads,
-                max_target_seqs=self.config.max_target_seqs,
-                word_size=self.config.word_size,
-                gapopen=self.config.gapopen,
-                gapextend=self.config.gapextend,
-            )
-        else:
-            raise ValueError(f"Unsupported BLAST program: {self.config.program}")
+        blast_cmd = blast_command(self.config, query_path, output_path)
 
         # Execute BLAST
         self.logger.info(f"Running BLAST {self.config.program} analysis...")
-        self.logger.info(f"Command: {blast_cmd}")
+        self.logger.info(f"Command: {subprocess.list2cmdline(blast_cmd)}")
 
         try:
-            stdout, stderr = blast_cmd()
+            completed = subprocess.run(
+                blast_cmd, capture_output=True, text=True, check=True
+            )
 
-            if stderr:
-                self.logger.warning(f"BLAST stderr: {stderr}")
+            if completed.stderr:
+                self.logger.warning(f"BLAST stderr: {completed.stderr}")
 
             self.logger.info(
                 f"BLAST analysis completed. Results saved to: {output_path}"
