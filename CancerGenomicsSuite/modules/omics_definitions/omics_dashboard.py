@@ -1134,7 +1134,7 @@ class ComprehensiveOmicsDashboard:
 
     def run(self, debug: bool = True, port: int = 8050):
         """Run the dashboard."""
-        self.app.run_server(debug=debug, port=port)
+        self.app.run(debug=debug, port=port)
 
 
 def create_comprehensive_omics_dashboard() -> ComprehensiveOmicsDashboard:

@@ -944,7 +944,7 @@ class CancerGenomicsDashboard:
     def run(self, host="0.0.0.0", port=8050, debug=False):
         """Run the dashboard"""
         logger.info(f"Starting Cancer Genomics Dashboard on {host}:{port}")
-        self.app.run_server(host=host, port=port, debug=debug)
+        self.app.run(host=host, port=port, debug=debug)
 
 
 # Streamlit Dashboard

@@ -531,10 +531,8 @@ def main():
     print(f"DEBUG: Settings object: {settings}")
     print(f"DEBUG: Settings type: {type(settings)}")
     try:
-        print("DEBUG: About to call app.run_server()")
-        app.run_server(
-            debug=settings.dash_debug_mode, host=settings.host, port=settings.port
-        )
+        print("DEBUG: About to call app.run()")
+        app.run(debug=settings.dash_debug_mode, host=settings.host, port=settings.port)
     except Exception as e:
         import traceback
 

@@ -902,4 +902,4 @@ class BatchDashboard:
             debug: Enable debug mode
         """
         logger.info(f"Starting batch processing dashboard on {host}:{port}")
-        self.app.run_server(host=host, port=port, debug=debug)
+        self.app.run(host=host, port=port, debug=debug)

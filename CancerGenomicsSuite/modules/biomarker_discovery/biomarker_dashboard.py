@@ -799,7 +799,7 @@ class BiomarkerDiscoveryDashboard:
 
     def run_server(self, debug: bool = True, port: int = 8050):
         """Run the dashboard server."""
-        self.app.run_server(debug=debug, port=port)
+        self.app.run(debug=debug, port=port)
 
 
 class BiomarkerVisualizationEngine:

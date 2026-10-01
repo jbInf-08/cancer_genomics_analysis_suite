@@ -1165,4 +1165,4 @@ if __name__ == "__main__":
     """
 
     dashboard = create_ml_dashboard(app)
-    app.run_server(debug=True)
+    app.run(debug=True)
