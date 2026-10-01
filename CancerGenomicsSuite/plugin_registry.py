@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 # encode/scopus/checkv modules (data-fetch functions), notifications.alert_monitor
 # (a notification service) and interactive_dashboards.dashboard_loader (a
 # framework class). sequence_search_tool.blast_dash is an empty file.
+# reporting.report_dash is also a framework: a report shell whose filters and
+# widgets are added in code (add_widget/add_filter), which nothing does, so it
+# would render an empty page whose Generate Report button has no callback.
 DASH_MODULES = [
     # Demo Module (always works)
     "modules.demo_module.demo_dash",
@@ -38,7 +41,6 @@ DASH_MODULES = [
     "modules.batch_processing.batch_dash",
     "modules.article_manager.manager_dash",
     "modules.article_scraper.scraper_dash",
-    "modules.reporting.report_dash",
     # New Bioinformatics Tools Integration
     "modules.galaxy_integration.galaxy_dash",
     "modules.r_integration.r_dash",
@@ -156,12 +158,6 @@ MODULE_METADATA = {
         "category": "Utilities",
         "description": "Scrape research articles from databases",
         "icon": "🕷️",
-    },
-    "modules.reporting.report_dash": {
-        "name": "Reporting",
-        "category": "Utilities",
-        "description": "Generate analysis reports",
-        "icon": "📊",
     },
     # New Bioinformatics Tools Integration
     "modules.galaxy_integration.galaxy_dash": {

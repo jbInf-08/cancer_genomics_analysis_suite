@@ -19,6 +19,7 @@ the whole page.
 from __future__ import annotations
 
 import importlib
+from pathlib import Path
 
 import dash
 import pytest
@@ -115,3 +116,25 @@ def test_self_contained_dashboard_leaves_a_given_app_alone(
     standalone = dashboard_class()
     assert standalone.app is not app
     assert _ids(standalone.app.layout) == expected
+
+
+def test_batch_dashboard_registers_on_a_given_app(tmp_path, monkeypatch):
+    """Same contract; and its job database goes to the working directory.
+
+    BatchQueue defaults to a file in the package directory, which an installed
+    package may not be able to write; registering would then fail.
+    """
+    monkeypatch.chdir(tmp_path)
+    mod = importlib.import_module(f"{PKG}.batch_processing.batch_dash")
+    expected = _ids(mod.BatchDashboard.build_layout())
+    assert expected and _ids(mod.layout) == expected
+
+    app = dash.Dash(__name__, suppress_callback_exceptions=True)
+    main_layout = dash.html.Div(id="main-app-layout")
+    app.layout = main_layout
+    dashboard = mod.register_callbacks(app)
+    assert dashboard.app is app
+    assert app.layout is main_layout
+    assert app.callback_map
+    db = Path(dashboard.batch_queue.db_path).resolve()
+    assert db.parent == tmp_path.resolve()

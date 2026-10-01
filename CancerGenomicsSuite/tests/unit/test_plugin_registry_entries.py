@@ -11,9 +11,9 @@ entries, 19 were dropped that way:
   framework class), and one was an empty file;
 - the rest were missing dependencies, or the class-based dashboards below.
 
-PENDING_ADAPTERS lists the class-based dashboards. Each builds its own Dash app
-and has no module-level layout yet. The last test is strict both ways: the list
-must shrink as they are adapted, and nothing else may start failing.
+PENDING_ADAPTERS listed the class-based dashboards while each still lacked a
+module-level layout; all are adapted now, so it is empty and every entry must
+load. The loading test stays strict both ways.
 """
 
 from __future__ import annotations
@@ -27,10 +27,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 SUITE = REPO / "CancerGenomicsSuite"
 
-PENDING_ADAPTERS = {
-    "modules.batch_processing.batch_dash",
-    "modules.reporting.report_dash",
-}
+PENDING_ADAPTERS: set = set()
 
 
 def _registry():
