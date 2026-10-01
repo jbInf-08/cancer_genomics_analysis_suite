@@ -204,15 +204,33 @@ class ScraperDashboard:
                             id="scraper-main-tabs",
                             value="articles",
                             children=[
-                                dcc.Tab(label="Articles", value="articles"),
-                                dcc.Tab(label="Search & Filter", value="search"),
-                                dcc.Tab(label="Statistics", value="statistics"),
-                                dcc.Tab(label="Scraping Log", value="logs"),
-                                dcc.Tab(label="Export", value="export"),
+                                dcc.Tab(
+                                    label="Articles",
+                                    value="articles",
+                                    children=self.create_articles_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Search & Filter",
+                                    value="search",
+                                    children=self.create_search_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Statistics",
+                                    value="statistics",
+                                    children=self.create_statistics_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Scraping Log",
+                                    value="logs",
+                                    children=self.create_logs_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Export",
+                                    value="export",
+                                    children=self.create_export_tab(),
+                                ),
                             ],
                         ),
-                        # Tab content
-                        html.Div(id="scraper-tab-content", className="mt-3"),
                     ],
                     className="container-fluid",
                 ),
@@ -271,7 +289,7 @@ class ScraperDashboard:
                             [
                                 html.Label("Search Query:"),
                                 dcc.Input(
-                                    id="search-input",
+                                    id="scraper-search-input",
                                     type="text",
                                     placeholder="Search in title, abstract, authors...",
                                     className="form-control mb-2",
@@ -290,7 +308,7 @@ class ScraperDashboard:
                                 ),
                                 html.Button(
                                     "Search",
-                                    id="search-button",
+                                    id="scraper-search-button",
                                     className="btn btn-primary mb-3",
                                 ),
                             ],
@@ -307,7 +325,7 @@ class ScraperDashboard:
                             [
                                 html.Label("Publication Date Range:"),
                                 dcc.DatePickerRange(
-                                    id="filter-date-range",
+                                    id="scraper-filter-date-range",
                                     start_date=datetime.now() - timedelta(days=365),
                                     end_date=datetime.now(),
                                     display_format="YYYY-MM-DD",
@@ -433,7 +451,7 @@ class ScraperDashboard:
                             [
                                 html.Label("Export Format:"),
                                 dcc.Dropdown(
-                                    id="export-format",
+                                    id="scraper-export-format",
                                     options=[
                                         {"label": "CSV", "value": "csv"},
                                         {"label": "JSON", "value": "json"},
@@ -614,25 +632,6 @@ class ScraperDashboard:
             return "", html.Div(
                 "Click 'Load Mock Data' to begin", className="text-muted"
             )
-
-        @self.app.callback(
-            Output("scraper-tab-content", "children"),
-            [Input("scraper-main-tabs", "value")],
-        )
-        def render_tab_content(active_tab):
-            """Render content based on active tab."""
-            if active_tab == "articles":
-                return self.create_articles_tab()
-            elif active_tab == "search":
-                return self.create_search_tab()
-            elif active_tab == "statistics":
-                return self.create_statistics_tab()
-            elif active_tab == "logs":
-                return self.create_logs_tab()
-            elif active_tab == "export":
-                return self.create_export_tab()
-            else:
-                return html.Div("Select a tab to view content")
 
         @self.app.callback(
             Output("articles-list", "children"),

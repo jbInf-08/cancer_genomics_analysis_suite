@@ -236,16 +236,38 @@ class ManagerDashboard:
                             id="main-tabs",
                             value="articles",
                             children=[
-                                dcc.Tab(label="Articles", value="articles"),
-                                dcc.Tab(label="Collections", value="collections"),
-                                dcc.Tab(label="Tags", value="tags"),
-                                dcc.Tab(label="Analytics", value="analytics"),
-                                dcc.Tab(label="Similarity", value="similarity"),
-                                dcc.Tab(label="Topic Modeling", value="topics"),
+                                dcc.Tab(
+                                    label="Articles",
+                                    value="articles",
+                                    children=self.create_articles_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Collections",
+                                    value="collections",
+                                    children=self.create_collections_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Tags",
+                                    value="tags",
+                                    children=self.create_tags_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Analytics",
+                                    value="analytics",
+                                    children=self.create_analytics_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Similarity",
+                                    value="similarity",
+                                    children=self.create_similarity_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Topic Modeling",
+                                    value="topics",
+                                    children=self.create_topics_tab(),
+                                ),
                             ],
                         ),
-                        # Tab content
-                        html.Div(id="manager-tab-content", className="mt-3"),
                     ],
                     className="container-fluid",
                 ),
@@ -668,26 +690,6 @@ class ManagerDashboard:
             except Exception as e:
                 logger.error(f"Error in search: {e}")
                 return "", html.Div(f"Error: {str(e)}", className="alert alert-danger")
-
-        @self.app.callback(
-            Output("manager-tab-content", "children"), [Input("main-tabs", "value")]
-        )
-        def render_tab_content(active_tab):
-            """Render content based on active tab."""
-            if active_tab == "articles":
-                return self.create_articles_tab()
-            elif active_tab == "collections":
-                return self.create_collections_tab()
-            elif active_tab == "tags":
-                return self.create_tags_tab()
-            elif active_tab == "analytics":
-                return self.create_analytics_tab()
-            elif active_tab == "similarity":
-                return self.create_similarity_tab()
-            elif active_tab == "topics":
-                return self.create_topics_tab()
-            else:
-                return html.Div("Select a tab to view content")
 
         @self.app.callback(
             [

@@ -181,19 +181,33 @@ class PathwayDashboard:
                             id="pathway-main-tabs",
                             value="overview",
                             children=[
-                                dcc.Tab(label="Overview", value="overview"),
                                 dcc.Tab(
-                                    label="Pathway Analysis", value="pathway-analysis"
+                                    label="Overview",
+                                    value="overview",
+                                    children=self.create_overview_tab(),
                                 ),
                                 dcc.Tab(
-                                    label="Network Visualization", value="network-viz"
+                                    label="Pathway Analysis",
+                                    value="pathway-analysis",
+                                    children=self.create_pathway_analysis_tab(),
                                 ),
-                                dcc.Tab(label="Expression Heatmaps", value="heatmaps"),
-                                dcc.Tab(label="KEGG Integration", value="kegg"),
+                                dcc.Tab(
+                                    label="Network Visualization",
+                                    value="network-viz",
+                                    children=self.create_network_visualization_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Expression Heatmaps",
+                                    value="heatmaps",
+                                    children=self.create_heatmaps_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="KEGG Integration",
+                                    value="kegg",
+                                    children=self.create_kegg_tab(),
+                                ),
                             ],
                         ),
-                        # Tab content
-                        html.Div(id="pathway-tab-content", className="mt-3"),
                     ],
                     className="container-fluid",
                 ),
@@ -427,25 +441,6 @@ class PathwayDashboard:
                     return "", empty_fig, empty_fig
 
             return "", go.Figure(), go.Figure()
-
-        @self.app.callback(
-            Output("pathway-tab-content", "children"),
-            [Input("pathway-main-tabs", "value")],
-        )
-        def render_tab_content(active_tab):
-            """Render content based on active tab."""
-            if active_tab == "overview":
-                return self.create_overview_tab()
-            elif active_tab == "pathway-analysis":
-                return self.create_pathway_analysis_tab()
-            elif active_tab == "network-viz":
-                return self.create_network_visualization_tab()
-            elif active_tab == "heatmaps":
-                return self.create_heatmaps_tab()
-            elif active_tab == "kegg":
-                return self.create_kegg_tab()
-            else:
-                return html.Div("Select a tab to view content")
 
         @self.app.callback(
             Output("pathway-network-graph", "figure"),

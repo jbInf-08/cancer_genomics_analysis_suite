@@ -197,25 +197,38 @@ class MultiOmicsDashboard:
                             id="multiomics-main-tabs",
                             value="overview",
                             children=[
-                                dcc.Tab(label="Data Overview", value="overview"),
                                 dcc.Tab(
-                                    label="Integration Results", value="integration"
+                                    label="Data Overview",
+                                    value="overview",
+                                    children=self.create_overview_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Integration Results",
+                                    value="integration",
+                                    children=self.create_integration_tab(),
                                 ),
                                 dcc.Tab(
                                     label="Dimensionality Reduction",
                                     value="dimension-reduction",
+                                    children=self.create_dimension_reduction_tab(),
                                 ),
                                 dcc.Tab(
-                                    label="Clustering Analysis", value="clustering"
+                                    label="Clustering Analysis",
+                                    value="clustering",
+                                    children=self.create_clustering_tab(),
                                 ),
                                 dcc.Tab(
-                                    label="Correlation Analysis", value="correlation"
+                                    label="Correlation Analysis",
+                                    value="correlation",
+                                    children=self.create_correlation_tab(),
                                 ),
-                                dcc.Tab(label="Visualization", value="visualization"),
+                                dcc.Tab(
+                                    label="Visualization",
+                                    value="visualization",
+                                    children=self.create_visualization_tab(),
+                                ),
                             ],
                         ),
-                        # Tab content
-                        html.Div(id="multiomics-tab-content", className="mt-3"),
                     ],
                     className="container-fluid",
                 ),
@@ -574,27 +587,6 @@ class MultiOmicsDashboard:
             return "", html.Div(
                 "Click 'Integrate Data' to begin integration", className="text-muted"
             )
-
-        @self.app.callback(
-            Output("multiomics-tab-content", "children"),
-            [Input("multiomics-main-tabs", "value")],
-        )
-        def render_tab_content(active_tab):
-            """Render content based on active tab."""
-            if active_tab == "overview":
-                return self.create_overview_tab()
-            elif active_tab == "integration":
-                return self.create_integration_tab()
-            elif active_tab == "dimension-reduction":
-                return self.create_dimension_reduction_tab()
-            elif active_tab == "clustering":
-                return self.create_clustering_tab()
-            elif active_tab == "correlation":
-                return self.create_correlation_tab()
-            elif active_tab == "visualization":
-                return self.create_visualization_tab()
-            else:
-                return html.Div("Select a tab to view content")
 
         @self.app.callback(
             Output("reduction-plot", "figure"),

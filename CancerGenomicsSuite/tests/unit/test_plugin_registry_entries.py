@@ -181,3 +181,138 @@ def test_no_component_id_is_shared_between_plugins(tmp_path):
     assert not new, f"component ids shared between plugins: {new}"
     resolved = sorted(KNOWN_SHARED_IDS - set(shared))
     assert not resolved, f"no longer shared; remove from KNOWN_SHARED_IDS: {resolved}"
+
+
+# Callbacks whose outputs are rendered later by another callback (a sub-tab or
+# a results area), in plugins not yet converted. Each such output is missing
+# whenever its container is not showing, and Dash then drops the callback's
+# whole update ("A nonexistent object was used in an Output"). To be removed,
+# not added to.
+KNOWN_OUTPUTS_OUTSIDE_LAYOUT = {
+    "A Plasmid Editor (APE)": {
+        "cloning-results",
+        "create-plasmid-results",
+        "load-plasmid-results",
+        "primer-results",
+        "restriction-results",
+    },
+    "DNA Sequence Analyzer": {
+        "dna-analysis-results",
+        "dna-sequence-input",
+        "dna-visualizations",
+        "sequence-name",
+    },
+    "Gene Expression Plotter": {
+        "expression-analysis-results",
+        "expression-data-preview",
+        "expression-upload-status",
+        "expression-visualizations",
+        "upload-expression-data",
+        "upload-metadata",
+    },
+    "IGV Integration": {"genome-results", "navigation-results", "track-results"},
+    "MATLAB Integration": {"descriptive-results", "fft-results"},
+    "Phylogenetic Tree Viewer": {
+        "tree-alignment-preview",
+        "tree-comparison-results",
+        "tree-results",
+        "tree-upload-status",
+        "tree-visualization",
+        "tree1-select",
+        "tree2-select",
+        "upload-alignment",
+    },
+    "Protein Sequence Viewer": {
+        "protein-analysis-results",
+        "protein-sequence-input",
+        "protein-sequence-name",
+        "protein-visualizations",
+    },
+    "PyMOL Integration": {
+        "alignment-results",
+        "file-load-results",
+        "pdb-fetch-results",
+    },
+    "R Integration": {"deseq2-results", "go-results"},
+    "Text Editors": {
+        "create-file-results",
+        "edit-file-results",
+        "file-info-results",
+        "open-file-results",
+        "preview-results",
+        "replace-results",
+        "search-results",
+    },
+}
+
+
+def test_every_callback_output_is_in_its_plugins_layout(tmp_path):
+    """The clinical, multi-omics, pathway, article manager and scraper
+    dashboards rendered each sub-tab from a callback. Seventeen of their
+    callbacks wrote into sub-tabs, so they failed whenever another sub-tab was
+    showing: at tab open, and when an action was taken from the wrong sub-tab.
+    Their sub-tab content is now Tab children, always in the layout.
+    """
+    body = f"""
+        import contextlib, io, json, logging, sys, warnings
+        warnings.filterwarnings("ignore")
+        logging.disable(logging.CRITICAL)
+        sys.path.insert(0, {str(SUITE)!r})
+        import dash
+        with contextlib.redirect_stdout(io.StringIO()):
+            import plugin_registry
+            plugins = plugin_registry.get_registered_plugins()
+
+        def layout_ids(c, out):
+            if isinstance(c, (list, tuple)):
+                for x in c:
+                    layout_ids(x, out)
+            elif hasattr(c, "to_plotly_json"):
+                if isinstance(getattr(c, "id", None), str):
+                    out.add(c.id)
+                layout_ids(getattr(c, "children", None), out)
+
+        app = dash.Dash(__name__, suppress_callback_exceptions=True)
+        outside = {{}}
+        for name, p in plugins.items():
+            static = set()
+            layout_ids(p["layout"], static)
+            seen = len(app._callback_list)
+            if p.get("register_callbacks"):
+                with contextlib.redirect_stdout(io.StringIO()):
+                    p["register_callbacks"](app)
+            for cb in app._callback_list[seen:]:
+                for part in cb["output"].strip(".").split("..."):
+                    if part.startswith("{{"):
+                        continue
+                    cid = part.rsplit(".", 1)[0]
+                    if cid not in static:
+                        outside.setdefault(name, []).append(cid)
+        print(json.dumps({{k: sorted(set(v)) for k, v in outside.items()}}))
+    """
+    proc = subprocess.run(
+        [sys.executable, "-c", textwrap.dedent(body)],
+        capture_output=True,
+        text=True,
+        timeout=900,
+        cwd=tmp_path,
+    )
+    assert proc.returncode == 0, proc.stderr[-3000:]
+    outside = {
+        k: set(v) for k, v in json.loads(proc.stdout.strip().splitlines()[-1]).items()
+    }
+
+    new = {
+        name: sorted(ids - KNOWN_OUTPUTS_OUTSIDE_LAYOUT.get(name, set()))
+        for name, ids in outside.items()
+    }
+    new = {k: v for k, v in new.items() if v}
+    assert not new, f"callback outputs missing from the plugin's layout: {new}"
+    fixed = {
+        name: sorted(ids - outside.get(name, set()))
+        for name, ids in KNOWN_OUTPUTS_OUTSIDE_LAYOUT.items()
+    }
+    fixed = {k: v for k, v in fixed.items() if v}
+    assert (
+        not fixed
+    ), f"now in the layout; remove from KNOWN_OUTPUTS_OUTSIDE_LAYOUT: {fixed}"
