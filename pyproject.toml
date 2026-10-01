@@ -231,8 +231,10 @@ test = [
     "psutil>=5.9.0",
 ]
 # Optional stacks (omit from default install for Windows / minimal CI)
+# bioblend has never released a 2.x or 3.x; the floor was 3.2.0, which made this
+# extra -- and [all], which includes it -- impossible to install.
 galaxy = [
-    "bioblend>=3.2.0",
+    "bioblend>=1.2.0",
 ]
 experiment-tracking = [
     "wandb>=0.16.0",
