@@ -33,13 +33,33 @@ logger = logging.getLogger(__name__)
 try:
     try:
         # Try Pydantic v2 first (pydantic_settings)
-        from pydantic import ConfigDict, Field, field_validator, model_validator
+        from pydantic import ConfigDict
+        from pydantic import Field as _PydanticField
+        from pydantic import field_validator, model_validator
         from pydantic_settings import BaseSettings
 
         PYDANTIC_VERSION = 2
         PYDANTIC_AVAILABLE = True
         validator = field_validator  # Alias for compatibility
         root_validator = model_validator  # Alias for compatibility
+
+        def Field(*args, env: Optional[str] = None, **kwargs):  # noqa: N802
+            """Pydantic v1's ``Field(env=...)``, for pydantic-settings 2.
+
+            Pydantic 2 has no ``env`` argument. It kept the name only as schema
+            metadata (with a deprecation warning) and pydantic-settings read the
+            variable named after the field instead. A declared variable worked
+            only when it happened to match the field name; the other 92 were
+            ignored. DATABASE_URL never reached ``database.url`` while a generic
+            URL variable did, and PORT and USERNAME leaked into the email
+            settings. pydantic-settings 2 looks a field up by its validation
+            alias, so the declared variable becomes that alias: the field is read
+            from it and only it, as under v1.
+            """
+            if env is not None:
+                kwargs.setdefault("validation_alias", env)
+            return _PydanticField(*args, **kwargs)
+
     except ImportError:
         # Fallback to Pydantic v1
         from pydantic import BaseSettings, Field, root_validator, validator
