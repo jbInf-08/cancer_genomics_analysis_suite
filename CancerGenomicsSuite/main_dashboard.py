@@ -144,15 +144,16 @@ try:
             id="dark-theme",
             media="none",
         ),
-        # Favicon - use gene.png if favicon.ico doesn't exist
-        html.Link(rel="icon", href="/static/icons/gene.png", type="image/png"),
+        # Favicon and header logo: static/icons/gene.svg (gene.png, referenced
+        # before, never existed, so both requests returned 404).
+        html.Link(rel="icon", href="/static/icons/gene.svg", type="image/svg+xml"),
         # Header with logo, sidebar & theme toggles - Simon Sexton Style
         html.Header(
             [
                 html.Div(
                     [
                         html.Img(
-                            src="/static/icons/gene.png",
+                            src="/static/icons/gene.svg",
                             height="40px",
                             className="logo",
                             alt="Cancer Genomics",
