@@ -74,12 +74,208 @@ layout = html.Div(
                     id="plasmid-tabs",
                     value="create",
                     children=[
-                        dcc.Tab(label="Create Plasmid", value="create"),
-                        dcc.Tab(label="Load Plasmid", value="load"),
-                        dcc.Tab(label="Edit Features", value="features"),
+                        dcc.Tab(
+                            label="Create Plasmid",
+                            value="create",
+                            children=html.Div(
+                                [
+                                    html.H4("Create New Plasmid"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Plasmid Name:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="plasmid-name",
+                                                type="text",
+                                                placeholder="pUC19",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "DNA Sequence:", className="input-label"
+                                            ),
+                                            dcc.Textarea(
+                                                id="plasmid-sequence",
+                                                placeholder="ATCGATCGATCG...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "200px",
+                                                    "fontFamily": "monospace",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Create Plasmid",
+                                        id="create-plasmid",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="create-plasmid-results",
+                                        className="creation-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Load Plasmid",
+                            value="load",
+                            children=html.Div(
+                                [
+                                    html.H4("Load Plasmid from File"),
+                                    dcc.Upload(
+                                        id="plasmid-file-upload",
+                                        children=html.Div(
+                                            [
+                                                "Drag and Drop or ",
+                                                html.A("Select Plasmid File"),
+                                            ]
+                                        ),
+                                        style={
+                                            "width": "100%",
+                                            "height": "60px",
+                                            "lineHeight": "60px",
+                                            "borderWidth": "1px",
+                                            "borderStyle": "dashed",
+                                            "borderRadius": "5px",
+                                            "textAlign": "center",
+                                            "margin": "10px",
+                                        },
+                                        multiple=False,
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Or enter file path:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="plasmid-file-path",
+                                                type="text",
+                                                placeholder="/path/to/plasmid.gb",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Load Plasmid",
+                                        id="load-plasmid",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="load-plasmid-results",
+                                        className="load-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Edit Features",
+                            value="features",
+                            children=html.Div(
+                                [
+                                    html.H4("Edit Features"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Feature Name:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="feature-name",
+                                                type="text",
+                                                placeholder="promoter",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Feature Type:", className="input-label"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="feature-type",
+                                                options=[
+                                                    {"label": "Gene", "value": "gene"},
+                                                    {
+                                                        "label": "Promoter",
+                                                        "value": "promoter",
+                                                    },
+                                                    {
+                                                        "label": "Terminator",
+                                                        "value": "terminator",
+                                                    },
+                                                    {
+                                                        "label": "Origin of Replication",
+                                                        "value": "ori",
+                                                    },
+                                                    {
+                                                        "label": "Antibiotic Resistance",
+                                                        "value": "resistance",
+                                                    },
+                                                    {
+                                                        "label": "Multiple Cloning Site",
+                                                        "value": "mcs",
+                                                    },
+                                                ],
+                                                value="gene",
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Start Position:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="feature-start",
+                                                type="number",
+                                                placeholder="1",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "End Position:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="feature-end",
+                                                type="number",
+                                                placeholder="100",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Add Feature",
+                                        id="add-feature",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="feature-results",
+                                        className="feature-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
                 ),
-                html.Div(id="plasmid-content", className="plasmid-content"),
             ],
             className="plasmid-section",
         ),
@@ -88,15 +284,251 @@ layout = html.Div(
             [
                 html.H3("Analysis Tools", className="subsection-title"),
                 dcc.Tabs(
-                    id="analysis-tabs",
+                    id="ape-analysis-tabs",
                     value="restriction",
                     children=[
-                        dcc.Tab(label="Restriction Sites", value="restriction"),
-                        dcc.Tab(label="Primer Design", value="primers"),
-                        dcc.Tab(label="Cloning Simulation", value="cloning"),
+                        dcc.Tab(
+                            label="Restriction Sites",
+                            value="restriction",
+                            children=html.Div(
+                                [
+                                    html.H4("Restriction Site Analysis"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "DNA Sequence:", className="input-label"
+                                            ),
+                                            dcc.Textarea(
+                                                id="restriction-sequence",
+                                                placeholder="ATCGATCGATCG...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "150px",
+                                                    "fontFamily": "monospace",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Restriction Enzymes (optional):",
+                                                className="input-label",
+                                            ),
+                                            dcc.Dropdown(
+                                                id="restriction-enzymes",
+                                                options=[
+                                                    {
+                                                        "label": "EcoRI",
+                                                        "value": "EcoRI",
+                                                    },
+                                                    {
+                                                        "label": "BamHI",
+                                                        "value": "BamHI",
+                                                    },
+                                                    {
+                                                        "label": "HindIII",
+                                                        "value": "HindIII",
+                                                    },
+                                                    {"label": "XbaI", "value": "XbaI"},
+                                                    {"label": "SalI", "value": "SalI"},
+                                                    {"label": "PstI", "value": "PstI"},
+                                                    {"label": "KpnI", "value": "KpnI"},
+                                                    {"label": "SacI", "value": "SacI"},
+                                                    {"label": "XhoI", "value": "XhoI"},
+                                                    {"label": "NotI", "value": "NotI"},
+                                                ],
+                                                multi=True,
+                                                placeholder="Select enzymes (leave empty for all)",
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Find Restriction Sites",
+                                        id="find-restriction-sites",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="restriction-results",
+                                        className="restriction-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Primer Design",
+                            value="primers",
+                            children=html.Div(
+                                [
+                                    html.H4("Primer Design"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "DNA Sequence:", className="input-label"
+                                            ),
+                                            dcc.Textarea(
+                                                id="primer-sequence",
+                                                placeholder="ATCGATCGATCG...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "150px",
+                                                    "fontFamily": "monospace",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Target Region Start:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="target-start",
+                                                type="number",
+                                                placeholder="100",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Target Region End:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="target-end",
+                                                type="number",
+                                                placeholder="200",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Primer Length:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="primer-length",
+                                                type="number",
+                                                value=20,
+                                                min=15,
+                                                max=30,
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Design Primers",
+                                        id="design-primers",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="primer-results", className="primer-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Cloning Simulation",
+                            value="cloning",
+                            children=html.Div(
+                                [
+                                    html.H4("Cloning Simulation"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Vector Sequence:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Textarea(
+                                                id="vector-sequence",
+                                                placeholder="Vector DNA sequence...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "100px",
+                                                    "fontFamily": "monospace",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Insert Sequence:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Textarea(
+                                                id="insert-sequence",
+                                                placeholder="Insert DNA sequence...",
+                                                style={
+                                                    "width": "100%",
+                                                    "height": "100px",
+                                                    "fontFamily": "monospace",
+                                                },
+                                                className="textarea-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Vector Cut Position:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="vector-cut",
+                                                type="number",
+                                                placeholder="100",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Insert Cut Position:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="insert-cut",
+                                                type="number",
+                                                placeholder="50",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Simulate Cloning",
+                                        id="simulate-cloning",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="cloning-results",
+                                        className="cloning-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
                 ),
-                html.Div(id="ape-analysis-content", className="analysis-content"),
             ],
             className="analysis-section",
         ),
@@ -193,160 +625,6 @@ def register_callbacks(app):
         return status, version, path
 
     @app.callback(
-        Output("plasmid-content", "children"), [Input("plasmid-tabs", "value")]
-    )
-    def update_plasmid_content(active_tab):
-        if active_tab == "create":
-            return html.Div(
-                [
-                    html.H4("Create New Plasmid"),
-                    html.Div(
-                        [
-                            html.Label("Plasmid Name:", className="input-label"),
-                            dcc.Input(
-                                id="plasmid-name",
-                                type="text",
-                                placeholder="pUC19",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("DNA Sequence:", className="input-label"),
-                            dcc.Textarea(
-                                id="plasmid-sequence",
-                                placeholder="ATCGATCGATCG...",
-                                style={
-                                    "width": "100%",
-                                    "height": "200px",
-                                    "fontFamily": "monospace",
-                                },
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Create Plasmid",
-                        id="create-plasmid",
-                        className="button primary",
-                    ),
-                    html.Div(id="create-plasmid-results", className="creation-results"),
-                ]
-            )
-
-        elif active_tab == "load":
-            return html.Div(
-                [
-                    html.H4("Load Plasmid from File"),
-                    dcc.Upload(
-                        id="plasmid-file-upload",
-                        children=html.Div(
-                            ["Drag and Drop or ", html.A("Select Plasmid File")]
-                        ),
-                        style={
-                            "width": "100%",
-                            "height": "60px",
-                            "lineHeight": "60px",
-                            "borderWidth": "1px",
-                            "borderStyle": "dashed",
-                            "borderRadius": "5px",
-                            "textAlign": "center",
-                            "margin": "10px",
-                        },
-                        multiple=False,
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Or enter file path:", className="input-label"),
-                            dcc.Input(
-                                id="plasmid-file-path",
-                                type="text",
-                                placeholder="/path/to/plasmid.gb",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Load Plasmid", id="load-plasmid", className="button primary"
-                    ),
-                    html.Div(id="load-plasmid-results", className="load-results"),
-                ]
-            )
-
-        elif active_tab == "features":
-            return html.Div(
-                [
-                    html.H4("Edit Features"),
-                    html.Div(
-                        [
-                            html.Label("Feature Name:", className="input-label"),
-                            dcc.Input(
-                                id="feature-name",
-                                type="text",
-                                placeholder="promoter",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Feature Type:", className="input-label"),
-                            dcc.Dropdown(
-                                id="feature-type",
-                                options=[
-                                    {"label": "Gene", "value": "gene"},
-                                    {"label": "Promoter", "value": "promoter"},
-                                    {"label": "Terminator", "value": "terminator"},
-                                    {"label": "Origin of Replication", "value": "ori"},
-                                    {
-                                        "label": "Antibiotic Resistance",
-                                        "value": "resistance",
-                                    },
-                                    {"label": "Multiple Cloning Site", "value": "mcs"},
-                                ],
-                                value="gene",
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Start Position:", className="input-label"),
-                            dcc.Input(
-                                id="feature-start",
-                                type="number",
-                                placeholder="1",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("End Position:", className="input-label"),
-                            dcc.Input(
-                                id="feature-end",
-                                type="number",
-                                placeholder="100",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Add Feature", id="add-feature", className="button primary"
-                    ),
-                    html.Div(id="feature-results", className="feature-results"),
-                ]
-            )
-
-    @app.callback(
         Output("create-plasmid-results", "children"),
         [Input("create-plasmid", "n_clicks")],
         [State("plasmid-name", "value"), State("plasmid-sequence", "value")],
@@ -424,202 +702,6 @@ def register_callbacks(app):
         except Exception as e:
             logger.error(f"Error loading plasmid: {e}")
             return html.P(f"❌ Error: {str(e)}")
-
-    @app.callback(
-        Output("ape-analysis-content", "children"), [Input("analysis-tabs", "value")]
-    )
-    def update_analysis_content(active_tab):
-        if active_tab == "restriction":
-            return html.Div(
-                [
-                    html.H4("Restriction Site Analysis"),
-                    html.Div(
-                        [
-                            html.Label("DNA Sequence:", className="input-label"),
-                            dcc.Textarea(
-                                id="restriction-sequence",
-                                placeholder="ATCGATCGATCG...",
-                                style={
-                                    "width": "100%",
-                                    "height": "150px",
-                                    "fontFamily": "monospace",
-                                },
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label(
-                                "Restriction Enzymes (optional):",
-                                className="input-label",
-                            ),
-                            dcc.Dropdown(
-                                id="restriction-enzymes",
-                                options=[
-                                    {"label": "EcoRI", "value": "EcoRI"},
-                                    {"label": "BamHI", "value": "BamHI"},
-                                    {"label": "HindIII", "value": "HindIII"},
-                                    {"label": "XbaI", "value": "XbaI"},
-                                    {"label": "SalI", "value": "SalI"},
-                                    {"label": "PstI", "value": "PstI"},
-                                    {"label": "KpnI", "value": "KpnI"},
-                                    {"label": "SacI", "value": "SacI"},
-                                    {"label": "XhoI", "value": "XhoI"},
-                                    {"label": "NotI", "value": "NotI"},
-                                ],
-                                multi=True,
-                                placeholder="Select enzymes (leave empty for all)",
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Find Restriction Sites",
-                        id="find-restriction-sites",
-                        className="button primary",
-                    ),
-                    html.Div(id="restriction-results", className="restriction-results"),
-                ]
-            )
-
-        elif active_tab == "primers":
-            return html.Div(
-                [
-                    html.H4("Primer Design"),
-                    html.Div(
-                        [
-                            html.Label("DNA Sequence:", className="input-label"),
-                            dcc.Textarea(
-                                id="primer-sequence",
-                                placeholder="ATCGATCGATCG...",
-                                style={
-                                    "width": "100%",
-                                    "height": "150px",
-                                    "fontFamily": "monospace",
-                                },
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Target Region Start:", className="input-label"),
-                            dcc.Input(
-                                id="target-start",
-                                type="number",
-                                placeholder="100",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Target Region End:", className="input-label"),
-                            dcc.Input(
-                                id="target-end",
-                                type="number",
-                                placeholder="200",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Primer Length:", className="input-label"),
-                            dcc.Input(
-                                id="primer-length",
-                                type="number",
-                                value=20,
-                                min=15,
-                                max=30,
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Design Primers",
-                        id="design-primers",
-                        className="button primary",
-                    ),
-                    html.Div(id="primer-results", className="primer-results"),
-                ]
-            )
-
-        elif active_tab == "cloning":
-            return html.Div(
-                [
-                    html.H4("Cloning Simulation"),
-                    html.Div(
-                        [
-                            html.Label("Vector Sequence:", className="input-label"),
-                            dcc.Textarea(
-                                id="vector-sequence",
-                                placeholder="Vector DNA sequence...",
-                                style={
-                                    "width": "100%",
-                                    "height": "100px",
-                                    "fontFamily": "monospace",
-                                },
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Insert Sequence:", className="input-label"),
-                            dcc.Textarea(
-                                id="insert-sequence",
-                                placeholder="Insert DNA sequence...",
-                                style={
-                                    "width": "100%",
-                                    "height": "100px",
-                                    "fontFamily": "monospace",
-                                },
-                                className="textarea-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Vector Cut Position:", className="input-label"),
-                            dcc.Input(
-                                id="vector-cut",
-                                type="number",
-                                placeholder="100",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Insert Cut Position:", className="input-label"),
-                            dcc.Input(
-                                id="insert-cut",
-                                type="number",
-                                placeholder="50",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Simulate Cloning",
-                        id="simulate-cloning",
-                        className="button primary",
-                    ),
-                    html.Div(id="cloning-results", className="cloning-results"),
-                ]
-            )
 
     @app.callback(
         Output("restriction-results", "children"),

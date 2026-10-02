@@ -8,7 +8,7 @@ management, and analysis.
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import plotly.express as px
@@ -27,16 +27,20 @@ class ScraperDashboard:
     A comprehensive dashboard for article scraping and management.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the scraper dashboard.
 
         Args:
-            app: Dash application instance
+            app: Dash application to register callbacks on. Without one, the
+                instance only builds the layout -- no services, no callbacks --
+                which is how the module-level `layout` is made.
         """
         self.app = app
-        self.scraper = ArticleScraper()
         self.current_articles = []
+        if app is None:
+            return
+        self.scraper = ArticleScraper()
         self.setup_callbacks()
 
     def create_layout(self) -> html.Div:
@@ -160,7 +164,7 @@ class ScraperDashboard:
                                     [
                                         html.Button(
                                             "Load Mock Data",
-                                            id="load-mock-data",
+                                            id="scraper-load-mock-data",
                                             className="btn btn-primary me-2",
                                         ),
                                         html.Button(
@@ -197,18 +201,36 @@ class ScraperDashboard:
                     [
                         # Tabs for different views
                         dcc.Tabs(
-                            id="main-tabs",
+                            id="scraper-main-tabs",
                             value="articles",
                             children=[
-                                dcc.Tab(label="Articles", value="articles"),
-                                dcc.Tab(label="Search & Filter", value="search"),
-                                dcc.Tab(label="Statistics", value="statistics"),
-                                dcc.Tab(label="Scraping Log", value="logs"),
-                                dcc.Tab(label="Export", value="export"),
+                                dcc.Tab(
+                                    label="Articles",
+                                    value="articles",
+                                    children=self.create_articles_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Search & Filter",
+                                    value="search",
+                                    children=self.create_search_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Statistics",
+                                    value="statistics",
+                                    children=self.create_statistics_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Scraping Log",
+                                    value="logs",
+                                    children=self.create_logs_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Export",
+                                    value="export",
+                                    children=self.create_export_tab(),
+                                ),
                             ],
                         ),
-                        # Tab content
-                        html.Div(id="scraper-tab-content", className="mt-3"),
                     ],
                     className="container-fluid",
                 ),
@@ -267,7 +289,7 @@ class ScraperDashboard:
                             [
                                 html.Label("Search Query:"),
                                 dcc.Input(
-                                    id="search-input",
+                                    id="scraper-search-input",
                                     type="text",
                                     placeholder="Search in title, abstract, authors...",
                                     className="form-control mb-2",
@@ -286,7 +308,7 @@ class ScraperDashboard:
                                 ),
                                 html.Button(
                                     "Search",
-                                    id="search-button",
+                                    id="scraper-search-button",
                                     className="btn btn-primary mb-3",
                                 ),
                             ],
@@ -303,7 +325,7 @@ class ScraperDashboard:
                             [
                                 html.Label("Publication Date Range:"),
                                 dcc.DatePickerRange(
-                                    id="filter-date-range",
+                                    id="scraper-filter-date-range",
                                     start_date=datetime.now() - timedelta(days=365),
                                     end_date=datetime.now(),
                                     display_format="YYYY-MM-DD",
@@ -429,7 +451,7 @@ class ScraperDashboard:
                             [
                                 html.Label("Export Format:"),
                                 dcc.Dropdown(
-                                    id="export-format",
+                                    id="scraper-export-format",
                                     options=[
                                         {"label": "CSV", "value": "csv"},
                                         {"label": "JSON", "value": "json"},
@@ -582,7 +604,7 @@ class ScraperDashboard:
                 Output("scraped-articles", "children", allow_duplicate=True),
                 Output("scraping-progress", "children", allow_duplicate=True),
             ],
-            [Input("load-mock-data", "n_clicks")],
+            [Input("scraper-load-mock-data", "n_clicks")],
             prevent_initial_call=True,
         )
         def load_mock_data(n_clicks):
@@ -610,24 +632,6 @@ class ScraperDashboard:
             return "", html.Div(
                 "Click 'Load Mock Data' to begin", className="text-muted"
             )
-
-        @self.app.callback(
-            Output("scraper-tab-content", "children"), [Input("main-tabs", "value")]
-        )
-        def render_tab_content(active_tab):
-            """Render content based on active tab."""
-            if active_tab == "articles":
-                return self.create_articles_tab()
-            elif active_tab == "search":
-                return self.create_search_tab()
-            elif active_tab == "statistics":
-                return self.create_statistics_tab()
-            elif active_tab == "logs":
-                return self.create_logs_tab()
-            elif active_tab == "export":
-                return self.create_export_tab()
-            else:
-                return html.Div("Select a tab to view content")
 
         @self.app.callback(
             Output("articles-list", "children"),
@@ -671,7 +675,7 @@ class ScraperDashboard:
                 Output("publication-trends-chart", "figure"),
                 Output("top-journals-chart", "figure"),
             ],
-            [Input("main-tabs", "value")],
+            [Input("scraper-main-tabs", "value")],
         )
         def update_statistics_charts(active_tab):
             """Update statistics charts."""
@@ -780,6 +784,16 @@ def create_scraper_dashboard(app: dash.Dash) -> ScraperDashboard:
     """
     dashboard = ScraperDashboard(app)
     return dashboard
+
+
+# Plugin interface read by plugin_registry: the layout, built without
+# services or callbacks, and a function registering the callbacks on the
+# main app.
+layout = ScraperDashboard().create_layout()
+
+
+def register_callbacks(app: dash.Dash) -> ScraperDashboard:
+    return create_scraper_dashboard(app)
 
 
 def main():

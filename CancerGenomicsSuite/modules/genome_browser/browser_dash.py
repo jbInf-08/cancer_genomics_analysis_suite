@@ -14,13 +14,8 @@ import dash
 import plotly.graph_objs as go
 from dash import Input, Output, State, callback_context, dash_table, dcc, html
 
-from CancerGenomicsSuite.modules.gene_annotation.dash_error_display import (
-    structured_error_to_dash,
-)
-from CancerGenomicsSuite.modules.gene_annotation.gene_location_predictor import (
-    GeneLocationPredictor,
-)
-
+from ..gene_annotation.dash_error_display import structured_error_to_dash
+from ..gene_annotation.gene_location_predictor import GeneLocationPredictor
 from .browser import GenomicFeature, GenomicRegion, create_sample_genome_browser
 
 # Configure logging
@@ -33,24 +28,34 @@ class GenomeBrowserDashboard:
     Dash dashboard for genome browser functionality.
     """
 
-    def __init__(self, app_name: str = "Genome Browser"):
+    def __init__(
+        self, app_name: str = "Genome Browser", app: Optional[dash.Dash] = None
+    ):
         """
         Initialize the genome browser dashboard.
 
         Args:
             app_name: Name of the Dash app
+            app: Register callbacks on this app instead of creating one.
+                Its layout and title are left alone; plugin_registry serves
+                the module-level `layout`.
         """
-        self.app = dash.Dash(__name__)
-        self.app.title = app_name
+        standalone = app is None
+        self.app = dash.Dash(__name__) if standalone else app
+        if standalone:
+            self.app.title = app_name
         self.browser = create_sample_genome_browser()
         self._gene_loc = GeneLocationPredictor()
         self._ensembl_banner: Optional[Any] = None
-        self.setup_layout()
+        # A given app is the main dashboard's: its layout is not ours to set.
+        if standalone:
+            self.setup_layout()
         self.setup_callbacks()
 
-    def setup_layout(self):
-        """Set up the dashboard layout."""
-        self.app.layout = html.Div(
+    @staticmethod
+    def build_layout() -> html.Div:
+        """The dashboard layout: static components, needing no app or services."""
+        return html.Div(
             [
                 # Header
                 html.Div(
@@ -92,7 +97,7 @@ class GenomeBrowserDashboard:
                             [
                                 html.Label("Chromosome:"),
                                 dcc.Input(
-                                    id="chromosome-input",
+                                    id="genome-chromosome-input",
                                     type="text",
                                     value="chr17",
                                     placeholder="e.g., chr1, chrX, chrM",
@@ -221,15 +226,15 @@ class GenomeBrowserDashboard:
                         html.Div(
                             [
                                 dcc.Input(
-                                    id="search-input",
+                                    id="genome-search-input",
                                     type="text",
                                     placeholder="Search features by name or description...",
                                     style={"width": "300px"},
                                 ),
                                 html.Button(
                                     "Search",
-                                    id="search-button",
-                                    className="search-button",
+                                    id="genome-search-button",
+                                    className="genome-search-button",
                                 ),
                             ],
                             className="search-controls",
@@ -256,7 +261,7 @@ class GenomeBrowserDashboard:
                             [
                                 html.Label("Format:"),
                                 dcc.Dropdown(
-                                    id="export-format-dropdown",
+                                    id="genome-export-format-dropdown",
                                     options=[
                                         {"label": "JSON", "value": "json"},
                                         {"label": "BED", "value": "bed"},
@@ -268,13 +273,15 @@ class GenomeBrowserDashboard:
                                 ),
                                 html.Button(
                                     "Export",
-                                    id="export-button",
-                                    className="export-button",
+                                    id="genome-export-button",
+                                    className="genome-export-button",
                                 ),
                             ],
                             className="export-controls",
                         ),
-                        html.Div(id="export-output", className="export-output"),
+                        html.Div(
+                            id="genome-export-output", className="genome-export-output"
+                        ),
                     ],
                     className="export-panel",
                 ),
@@ -283,7 +290,8 @@ class GenomeBrowserDashboard:
                     [
                         html.H3("Browser Statistics"),
                         html.Div(
-                            id="statistics-display", className="statistics-display"
+                            id="genome-statistics-display",
+                            className="genome-statistics-display",
                         ),
                     ],
                     className="statistics-panel",
@@ -294,6 +302,10 @@ class GenomeBrowserDashboard:
             className="main-container",
         )
 
+    def setup_layout(self):
+        """Set up the dashboard layout."""
+        self.app.layout = self.build_layout()
+
     def setup_callbacks(self):
         """Set up Dash callbacks for interactivity."""
 
@@ -303,7 +315,7 @@ class GenomeBrowserDashboard:
                 Output("current-region-display", "children"),
                 Output("genome-browser-plot", "figure"),
                 Output("feature-table-container", "children"),
-                Output("statistics-display", "children"),
+                Output("genome-statistics-display", "children"),
                 Output("ensembl-annotate-banner", "children"),
             ],
             [
@@ -317,7 +329,7 @@ class GenomeBrowserDashboard:
             ],
             [
                 State("reference-genome-dropdown", "value"),
-                State("chromosome-input", "value"),
+                State("genome-chromosome-input", "value"),
                 State("start-input", "value"),
                 State("end-input", "value"),
                 State("region-name-input", "value"),
@@ -488,8 +500,8 @@ class GenomeBrowserDashboard:
 
         @self.app.callback(
             Output("genome-search-results", "children"),
-            [Input("search-button", "n_clicks")],
-            [State("search-input", "value")],
+            [Input("genome-search-button", "n_clicks")],
+            [State("genome-search-input", "value")],
         )
         def search_features(search_clicks, query):
             """Search for features."""
@@ -526,9 +538,9 @@ class GenomeBrowserDashboard:
             return html.Div(result_items, className="search-results-list")
 
         @self.app.callback(
-            Output("export-output", "children"),
-            [Input("export-button", "n_clicks")],
-            [State("export-format-dropdown", "value")],
+            Output("genome-export-output", "children"),
+            [Input("genome-export-button", "n_clicks")],
+            [State("genome-export-format-dropdown", "value")],
         )
         def export_data(export_clicks, format_type):
             """Export current region data."""
@@ -980,6 +992,15 @@ def create_genome_browser_dashboard() -> GenomeBrowserDashboard:
         GenomeBrowserDashboard instance
     """
     return GenomeBrowserDashboard()
+
+
+# Plugin interface read by plugin_registry: the static layout, and a
+# function creating the dashboard on the main app.
+layout = GenomeBrowserDashboard.build_layout()
+
+
+def register_callbacks(app: dash.Dash) -> GenomeBrowserDashboard:
+    return GenomeBrowserDashboard(app=app)
 
 
 if __name__ == "__main__":

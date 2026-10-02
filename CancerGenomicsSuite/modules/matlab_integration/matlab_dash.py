@@ -125,14 +125,176 @@ layout = html.Div(
                     id="signal-processing-tabs",
                     value="fft",
                     children=[
-                        dcc.Tab(label="FFT Analysis", value="fft"),
-                        dcc.Tab(label="Filtering", value="filter"),
-                        dcc.Tab(label="Spectrogram", value="spectrogram"),
+                        dcc.Tab(
+                            label="FFT Analysis",
+                            value="fft",
+                            children=html.Div(
+                                [
+                                    html.H4("Fast Fourier Transform Analysis"),
+                                    html.P("Analyze frequency components of signals"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Signal Length:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="fft-signal-length",
+                                                type="number",
+                                                value=1000,
+                                                min=100,
+                                                max=10000,
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Sampling Rate (Hz):",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="fft-sampling-rate",
+                                                type="number",
+                                                value=1000,
+                                                min=1,
+                                                max=10000,
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Run FFT Analysis",
+                                        id="run-fft",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="fft-results", className="analysis-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Filtering",
+                            value="filter",
+                            children=html.Div(
+                                [
+                                    html.H4("Digital Filtering"),
+                                    html.P("Apply digital filters to signals"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Filter Type:", className="input-label"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="filter-type",
+                                                options=[
+                                                    {
+                                                        "label": "Lowpass",
+                                                        "value": "lowpass",
+                                                    },
+                                                    {
+                                                        "label": "Highpass",
+                                                        "value": "highpass",
+                                                    },
+                                                    {
+                                                        "label": "Bandpass",
+                                                        "value": "bandpass",
+                                                    },
+                                                ],
+                                                value="lowpass",
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Cutoff Frequency:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="filter-cutoff",
+                                                type="number",
+                                                value=0.5,
+                                                min=0.01,
+                                                max=0.99,
+                                                step=0.01,
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Apply Filter",
+                                        id="apply-filter",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="filter-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Spectrogram",
+                            value="spectrogram",
+                            children=html.Div(
+                                [
+                                    html.H4("Spectrogram Analysis"),
+                                    html.P(
+                                        "Generate time-frequency representation of signals"
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Window Size:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="spectrogram-window",
+                                                type="number",
+                                                value=256,
+                                                min=64,
+                                                max=1024,
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Overlap:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="spectrogram-overlap",
+                                                type="number",
+                                                value=128,
+                                                min=32,
+                                                max=512,
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Generate Spectrogram",
+                                        id="generate-spectrogram",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="spectrogram-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
-                ),
-                html.Div(
-                    id="signal-processing-content",
-                    className="signal-processing-content",
                 ),
             ],
             className="signal-processing-section",
@@ -145,14 +307,124 @@ layout = html.Div(
                     id="statistical-analysis-tabs",
                     value="descriptive",
                     children=[
-                        dcc.Tab(label="Descriptive Statistics", value="descriptive"),
-                        dcc.Tab(label="Regression Analysis", value="regression"),
-                        dcc.Tab(label="Correlation Analysis", value="correlation"),
+                        dcc.Tab(
+                            label="Descriptive Statistics",
+                            value="descriptive",
+                            children=html.Div(
+                                [
+                                    html.H4("Descriptive Statistics"),
+                                    html.P("Calculate basic statistical measures"),
+                                    html.Button(
+                                        "Run Descriptive Analysis",
+                                        id="run-descriptive",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="descriptive-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Regression Analysis",
+                            value="regression",
+                            children=html.Div(
+                                [
+                                    html.H4("Linear Regression Analysis"),
+                                    html.P("Perform linear regression analysis"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "X Variable Name:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="regression-x",
+                                                type="text",
+                                                placeholder="x_data",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Y Variable Name:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="regression-y",
+                                                type="text",
+                                                placeholder="y_data",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Run Regression",
+                                        id="run-regression",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="regression-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Correlation Analysis",
+                            value="correlation",
+                            children=html.Div(
+                                [
+                                    html.H4("Correlation Analysis"),
+                                    html.P("Calculate correlation between variables"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Variable 1 Name:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="correlation-var1",
+                                                type="text",
+                                                placeholder="var1",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Variable 2 Name:",
+                                                className="input-label",
+                                            ),
+                                            dcc.Input(
+                                                id="correlation-var2",
+                                                type="text",
+                                                placeholder="var2",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Calculate Correlation",
+                                        id="calculate-correlation",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="matlab-correlation-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
-                ),
-                html.Div(
-                    id="statistical-analysis-content",
-                    className="statistical-analysis-content",
                 ),
             ],
             className="statistical-analysis-section",
@@ -423,136 +695,6 @@ fprintf('Standard Deviation: %.4f\\n', std_val);
         return ""
 
     @app.callback(
-        Output("signal-processing-content", "children"),
-        [Input("signal-processing-tabs", "value")],
-    )
-    def update_signal_processing_content(active_tab):
-        if active_tab == "fft":
-            return html.Div(
-                [
-                    html.H4("Fast Fourier Transform Analysis"),
-                    html.P("Analyze frequency components of signals"),
-                    html.Div(
-                        [
-                            html.Label("Signal Length:", className="input-label"),
-                            dcc.Input(
-                                id="fft-signal-length",
-                                type="number",
-                                value=1000,
-                                min=100,
-                                max=10000,
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Sampling Rate (Hz):", className="input-label"),
-                            dcc.Input(
-                                id="fft-sampling-rate",
-                                type="number",
-                                value=1000,
-                                min=1,
-                                max=10000,
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Run FFT Analysis", id="run-fft", className="button primary"
-                    ),
-                    html.Div(id="fft-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "filter":
-            return html.Div(
-                [
-                    html.H4("Digital Filtering"),
-                    html.P("Apply digital filters to signals"),
-                    html.Div(
-                        [
-                            html.Label("Filter Type:", className="input-label"),
-                            dcc.Dropdown(
-                                id="filter-type",
-                                options=[
-                                    {"label": "Lowpass", "value": "lowpass"},
-                                    {"label": "Highpass", "value": "highpass"},
-                                    {"label": "Bandpass", "value": "bandpass"},
-                                ],
-                                value="lowpass",
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Cutoff Frequency:", className="input-label"),
-                            dcc.Input(
-                                id="filter-cutoff",
-                                type="number",
-                                value=0.5,
-                                min=0.01,
-                                max=0.99,
-                                step=0.01,
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Apply Filter", id="apply-filter", className="button primary"
-                    ),
-                    html.Div(id="filter-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "spectrogram":
-            return html.Div(
-                [
-                    html.H4("Spectrogram Analysis"),
-                    html.P("Generate time-frequency representation of signals"),
-                    html.Div(
-                        [
-                            html.Label("Window Size:", className="input-label"),
-                            dcc.Input(
-                                id="spectrogram-window",
-                                type="number",
-                                value=256,
-                                min=64,
-                                max=1024,
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Overlap:", className="input-label"),
-                            dcc.Input(
-                                id="spectrogram-overlap",
-                                type="number",
-                                value=128,
-                                min=32,
-                                max=512,
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Generate Spectrogram",
-                        id="generate-spectrogram",
-                        className="button primary",
-                    ),
-                    html.Div(id="spectrogram-results", className="analysis-results"),
-                ]
-            )
-
-    @app.callback(
         Output("fft-results", "children"),
         [Input("run-fft", "n_clicks")],
         [State("fft-signal-length", "value"), State("fft-sampling-rate", "value")],
@@ -595,101 +737,6 @@ fprintf('Standard Deviation: %.4f\\n', std_val);
                 [
                     html.H5("❌ Error"),
                     html.P(f"Error: {str(e)}"),
-                ]
-            )
-
-    @app.callback(
-        Output("statistical-analysis-content", "children"),
-        [Input("statistical-analysis-tabs", "value")],
-    )
-    def update_statistical_analysis_content(active_tab):
-        if active_tab == "descriptive":
-            return html.Div(
-                [
-                    html.H4("Descriptive Statistics"),
-                    html.P("Calculate basic statistical measures"),
-                    html.Button(
-                        "Run Descriptive Analysis",
-                        id="run-descriptive",
-                        className="button primary",
-                    ),
-                    html.Div(id="descriptive-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "regression":
-            return html.Div(
-                [
-                    html.H4("Linear Regression Analysis"),
-                    html.P("Perform linear regression analysis"),
-                    html.Div(
-                        [
-                            html.Label("X Variable Name:", className="input-label"),
-                            dcc.Input(
-                                id="regression-x",
-                                type="text",
-                                placeholder="x_data",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Y Variable Name:", className="input-label"),
-                            dcc.Input(
-                                id="regression-y",
-                                type="text",
-                                placeholder="y_data",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Run Regression",
-                        id="run-regression",
-                        className="button primary",
-                    ),
-                    html.Div(id="regression-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "correlation":
-            return html.Div(
-                [
-                    html.H4("Correlation Analysis"),
-                    html.P("Calculate correlation between variables"),
-                    html.Div(
-                        [
-                            html.Label("Variable 1 Name:", className="input-label"),
-                            dcc.Input(
-                                id="correlation-var1",
-                                type="text",
-                                placeholder="var1",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Variable 2 Name:", className="input-label"),
-                            dcc.Input(
-                                id="correlation-var2",
-                                type="text",
-                                placeholder="var2",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Calculate Correlation",
-                        id="calculate-correlation",
-                        className="button primary",
-                    ),
-                    html.Div(id="correlation-results", className="analysis-results"),
                 ]
             )
 

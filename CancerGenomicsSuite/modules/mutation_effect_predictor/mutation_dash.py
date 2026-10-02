@@ -10,7 +10,7 @@ import json
 import logging
 import time
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import dash
 import pandas as pd
@@ -26,22 +26,13 @@ from dash import (
     no_update,
 )
 
-from CancerGenomicsSuite.modules.gene_annotation.dash_error_display import (
+from ..gene_annotation.dash_error_display import (
     structured_error_to_dash as _render_structured_api_error,
 )
-from CancerGenomicsSuite.modules.gene_annotation.gene_location_predictor import (
-    GeneLocationPredictor,
-)
-from CancerGenomicsSuite.modules.pipeline_orchestration.celery_md_poll import (
-    poll_md_async_result,
-)
-from CancerGenomicsSuite.modules.pipeline_orchestration.md_workflow_dash_display import (
-    md_workflow_result_to_div,
-)
-from CancerGenomicsSuite.modules.pipeline_orchestration.workflow_executor import (
-    WorkflowExecutor,
-)
-
+from ..gene_annotation.gene_location_predictor import GeneLocationPredictor
+from ..pipeline_orchestration.celery_md_poll import poll_md_async_result
+from ..pipeline_orchestration.md_workflow_dash_display import md_workflow_result_to_div
+from ..pipeline_orchestration.workflow_executor import WorkflowExecutor
 from .predictor import Mutation, create_sample_mutations, create_sample_predictor
 
 # Configure logging
@@ -54,25 +45,37 @@ class MutationEffectDashboard:
     Dash dashboard for mutation effect prediction.
     """
 
-    def __init__(self, app_name: str = "Mutation Effect Predictor"):
+    def __init__(
+        self,
+        app_name: str = "Mutation Effect Predictor",
+        app: Optional[dash.Dash] = None,
+    ):
         """
         Initialize the mutation effect prediction dashboard.
 
         Args:
             app_name: Name of the Dash app
+            app: Register callbacks on this app instead of creating one.
+                Its layout and title are left alone; plugin_registry serves
+                the module-level `layout`.
         """
-        self.app = dash.Dash(__name__)
-        self.app.title = app_name
+        standalone = app is None
+        self.app = dash.Dash(__name__) if standalone else app
+        if standalone:
+            self.app.title = app_name
         self.predictor = create_sample_predictor()
         self.current_predictions = []
         self._gene_loc = GeneLocationPredictor()
         self._workflow_executor = WorkflowExecutor()
-        self.setup_layout()
+        # A given app is the main dashboard's: its layout is not ours to set.
+        if standalone:
+            self.setup_layout()
         self.setup_callbacks()
 
-    def setup_layout(self):
-        """Set up the dashboard layout."""
-        self.app.layout = html.Div(
+    @staticmethod
+    def build_layout() -> html.Div:
+        """The dashboard layout: static components, needing no app or services."""
+        return html.Div(
             [
                 # Header
                 html.Div(
@@ -107,7 +110,7 @@ class MutationEffectDashboard:
                                     [
                                         html.Label("Chromosome:"),
                                         dcc.Input(
-                                            id="chromosome-input",
+                                            id="mutation-chromosome-input",
                                             type="text",
                                             value="chr17",
                                             placeholder="e.g., chr1, chrX, chrM",
@@ -251,8 +254,8 @@ class MutationEffectDashboard:
                             [
                                 html.Button(
                                     "Predict Mutation Effect",
-                                    id="predict-button",
-                                    className="predict-button",
+                                    id="mutation-predict-button",
+                                    className="mutation-predict-button",
                                 ),
                                 html.Button(
                                     "Load Sample Mutations",
@@ -601,7 +604,7 @@ class MutationEffectDashboard:
                 html.Div(
                     [
                         html.H3("Detailed Results"),
-                        html.Div(id="results-table-container"),
+                        html.Div(id="mutation-results-table-container"),
                     ],
                     className="table-panel",
                 ),
@@ -613,7 +616,7 @@ class MutationEffectDashboard:
                             [
                                 html.Label("Format:"),
                                 dcc.Dropdown(
-                                    id="export-format-dropdown",
+                                    id="mutation-export-format-dropdown",
                                     options=[
                                         {"label": "JSON", "value": "json"},
                                         {"label": "CSV", "value": "csv"},
@@ -625,13 +628,16 @@ class MutationEffectDashboard:
                                 ),
                                 html.Button(
                                     "Export",
-                                    id="export-button",
-                                    className="export-button",
+                                    id="mutation-export-button",
+                                    className="mutation-export-button",
                                 ),
                             ],
                             className="export-controls",
                         ),
-                        html.Div(id="export-output", className="export-output"),
+                        html.Div(
+                            id="mutation-export-output",
+                            className="mutation-export-output",
+                        ),
                     ],
                     className="export-panel",
                 ),
@@ -640,7 +646,8 @@ class MutationEffectDashboard:
                     [
                         html.H3("Predictor Statistics"),
                         html.Div(
-                            id="statistics-display", className="statistics-display"
+                            id="mutation-statistics-display",
+                            className="mutation-statistics-display",
                         ),
                     ],
                     className="statistics-panel",
@@ -651,6 +658,10 @@ class MutationEffectDashboard:
             className="main-container",
         )
 
+    def setup_layout(self):
+        """Set up the dashboard layout."""
+        self.app.layout = self.build_layout()
+
     def setup_callbacks(self):
         """Set up Dash callbacks for interactivity."""
 
@@ -660,15 +671,15 @@ class MutationEffectDashboard:
                 Output("results-summary", "children"),
                 Output("prediction-plot", "figure"),
                 Output("consensus-analysis", "children"),
-                Output("results-table-container", "children"),
+                Output("mutation-results-table-container", "children"),
             ],
             [
-                Input("predict-button", "n_clicks"),
+                Input("mutation-predict-button", "n_clicks"),
                 Input("load-samples-button", "n_clicks"),
             ],
             [
                 State("gene-symbol-input", "value"),
-                State("chromosome-input", "value"),
+                State("mutation-chromosome-input", "value"),
                 State("position-input", "value"),
                 State("ref-allele-input", "value"),
                 State("alt-allele-input", "value"),
@@ -718,7 +729,7 @@ class MutationEffectDashboard:
                 self.current_predictions = all_results
                 mutation_json = json.dumps([m.to_dict() for m in sample_mutations])
 
-            elif button_id == "predict-button" and predict_clicks:
+            elif button_id == "mutation-predict-button" and predict_clicks:
                 # Predict single mutation
                 try:
                     mutation = Mutation(
@@ -759,7 +770,7 @@ class MutationEffectDashboard:
             [Input("annotate-locus-button", "n_clicks")],
             [
                 State("gene-symbol-input", "value"),
-                State("chromosome-input", "value"),
+                State("mutation-chromosome-input", "value"),
                 State("position-input", "value"),
                 State("gene-flank-input", "value"),
                 State("annotation-ref-genome-dropdown", "value"),
@@ -952,7 +963,7 @@ class MutationEffectDashboard:
                 State("md-run-via-celery-checklist", "value"),
                 State("md-poll-celery-results-checklist", "value"),
                 State("gene-symbol-input", "value"),
-                State("chromosome-input", "value"),
+                State("mutation-chromosome-input", "value"),
                 State("position-input", "value"),
                 State("ref-allele-input", "value"),
                 State("alt-allele-input", "value"),
@@ -1137,9 +1148,9 @@ class MutationEffectDashboard:
             return div, store, False
 
         @self.app.callback(
-            Output("export-output", "children"),
-            [Input("export-button", "n_clicks")],
-            [State("export-format-dropdown", "value")],
+            Output("mutation-export-output", "children"),
+            [Input("mutation-export-button", "n_clicks")],
+            [State("mutation-export-format-dropdown", "value")],
         )
         def export_results(export_clicks, format_type):
             """Export prediction results."""
@@ -1175,9 +1186,9 @@ class MutationEffectDashboard:
                 )
 
         @self.app.callback(
-            Output("statistics-display", "children"),
+            Output("mutation-statistics-display", "children"),
             [
-                Input("predict-button", "n_clicks"),
+                Input("mutation-predict-button", "n_clicks"),
                 Input("load-samples-button", "n_clicks"),
             ],
         )
@@ -1660,6 +1671,15 @@ def create_mutation_effect_dashboard() -> MutationEffectDashboard:
         MutationEffectDashboard instance
     """
     return MutationEffectDashboard()
+
+
+# Plugin interface read by plugin_registry: the static layout, and a
+# function creating the dashboard on the main app.
+layout = MutationEffectDashboard.build_layout()
+
+
+def register_callbacks(app: dash.Dash) -> MutationEffectDashboard:
+    return MutationEffectDashboard(app=app)
 
 
 if __name__ == "__main__":
