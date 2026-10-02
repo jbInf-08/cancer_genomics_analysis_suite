@@ -141,8 +141,7 @@ def test_static_files():
         "static/css/dashboard_dark.css",
         "static/js/sidebar_toggle.js",
         "static/js/theme_toggle.js",
-        "static/icons/favicon.ico",
-        "static/images/logo.png",
+        "static/icons/gene.svg",
     ]
 
     all_exist = True
