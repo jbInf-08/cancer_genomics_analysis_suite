@@ -59,8 +59,13 @@ class RClient:
             try:
                 self.r = robjects.r
                 self.available_packages = self._get_installed_packages()
-                # Import common bioinformatics packages
-                self._import_common_packages()
+                # R packages are not imported here. Each analysis's R code
+                # calls library() for what it needs, and importing fourteen
+                # Bioconductor/tidyverse packages up front cost about a
+                # minute on every construction: r_dash builds a client at
+                # import, so every app start paid it. One defunct package
+                # could also bring the whole process down.
+                # preload_common_packages() still does it on request.
                 logger.info("R client initialized with rpy2 support")
             except Exception as e:
                 logger.warning(
@@ -84,8 +89,12 @@ class RClient:
             logger.warning(f"Could not get installed packages: {e}")
             return []
 
-    def _import_common_packages(self):
-        """Import commonly used bioinformatics packages"""
+    def preload_common_packages(self):
+        """Import commonly used bioinformatics packages into the R session.
+
+        Not called at construction; the analyses load their own packages.
+        get_r_status() lists whatever has been loaded this way.
+        """
         self.packages = {}
 
         if not self.rpy2_available:
