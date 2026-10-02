@@ -37,14 +37,15 @@ classifiers = [
 requires-python = ">=3.8"
 dependencies = [
     # Core web framework
-    "dash>=2.15.0",
+    # 3.1.0 is the first dash that accepts Flask 3.1, which the flask floor
+    # below needs. dash was never capped, so CI already installs 4.x and the
+    # suite runs on it; this floor only stops a resolver from choosing a dash
+    # that would hold Flask back.
+    "dash>=3.1.0",
     "plotly>=5.17.0",
-    # Stays below 3.1: dash 2.15.0 -- the version that fixes CVE-2024-21485
-    # (medium) -- requires Flask<3.1. The only open flask advisory,
-    # CVE-2026-27205, is low and fixed in 3.1.3, so taking it would mean
-    # giving up the dash fix or moving dash to 3.x across 49 importing
-    # files. Revisit when dash supports Flask 3.1.
-    "flask>=2.3.3,<3.1",
+    # 3.1.3 fixes CVE-2026-27205. The cap below 3.1 existed only because dash
+    # 2.x required Flask<3.1; dash 3.1+ allows Flask<3.2.
+    "flask>=3.1.3,<3.2",
     "flask-sqlalchemy>=3.0.5",
     "flask-cors>=6.0.0",
     "flask-login>=0.6.3",
