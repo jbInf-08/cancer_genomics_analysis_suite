@@ -11,7 +11,7 @@ import json
 import logging
 import time
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import dash
 import plotly.graph_objs as go
@@ -26,19 +26,10 @@ from dash import (
     no_update,
 )
 
-from CancerGenomicsSuite.modules.gene_annotation.dash_error_display import (
-    structured_error_to_dash,
-)
-from CancerGenomicsSuite.modules.pipeline_orchestration.celery_md_poll import (
-    poll_md_async_result,
-)
-from CancerGenomicsSuite.modules.pipeline_orchestration.md_workflow_dash_display import (
-    md_workflow_result_to_div,
-)
-from CancerGenomicsSuite.modules.pipeline_orchestration.workflow_executor import (
-    WorkflowExecutor,
-)
-
+from ..gene_annotation.dash_error_display import structured_error_to_dash
+from ..pipeline_orchestration.celery_md_poll import poll_md_async_result
+from ..pipeline_orchestration.md_workflow_dash_display import md_workflow_result_to_div
+from ..pipeline_orchestration.workflow_executor import WorkflowExecutor
 from .visualizer import create_sample_visualizer
 
 # Configure logging
@@ -51,24 +42,36 @@ class ProteinStructureDashboard:
     Dash dashboard for protein structure visualization.
     """
 
-    def __init__(self, app_name: str = "Protein Structure Visualizer"):
+    def __init__(
+        self,
+        app_name: str = "Protein Structure Visualizer",
+        app: Optional[dash.Dash] = None,
+    ):
         """
         Initialize the protein structure visualization dashboard.
 
         Args:
             app_name: Name of the Dash app
+            app: Register callbacks on this app instead of creating one.
+                Its layout and title are left alone; plugin_registry serves
+                the module-level `layout`.
         """
-        self.app = dash.Dash(__name__)
-        self.app.title = app_name
+        standalone = app is None
+        self.app = dash.Dash(__name__) if standalone else app
+        if standalone:
+            self.app.title = app_name
         self.visualizer = create_sample_visualizer()
         self.current_structure = None
         self._workflow_executor = WorkflowExecutor()
-        self.setup_layout()
+        # A given app is the main dashboard's: its layout is not ours to set.
+        if standalone:
+            self.setup_layout()
         self.setup_callbacks()
 
-    def setup_layout(self):
-        """Set up the dashboard layout."""
-        self.app.layout = html.Div(
+    @staticmethod
+    def build_layout() -> html.Div:
+        """The dashboard layout: static components, needing no app or services."""
+        return html.Div(
             [
                 # Header
                 html.Div(
@@ -228,7 +231,7 @@ class ProteinStructureDashboard:
                                 ),
                                 html.Button(
                                     "Load Sample Structure",
-                                    id="load-sample-button",
+                                    id="structure-load-sample-button",
                                     className="sample-button",
                                 ),
                                 html.Button(
@@ -404,7 +407,7 @@ class ProteinStructureDashboard:
                     [
                         html.H3("Structure Analysis"),
                         dcc.Tabs(
-                            id="analysis-tabs",
+                            id="structure-analysis-tabs",
                             value="statistics",
                             children=[
                                 dcc.Tab(label="Statistics", value="statistics"),
@@ -454,7 +457,7 @@ class ProteinStructureDashboard:
                             [
                                 html.Label("Format:"),
                                 dcc.Dropdown(
-                                    id="export-format-dropdown",
+                                    id="structure-export-format-dropdown",
                                     options=[
                                         {"label": "JSON", "value": "json"},
                                         {"label": "PDB", "value": "pdb"},
@@ -466,13 +469,16 @@ class ProteinStructureDashboard:
                                 ),
                                 html.Button(
                                     "Export",
-                                    id="export-button",
-                                    className="export-button",
+                                    id="structure-export-button",
+                                    className="structure-export-button",
                                 ),
                             ],
                             className="export-controls",
                         ),
-                        html.Div(id="export-output", className="export-output"),
+                        html.Div(
+                            id="structure-export-output",
+                            className="structure-export-output",
+                        ),
                     ],
                     className="export-panel",
                 ),
@@ -481,17 +487,22 @@ class ProteinStructureDashboard:
                     [
                         html.H3("Visualizer Statistics"),
                         html.Div(
-                            id="statistics-display", className="statistics-display"
+                            id="structure-statistics-display",
+                            className="structure-statistics-display",
                         ),
                     ],
                     className="statistics-panel",
                 ),
                 # Hidden divs to store data
                 html.Div(id="loaded-structure", style={"display": "none"}),
-                html.Div(id="analysis-status", style={"display": "none"}),
+                html.Div(id="structure-analysis-status", style={"display": "none"}),
             ],
             className="main-container",
         )
+
+    def setup_layout(self):
+        """Set up the dashboard layout."""
+        self.app.layout = self.build_layout()
 
     def setup_callbacks(self):
         """Set up Dash callbacks for interactivity."""
@@ -505,7 +516,7 @@ class ProteinStructureDashboard:
             ],
             [
                 Input("load-structure-button", "n_clicks"),
-                Input("load-sample-button", "n_clicks"),
+                Input("structure-load-sample-button", "n_clicks"),
             ],
             [State("structure-upload", "contents"), State("pdb-id-input", "value")],
         )
@@ -518,7 +529,7 @@ class ProteinStructureDashboard:
 
             button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-            if button_id == "load-sample-button" and sample_clicks:
+            if button_id == "structure-load-sample-button" and sample_clicks:
                 # Load sample structure
                 self.visualizer = create_sample_visualizer()
                 self.current_structure = self.visualizer.current_structure
@@ -729,7 +740,7 @@ class ProteinStructureDashboard:
         @self.app.callback(
             [
                 Output("structure-3d-plot", "figure"),
-                Output("analysis-status", "children"),
+                Output("structure-analysis-status", "children"),
             ],
             [
                 Input("update-viz-button", "n_clicks"),
@@ -787,7 +798,7 @@ class ProteinStructureDashboard:
 
         @self.app.callback(
             Output("structure-analysis-content", "children"),
-            [Input("analysis-tabs", "value")],
+            [Input("structure-analysis-tabs", "value")],
             [State("chain-dropdown", "value")],
         )
         def update_analysis_content(tab_value, chain_id):
@@ -830,9 +841,9 @@ class ProteinStructureDashboard:
                 return "Select a data type"
 
         @self.app.callback(
-            Output("export-output", "children"),
-            [Input("export-button", "n_clicks")],
-            [State("export-format-dropdown", "value")],
+            Output("structure-export-output", "children"),
+            [Input("structure-export-button", "n_clicks")],
+            [State("structure-export-format-dropdown", "value")],
         )
         def export_structure(export_clicks, format_type):
             """Export structure data."""
@@ -867,10 +878,10 @@ class ProteinStructureDashboard:
                 )
 
         @self.app.callback(
-            Output("statistics-display", "children"),
+            Output("structure-statistics-display", "children"),
             [
                 Input("load-structure-button", "n_clicks"),
-                Input("load-sample-button", "n_clicks"),
+                Input("structure-load-sample-button", "n_clicks"),
             ],
         )
         def update_statistics(load_clicks, sample_clicks):
@@ -1687,6 +1698,15 @@ def create_protein_structure_dashboard() -> ProteinStructureDashboard:
         ProteinStructureDashboard instance
     """
     return ProteinStructureDashboard()
+
+
+# Plugin interface read by plugin_registry: the static layout, and a
+# function creating the dashboard on the main app.
+layout = ProteinStructureDashboard.build_layout()
+
+
+def register_callbacks(app: dash.Dash) -> ProteinStructureDashboard:
+    return ProteinStructureDashboard(app=app)
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ visualize results through a web-based interface.
 """
 
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import plotly.graph_objects as go
@@ -24,7 +24,7 @@ class ProteinDashboard:
     web-based dashboard for protein sequence analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the protein dashboard.
 
@@ -33,6 +33,10 @@ class ProteinDashboard:
         """
         self.app = app
         self.logger = logging.getLogger(__name__)
+        if app is None:
+            # Layout only: plugin_registry's module-level `layout` is built
+            # this way, with no services and no callbacks.
+            return
         self.viewer = ProteinViewer()
 
         # Register callbacks
@@ -567,22 +571,8 @@ def register_callbacks(app):
     return dashboard
 
 
-# Legacy layout for backward compatibility
-layout = html.Div(
-    [
-        html.H1("Protein Sequence Viewer"),
-        html.P("This module provides comprehensive protein sequence analysis tools."),
-        html.Div(
-            [
-                html.Label("Input Protein Sequence:"),
-                dcc.Textarea(
-                    id="protein-input",
-                    placeholder="Enter protein sequence here...",
-                    style={"width": "100%", "height": 200},
-                ),
-                html.Button("Analyze", id="analyze-protein-btn", n_clicks=0),
-                html.Div(id="protein-output"),
-            ]
-        ),
-    ]
-)
+# The layout plugin_registry serves: the dashboard's real one, which its
+# callbacks are written against. It used to be a placeholder form that lacked
+# the inputs and outputs those callbacks use, so in the app the dashboard did
+# nothing.
+layout = ProteinDashboard().get_layout()

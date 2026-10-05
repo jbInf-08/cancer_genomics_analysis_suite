@@ -19,7 +19,7 @@ from urllib import request as urllib_request
 
 import requests
 
-from CancerGenomicsSuite.modules.gromacs_integration.gromacs_client import GROMACSClient
+from ..gromacs_integration.gromacs_client import GROMACSClient
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,19 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-# List all modules that provide Dash interfaces
+# List all modules that provide Dash interfaces.
+#
+# Each entry must import and expose a module-level `layout` (and optionally
+# `register_callbacks(app)`); get_registered_plugins() skips anything else with
+# only a warning. tests/unit/test_plugin_registry_entries.py checks every entry.
+#
+# Not listed, because they are not dashboards: external_data_integrators'
+# encode/scopus/checkv modules (data-fetch functions), notifications.alert_monitor
+# (a notification service) and interactive_dashboards.dashboard_loader (a
+# framework class). sequence_search_tool.blast_dash is an empty file.
+# reporting.report_dash is also a framework: a report shell whose filters and
+# widgets are added in code (add_widget/add_filter), which nothing does, so it
+# would render an empty page whose Generate Report button has no callback.
 DASH_MODULES = [
     # Demo Module (always works)
     "modules.demo_module.demo_dash",
@@ -13,29 +25,22 @@ DASH_MODULES = [
     "modules.dna_sequence_analyzer.dna_dash",
     "modules.gene_expression_plotter.expression_dash",
     "modules.mutation_predictor.mutation_dash",
-    "modules.mutation_effect_predictor.predictor_dash",
+    "modules.mutation_effect_predictor.mutation_dash",
     "modules.microarray_analyzer.microarray_dash",
     "modules.ml_outcome_predictor.ml_dash",
     # Visualization Modules
     "modules.protein_structure_visualizer.structure_dash",
-    "modules.protein_sequence_viewer.sequence_dash",
-    "modules.genome_browser.genome_dash",
+    "modules.protein_sequence_viewer.protein_dash",
+    "modules.genome_browser.browser_dash",
     "modules.phylogenetic_tree_viewer.tree_dash",
     "modules.metabolic_pathway_mapper.pathway_dash",
     # Data Integration Modules
-    "modules.multi_omics_integrator.integrator_dash",
+    "modules.multi_omics_integrator.multiomics_dash",
     "modules.clinical_data_dashboard.clinical_dash",
-    "modules.external_data_integrators.encode_integration",
-    "modules.external_data_integrators.scopus_integration",
-    "modules.external_data_integrators.checkv_integration",
     # Utility Modules
-    "modules.sequence_search_tool.blast_dash",
     "modules.batch_processing.batch_dash",
     "modules.article_manager.manager_dash",
     "modules.article_scraper.scraper_dash",
-    "modules.reporting.reporting_dash",
-    "modules.notifications.alert_monitor",
-    "modules.interactive_dashboards.dashboard_loader",
     # New Bioinformatics Tools Integration
     "modules.galaxy_integration.galaxy_dash",
     "modules.r_integration.r_dash",
@@ -76,7 +81,7 @@ MODULE_METADATA = {
         "description": "Predict and analyze genetic mutations",
         "icon": "🔬",
     },
-    "modules.mutation_effect_predictor.predictor_dash": {
+    "modules.mutation_effect_predictor.mutation_dash": {
         "name": "Mutation Effect Predictor",
         "category": "Core Analysis",
         "description": "Predict the functional effects of mutations",
@@ -100,13 +105,13 @@ MODULE_METADATA = {
         "description": "3D visualization of protein structures",
         "icon": "🏗️",
     },
-    "modules.protein_sequence_viewer.sequence_dash": {
+    "modules.protein_sequence_viewer.protein_dash": {
         "name": "Protein Sequence Viewer",
         "category": "Visualization",
         "description": "View and analyze protein sequences",
         "icon": "📋",
     },
-    "modules.genome_browser.genome_dash": {
+    "modules.genome_browser.browser_dash": {
         "name": "Genome Browser",
         "category": "Visualization",
         "description": "Interactive genome browser interface",
@@ -124,7 +129,7 @@ MODULE_METADATA = {
         "description": "Map and visualize metabolic pathways",
         "icon": "🛤️",
     },
-    "modules.multi_omics_integrator.integrator_dash": {
+    "modules.multi_omics_integrator.multiomics_dash": {
         "name": "Multi-Omics Integrator",
         "category": "Data Integration",
         "description": "Integrate multiple omics data types",
@@ -135,30 +140,6 @@ MODULE_METADATA = {
         "category": "Data Integration",
         "description": "Clinical data analysis and visualization",
         "icon": "🏥",
-    },
-    "modules.external_data_integrators.encode_integration": {
-        "name": "ENCODE Integration",
-        "category": "Data Integration",
-        "description": "Integrate ENCODE database data",
-        "icon": "📚",
-    },
-    "modules.external_data_integrators.scopus_integration": {
-        "name": "Scopus Integration",
-        "category": "Data Integration",
-        "description": "Access Scopus research database",
-        "icon": "📖",
-    },
-    "modules.external_data_integrators.checkv_integration": {
-        "name": "CheckV Integration",
-        "category": "Data Integration",
-        "description": "Viral genome quality assessment",
-        "icon": "🦠",
-    },
-    "modules.sequence_search_tool.blast_dash": {
-        "name": "Sequence Search Tool",
-        "category": "Utilities",
-        "description": "BLAST and sequence alignment tools",
-        "icon": "🔎",
     },
     "modules.batch_processing.batch_dash": {
         "name": "Batch Processing",
@@ -177,24 +158,6 @@ MODULE_METADATA = {
         "category": "Utilities",
         "description": "Scrape research articles from databases",
         "icon": "🕷️",
-    },
-    "modules.reporting.reporting_dash": {
-        "name": "Reporting",
-        "category": "Utilities",
-        "description": "Generate analysis reports",
-        "icon": "📊",
-    },
-    "modules.notifications.alert_monitor": {
-        "name": "Alert Monitor",
-        "category": "Utilities",
-        "description": "Monitor and manage system alerts",
-        "icon": "🔔",
-    },
-    "modules.interactive_dashboards.dashboard_loader": {
-        "name": "Interactive Dashboards",
-        "category": "Utilities",
-        "description": "Load and manage custom dashboards",
-        "icon": "📱",
     },
     # New Bioinformatics Tools Integration
     "modules.galaxy_integration.galaxy_dash": {

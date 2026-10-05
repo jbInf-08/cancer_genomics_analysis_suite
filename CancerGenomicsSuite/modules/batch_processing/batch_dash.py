@@ -354,7 +354,10 @@ class BatchDashboard:
     """
 
     def __init__(
-        self, app_name: str = "BatchProcessingDashboard", batch_queue: BatchQueue = None
+        self,
+        app_name: str = "BatchProcessingDashboard",
+        batch_queue: BatchQueue = None,
+        app: Optional[dash.Dash] = None,
     ):
         """
         Initialize BatchDashboard.
@@ -362,11 +365,20 @@ class BatchDashboard:
         Args:
             app_name: Name of the Dash application
             batch_queue: BatchQueue instance to manage
+            app: Register the callbacks on this app instead of creating one. Its
+                layout and configuration are left alone; plugin_registry serves
+                the module-level `layout`.
         """
         self.app_name = app_name
-        self.app = dash.Dash(__name__)
+        standalone = app is None
+        self.app = dash.Dash(__name__) if standalone else app
         self.batch_queue = batch_queue or BatchQueue()
         self.callbacks_registered = set()
+
+        if not standalone:
+            # The main dashboard's app: its layout is not ours to set.
+            self._register_default_callbacks()
+            return
 
         # Configure app
         self.app.config.suppress_callback_exceptions = True
@@ -374,9 +386,10 @@ class BatchDashboard:
         # Set up default layout
         self._setup_default_layout()
 
-    def _setup_default_layout(self):
-        """Set up default dashboard layout."""
-        self.app.layout = html.Div(
+    @staticmethod
+    def build_layout() -> html.Div:
+        """The dashboard layout: static components, needing no app or queue."""
+        return html.Div(
             [
                 # Header
                 html.Div(
@@ -457,6 +470,10 @@ class BatchDashboard:
             ],
             className="dashboard-container",
         )
+
+    def _setup_default_layout(self):
+        """Set up default dashboard layout."""
+        self.app.layout = self.build_layout()
 
         # Register default callbacks
         self._register_default_callbacks()
@@ -903,3 +920,15 @@ class BatchDashboard:
         """
         logger.info(f"Starting batch processing dashboard on {host}:{port}")
         self.app.run(host=host, port=port, debug=debug)
+
+
+# Plugin interface read by plugin_registry: the static layout, and a
+# function creating the dashboard on the main app.
+layout = BatchDashboard.build_layout()
+
+
+def register_callbacks(app: dash.Dash) -> BatchDashboard:
+    # BatchQueue's default database lives in this package's directory, which an
+    # installed package may not be able to write. The main app keeps its job
+    # database in the working directory instead, like the article dashboards.
+    return BatchDashboard(batch_queue=BatchQueue(db_path="batch_jobs.db"), app=app)

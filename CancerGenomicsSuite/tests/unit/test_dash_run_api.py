@@ -49,7 +49,7 @@ def test_no_dash_app_calls_run_server():
     )
 
 
-def test_main_dashboard_main_starts_the_server_with_settings():
+def test_main_dashboard_main_starts_the_server_with_settings(tmp_path):
     """The console-script entry point reaches app.run with the configured values.
 
     Runs in a subprocess: importing main_dashboard loads every plugin and needs
@@ -74,6 +74,9 @@ def test_main_dashboard_main_starts_the_server_with_settings():
         capture_output=True,
         text=True,
         timeout=600,
+        # importing main_dashboard registers every plugin, and some of them
+        # create SQLite files and work directories in the working directory
+        cwd=tmp_path,
     )
     assert proc.returncode == 0, proc.stderr[-3000:]
     assert proc.stdout.strip().endswith("ok")
