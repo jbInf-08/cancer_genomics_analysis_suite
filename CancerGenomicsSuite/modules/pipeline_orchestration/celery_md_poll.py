@@ -8,9 +8,7 @@ from typing import Any, Dict, Optional, Tuple
 
 from dash import html
 
-from CancerGenomicsSuite.modules.pipeline_orchestration.md_workflow_dash_display import (
-    md_workflow_result_to_div,
-)
+from .md_workflow_dash_display import md_workflow_result_to_div
 
 logger = logging.getLogger(__name__)
 

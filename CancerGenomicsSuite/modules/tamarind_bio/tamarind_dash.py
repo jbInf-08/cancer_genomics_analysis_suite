@@ -91,7 +91,9 @@ layout = html.Div(
                     className="input-group",
                 ),
                 html.Button(
-                    "Run Workflow", id="run-workflow", className="button primary"
+                    "Run Workflow",
+                    id="tamarind-run-workflow",
+                    className="button primary",
                 ),
                 html.Div(id="workflow-results", className="workflow-results"),
             ],
@@ -128,7 +130,7 @@ def register_callbacks(app):
 
     @app.callback(
         Output("workflow-results", "children"),
-        [Input("run-workflow", "n_clicks")],
+        [Input("tamarind-run-workflow", "n_clicks")],
         [State("workflow-upload", "contents")],
     )
     def run_workflow(n_clicks, contents):

@@ -78,12 +78,104 @@ layout = html.Div(
                     id="load-structure-tabs",
                     value="file",
                     children=[
-                        dcc.Tab(label="From File", value="file"),
-                        dcc.Tab(label="From PDB", value="pdb"),
+                        dcc.Tab(
+                            label="From File",
+                            value="file",
+                            children=html.Div(
+                                [
+                                    html.H4("Load Structure from File"),
+                                    dcc.Upload(
+                                        id="structure-file-upload",
+                                        children=html.Div(
+                                            [
+                                                "Drag and Drop or ",
+                                                html.A("Select Structure File"),
+                                            ]
+                                        ),
+                                        style={
+                                            "width": "100%",
+                                            "height": "60px",
+                                            "lineHeight": "60px",
+                                            "borderWidth": "1px",
+                                            "borderStyle": "dashed",
+                                            "borderRadius": "5px",
+                                            "textAlign": "center",
+                                            "margin": "10px",
+                                        },
+                                        multiple=False,
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Object Name:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="file-object-name",
+                                                type="text",
+                                                value="mol",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Load Structure",
+                                        id="load-file-structure",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="file-load-results", className="load-results"
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="From PDB",
+                            value="pdb",
+                            children=html.Div(
+                                [
+                                    html.H4("Fetch Structure from PDB"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "PDB ID:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="pdb-id",
+                                                type="text",
+                                                placeholder="1CRN",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Object Name:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="pdb-object-name",
+                                                type="text",
+                                                placeholder="pdb_structure",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Fetch Structure",
+                                        id="fetch-pdb-structure",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="pdb-fetch-results",
+                                        className="fetch-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
-                ),
-                html.Div(
-                    id="load-structure-content", className="load-structure-content"
                 ),
             ],
             className="load-structure-section",
@@ -162,16 +254,249 @@ layout = html.Div(
             [
                 html.H3("Structure Analysis", className="subsection-title"),
                 dcc.Tabs(
-                    id="analysis-tabs",
+                    id="pymol-analysis-tabs",
                     value="alignment",
                     children=[
-                        dcc.Tab(label="Alignment", value="alignment"),
-                        dcc.Tab(label="Distance", value="distance"),
-                        dcc.Tab(label="Secondary Structure", value="secondary"),
-                        dcc.Tab(label="Surface", value="surface"),
+                        dcc.Tab(
+                            label="Alignment",
+                            value="alignment",
+                            children=html.Div(
+                                [
+                                    html.H4("Structure Alignment"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Object 1:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="align-object1",
+                                                type="text",
+                                                placeholder="mol1",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Object 2:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="align-object2",
+                                                type="text",
+                                                placeholder="mol2",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Method:", className="input-label"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="alignment-method",
+                                                options=[
+                                                    {
+                                                        "label": "Align",
+                                                        "value": "align",
+                                                    },
+                                                    {
+                                                        "label": "Super",
+                                                        "value": "super",
+                                                    },
+                                                    {
+                                                        "label": "CEAlign",
+                                                        "value": "cealign",
+                                                    },
+                                                ],
+                                                value="align",
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Align Structures",
+                                        id="align-structures",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="alignment-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Distance",
+                            value="distance",
+                            children=html.Div(
+                                [
+                                    html.H4("Distance Calculation"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Object Name:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="distance-object",
+                                                type="text",
+                                                placeholder="mol",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Selection 1:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="distance-selection1",
+                                                type="text",
+                                                placeholder="resi 10",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Selection 2:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="distance-selection2",
+                                                type="text",
+                                                placeholder="resi 20",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Calculate Distance",
+                                        id="calculate-distance",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="distance-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Secondary Structure",
+                            value="secondary",
+                            children=html.Div(
+                                [
+                                    html.H4("Secondary Structure Analysis"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Object Name:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="secondary-object",
+                                                type="text",
+                                                placeholder="mol",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Analyze Secondary Structure",
+                                        id="analyze-secondary",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="secondary-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
+                        dcc.Tab(
+                            label="Surface",
+                            value="surface",
+                            children=html.Div(
+                                [
+                                    html.H4("Surface Creation"),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Object Name:", className="input-label"
+                                            ),
+                                            dcc.Input(
+                                                id="surface-object",
+                                                type="text",
+                                                placeholder="mol",
+                                                className="input-field",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Surface Type:", className="input-label"
+                                            ),
+                                            dcc.Dropdown(
+                                                id="surface-type",
+                                                options=[
+                                                    {
+                                                        "label": "Surface",
+                                                        "value": "surface",
+                                                    },
+                                                    {"label": "Dots", "value": "dots"},
+                                                    {"label": "Mesh", "value": "mesh"},
+                                                ],
+                                                value="surface",
+                                                className="dropdown",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Div(
+                                        [
+                                            html.Label(
+                                                "Transparency:", className="input-label"
+                                            ),
+                                            dcc.Slider(
+                                                id="surface-transparency",
+                                                min=0,
+                                                max=1,
+                                                step=0.1,
+                                                value=0.5,
+                                                marks={
+                                                    i / 10: str(i / 10)
+                                                    for i in range(0, 11, 2)
+                                                },
+                                                className="slider",
+                                            ),
+                                        ],
+                                        className="input-group",
+                                    ),
+                                    html.Button(
+                                        "Create Surface",
+                                        id="create-surface",
+                                        className="button primary",
+                                    ),
+                                    html.Div(
+                                        id="surface-results",
+                                        className="analysis-results",
+                                    ),
+                                ]
+                            ),
+                        ),
                     ],
                 ),
-                html.Div(id="pymol-analysis-content", className="analysis-content"),
             ],
             className="analysis-section",
         ),
@@ -272,90 +597,6 @@ def register_callbacks(app):
             path = "Not found"
 
         return status, version, path
-
-    @app.callback(
-        Output("load-structure-content", "children"),
-        [Input("load-structure-tabs", "value")],
-    )
-    def update_load_structure_content(active_tab):
-        if active_tab == "file":
-            return html.Div(
-                [
-                    html.H4("Load Structure from File"),
-                    dcc.Upload(
-                        id="structure-file-upload",
-                        children=html.Div(
-                            ["Drag and Drop or ", html.A("Select Structure File")]
-                        ),
-                        style={
-                            "width": "100%",
-                            "height": "60px",
-                            "lineHeight": "60px",
-                            "borderWidth": "1px",
-                            "borderStyle": "dashed",
-                            "borderRadius": "5px",
-                            "textAlign": "center",
-                            "margin": "10px",
-                        },
-                        multiple=False,
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Object Name:", className="input-label"),
-                            dcc.Input(
-                                id="file-object-name",
-                                type="text",
-                                value="mol",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Load Structure",
-                        id="load-file-structure",
-                        className="button primary",
-                    ),
-                    html.Div(id="file-load-results", className="load-results"),
-                ]
-            )
-
-        elif active_tab == "pdb":
-            return html.Div(
-                [
-                    html.H4("Fetch Structure from PDB"),
-                    html.Div(
-                        [
-                            html.Label("PDB ID:", className="input-label"),
-                            dcc.Input(
-                                id="pdb-id",
-                                type="text",
-                                placeholder="1CRN",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Object Name:", className="input-label"),
-                            dcc.Input(
-                                id="pdb-object-name",
-                                type="text",
-                                placeholder="pdb_structure",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Fetch Structure",
-                        id="fetch-pdb-structure",
-                        className="button primary",
-                    ),
-                    html.Div(id="pdb-fetch-results", className="fetch-results"),
-                ]
-            )
 
     @app.callback(
         Output("file-load-results", "children"),
@@ -502,193 +743,6 @@ def register_callbacks(app):
         except Exception as e:
             logger.error(f"Error visualizing structure: {e}")
             return html.P(f"❌ Error: {str(e)}")
-
-    @app.callback(
-        Output("pymol-analysis-content", "children"), [Input("analysis-tabs", "value")]
-    )
-    def update_analysis_content(active_tab):
-        if active_tab == "alignment":
-            return html.Div(
-                [
-                    html.H4("Structure Alignment"),
-                    html.Div(
-                        [
-                            html.Label("Object 1:", className="input-label"),
-                            dcc.Input(
-                                id="align-object1",
-                                type="text",
-                                placeholder="mol1",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Object 2:", className="input-label"),
-                            dcc.Input(
-                                id="align-object2",
-                                type="text",
-                                placeholder="mol2",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Method:", className="input-label"),
-                            dcc.Dropdown(
-                                id="alignment-method",
-                                options=[
-                                    {"label": "Align", "value": "align"},
-                                    {"label": "Super", "value": "super"},
-                                    {"label": "CEAlign", "value": "cealign"},
-                                ],
-                                value="align",
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Align Structures",
-                        id="align-structures",
-                        className="button primary",
-                    ),
-                    html.Div(id="alignment-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "distance":
-            return html.Div(
-                [
-                    html.H4("Distance Calculation"),
-                    html.Div(
-                        [
-                            html.Label("Object Name:", className="input-label"),
-                            dcc.Input(
-                                id="distance-object",
-                                type="text",
-                                placeholder="mol",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Selection 1:", className="input-label"),
-                            dcc.Input(
-                                id="distance-selection1",
-                                type="text",
-                                placeholder="resi 10",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Selection 2:", className="input-label"),
-                            dcc.Input(
-                                id="distance-selection2",
-                                type="text",
-                                placeholder="resi 20",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Calculate Distance",
-                        id="calculate-distance",
-                        className="button primary",
-                    ),
-                    html.Div(id="distance-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "secondary":
-            return html.Div(
-                [
-                    html.H4("Secondary Structure Analysis"),
-                    html.Div(
-                        [
-                            html.Label("Object Name:", className="input-label"),
-                            dcc.Input(
-                                id="secondary-object",
-                                type="text",
-                                placeholder="mol",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Analyze Secondary Structure",
-                        id="analyze-secondary",
-                        className="button primary",
-                    ),
-                    html.Div(id="secondary-results", className="analysis-results"),
-                ]
-            )
-
-        elif active_tab == "surface":
-            return html.Div(
-                [
-                    html.H4("Surface Creation"),
-                    html.Div(
-                        [
-                            html.Label("Object Name:", className="input-label"),
-                            dcc.Input(
-                                id="surface-object",
-                                type="text",
-                                placeholder="mol",
-                                className="input-field",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Surface Type:", className="input-label"),
-                            dcc.Dropdown(
-                                id="surface-type",
-                                options=[
-                                    {"label": "Surface", "value": "surface"},
-                                    {"label": "Dots", "value": "dots"},
-                                    {"label": "Mesh", "value": "mesh"},
-                                ],
-                                value="surface",
-                                className="dropdown",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Transparency:", className="input-label"),
-                            dcc.Slider(
-                                id="surface-transparency",
-                                min=0,
-                                max=1,
-                                step=0.1,
-                                value=0.5,
-                                marks={i / 10: str(i / 10) for i in range(0, 11, 2)},
-                                className="slider",
-                            ),
-                        ],
-                        className="input-group",
-                    ),
-                    html.Button(
-                        "Create Surface",
-                        id="create-surface",
-                        className="button primary",
-                    ),
-                    html.Div(id="surface-results", className="analysis-results"),
-                ]
-            )
 
     @app.callback(
         Output("alignment-results", "children"),

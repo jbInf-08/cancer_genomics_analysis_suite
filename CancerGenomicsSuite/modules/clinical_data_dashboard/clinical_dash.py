@@ -7,7 +7,7 @@ analysis, survival analysis, and visualization.
 
 import json
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import numpy as np
@@ -31,16 +31,20 @@ class ClinicalDashboard:
     A comprehensive dashboard for clinical data analysis and survival analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the clinical dashboard.
 
         Args:
-            app: Dash application instance
+            app: Dash application to register callbacks on. Without one, the
+                instance only builds the layout -- no services, no callbacks --
+                which is how the module-level `layout` is made.
         """
         self.app = app
-        self.analyzer = ClinicalDataAnalyzer()
         self.current_data = None
+        if app is None:
+            return
+        self.analyzer = ClinicalDataAnalyzer()
         self.setup_callbacks()
 
     def create_layout(self) -> html.Div:
@@ -174,7 +178,7 @@ class ClinicalDashboard:
                                     [
                                         html.Button(
                                             "Load Mock Data",
-                                            id="load-mock-data",
+                                            id="clinical-load-mock-data",
                                             className="btn btn-primary me-2",
                                         ),
                                         html.Button(
@@ -194,7 +198,7 @@ class ClinicalDashboard:
                                         ),
                                         html.Button(
                                             "Export Results",
-                                            id="export-results",
+                                            id="clinical-export-results",
                                             className="btn btn-secondary",
                                         ),
                                     ],
@@ -211,23 +215,41 @@ class ClinicalDashboard:
                     [
                         # Tabs for different views
                         dcc.Tabs(
-                            id="main-tabs",
+                            id="clinical-main-tabs",
                             value="overview",
                             children=[
-                                dcc.Tab(label="Data Overview", value="overview"),
-                                dcc.Tab(label="Survival Analysis", value="survival"),
                                 dcc.Tab(
-                                    label="Clinical Correlations", value="correlations"
+                                    label="Data Overview",
+                                    value="overview",
+                                    children=self.create_overview_tab(),
                                 ),
                                 dcc.Tab(
-                                    label="Clinical Associations", value="associations"
+                                    label="Survival Analysis",
+                                    value="survival",
+                                    children=self.create_survival_tab(),
                                 ),
-                                dcc.Tab(label="Predictive Modeling", value="modeling"),
-                                dcc.Tab(label="Visualizations", value="visualizations"),
+                                dcc.Tab(
+                                    label="Clinical Correlations",
+                                    value="correlations",
+                                    children=self.create_correlations_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Clinical Associations",
+                                    value="associations",
+                                    children=self.create_associations_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Predictive Modeling",
+                                    value="modeling",
+                                    children=self.create_modeling_tab(),
+                                ),
+                                dcc.Tab(
+                                    label="Visualizations",
+                                    value="visualizations",
+                                    children=self.create_visualizations_tab(),
+                                ),
                             ],
                         ),
-                        # Tab content
-                        html.Div(id="clinical-tab-content", className="mt-3"),
                     ],
                     className="container-fluid",
                 ),
@@ -237,7 +259,7 @@ class ClinicalDashboard:
                 html.Div(id="clinical-analysis-results", style={"display": "none"}),
                 # Download components
                 dcc.Download(id="clinical-download-results"),
-                dcc.Download(id="download-data"),
+                dcc.Download(id="clinical-download-data"),
             ]
         )
 
@@ -255,12 +277,12 @@ class ClinicalDashboard:
                 html.Div(
                     [
                         html.H4("Data Quality Metrics"),
-                        html.Div(id="quality-metrics", className="row"),
+                        html.Div(id="clinical-quality-metrics", className="row"),
                     ],
                     className="card mb-4",
                 ),
                 html.Div(
-                    [html.H4("Data Summary"), html.Div(id="data-summary")],
+                    [html.H4("Data Summary"), html.Div(id="clinical-data-summary")],
                     className="card",
                 ),
             ]
@@ -349,7 +371,7 @@ class ClinicalDashboard:
                 html.Div(
                     [
                         html.H4("Correlation Heatmap"),
-                        dcc.Graph(id="correlation-heatmap"),
+                        dcc.Graph(id="clinical-correlation-heatmap"),
                     ],
                     className="card mb-4",
                 ),
@@ -419,7 +441,7 @@ class ClinicalDashboard:
                                 ),
                                 html.Label("Model Type:"),
                                 dcc.Dropdown(
-                                    id="model-type",
+                                    id="clinical-model-type",
                                     options=[
                                         {
                                             "label": "Classification",
@@ -461,7 +483,7 @@ class ClinicalDashboard:
                 html.Div(
                     [
                         html.H4("Feature Importance"),
-                        dcc.Graph(id="feature-importance-plot"),
+                        dcc.Graph(id="clinical-feature-importance-plot"),
                     ],
                     className="card",
                 ),
@@ -479,7 +501,7 @@ class ClinicalDashboard:
                             [
                                 html.Label("Visualization Type:"),
                                 dcc.Dropdown(
-                                    id="visualization-type",
+                                    id="clinical-visualization-type",
                                     options=[
                                         {
                                             "label": "Survival Curves",
@@ -511,7 +533,9 @@ class ClinicalDashboard:
                             ],
                             className="mb-3",
                         ),
-                        dcc.Graph(id="main-visualization", style={"height": "600px"}),
+                        dcc.Graph(
+                            id="clinical-main-visualization", style={"height": "600px"}
+                        ),
                     ],
                     className="card",
                 )
@@ -525,9 +549,9 @@ class ClinicalDashboard:
             [
                 Output("clinical-data", "children"),
                 Output("survival-data", "children"),
-                Output("data-summary", "children"),
+                Output("clinical-data-summary", "children"),
             ],
-            [Input("load-mock-data", "n_clicks")],
+            [Input("clinical-load-mock-data", "n_clicks")],
         )
         def load_mock_data(n_clicks):
             """Load mock data and create summary."""
@@ -606,7 +630,7 @@ class ClinicalDashboard:
 
         @self.app.callback(
             [
-                Output("correlation-heatmap", "figure"),
+                Output("clinical-correlation-heatmap", "figure"),
                 Output("correlation-results", "children"),
             ],
             [Input("run-correlation", "n_clicks")],
@@ -649,26 +673,6 @@ class ClinicalDashboard:
             return go.Figure(), html.Div(
                 "Click 'Run Correlation Analysis' to begin", className="text-muted"
             )
-
-        @self.app.callback(
-            Output("clinical-tab-content", "children"), [Input("main-tabs", "value")]
-        )
-        def render_tab_content(active_tab):
-            """Render content based on active tab."""
-            if active_tab == "overview":
-                return self.create_overview_tab()
-            elif active_tab == "survival":
-                return self.create_survival_tab()
-            elif active_tab == "correlations":
-                return self.create_correlations_tab()
-            elif active_tab == "associations":
-                return self.create_associations_tab()
-            elif active_tab == "modeling":
-                return self.create_modeling_tab()
-            elif active_tab == "visualizations":
-                return self.create_visualizations_tab()
-            else:
-                return html.Div("Select a tab to view content")
 
         @self.app.callback(
             Output("survival-plot", "figure"), [Input("survival-results", "children")]
@@ -876,6 +880,16 @@ def create_clinical_dashboard(app: dash.Dash) -> ClinicalDashboard:
     """
     dashboard = ClinicalDashboard(app)
     return dashboard
+
+
+# Plugin interface read by plugin_registry: the layout, built without
+# services or callbacks, and a function registering the callbacks on the
+# main app.
+layout = ClinicalDashboard().create_layout()
+
+
+def register_callbacks(app: dash.Dash) -> ClinicalDashboard:
+    return create_clinical_dashboard(app)
 
 
 def main():
