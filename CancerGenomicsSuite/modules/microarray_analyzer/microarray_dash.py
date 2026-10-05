@@ -10,6 +10,7 @@ import base64
 import io
 import json
 import logging
+from typing import Optional
 
 import dash
 import numpy as np
@@ -29,23 +30,33 @@ class MicroarrayDashboard:
     Dash dashboard for microarray data analysis.
     """
 
-    def __init__(self, app_name: str = "Microarray Analyzer"):
+    def __init__(
+        self, app_name: str = "Microarray Analyzer", app: Optional[dash.Dash] = None
+    ):
         """
         Initialize the microarray analysis dashboard.
 
         Args:
             app_name: Name of the Dash app
+            app: Register callbacks on this app instead of creating one.
+                Its layout and title are left alone; plugin_registry serves
+                the module-level `layout`.
         """
-        self.app = dash.Dash(__name__)
-        self.app.title = app_name
+        standalone = app is None
+        self.app = dash.Dash(__name__) if standalone else app
+        if standalone:
+            self.app.title = app_name
         self.analyzer = create_sample_analyzer()
         self.current_data = None
-        self.setup_layout()
+        # A given app is the main dashboard's: its layout is not ours to set.
+        if standalone:
+            self.setup_layout()
         self.setup_callbacks()
 
-    def setup_layout(self):
-        """Set up the dashboard layout."""
-        self.app.layout = html.Div(
+    @staticmethod
+    def build_layout() -> html.Div:
+        """The dashboard layout: static components, needing no app or services."""
+        return html.Div(
             [
                 # Header
                 html.Div(
@@ -181,7 +192,7 @@ class MicroarrayDashboard:
                                 ),
                                 html.Button(
                                     "Load Sample Data",
-                                    id="load-sample-button",
+                                    id="microarray-load-sample-button",
                                     className="sample-button",
                                 ),
                             ],
@@ -194,7 +205,10 @@ class MicroarrayDashboard:
                 html.Div(
                     [
                         html.H3("Data Summary"),
-                        html.Div(id="data-summary", className="data-summary"),
+                        html.Div(
+                            id="microarray-data-summary",
+                            className="microarray-data-summary",
+                        ),
                     ],
                     className="summary-panel",
                 ),
@@ -368,7 +382,7 @@ class MicroarrayDashboard:
                             ],
                             className="table-controls",
                         ),
-                        html.Div(id="results-table-container"),
+                        html.Div(id="microarray-results-table-container"),
                     ],
                     className="table-panel",
                 ),
@@ -380,7 +394,7 @@ class MicroarrayDashboard:
                             [
                                 html.Label("Format:"),
                                 dcc.Dropdown(
-                                    id="export-format-dropdown",
+                                    id="microarray-export-format-dropdown",
                                     options=[
                                         {"label": "JSON", "value": "json"},
                                         {"label": "CSV", "value": "csv"},
@@ -392,13 +406,16 @@ class MicroarrayDashboard:
                                 ),
                                 html.Button(
                                     "Export",
-                                    id="export-button",
-                                    className="export-button",
+                                    id="microarray-export-button",
+                                    className="microarray-export-button",
                                 ),
                             ],
                             className="export-controls",
                         ),
-                        html.Div(id="export-output", className="export-output"),
+                        html.Div(
+                            id="microarray-export-output",
+                            className="microarray-export-output",
+                        ),
                     ],
                     className="export-panel",
                 ),
@@ -407,31 +424,36 @@ class MicroarrayDashboard:
                     [
                         html.H3("Analysis Statistics"),
                         html.Div(
-                            id="statistics-display", className="statistics-display"
+                            id="microarray-statistics-display",
+                            className="microarray-statistics-display",
                         ),
                     ],
                     className="statistics-panel",
                 ),
                 # Hidden divs to store data
-                html.Div(id="uploaded-data", style={"display": "none"}),
-                html.Div(id="analysis-status", style={"display": "none"}),
+                html.Div(id="microarray-uploaded-data", style={"display": "none"}),
+                html.Div(id="microarray-analysis-status", style={"display": "none"}),
             ],
             className="main-container",
         )
+
+    def setup_layout(self):
+        """Set up the dashboard layout."""
+        self.app.layout = self.build_layout()
 
     def setup_callbacks(self):
         """Set up Dash callbacks for interactivity."""
 
         @self.app.callback(
             [
-                Output("uploaded-data", "children"),
-                Output("data-summary", "children"),
+                Output("microarray-uploaded-data", "children"),
+                Output("microarray-data-summary", "children"),
                 Output("group-column-dropdown", "options"),
                 Output("group-column-dropdown", "value"),
             ],
             [
                 Input("load-data-button", "n_clicks"),
-                Input("load-sample-button", "n_clicks"),
+                Input("microarray-load-sample-button", "n_clicks"),
             ],
             [
                 State("expression-upload", "contents"),
@@ -456,7 +478,7 @@ class MicroarrayDashboard:
 
             button_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-            if button_id == "load-sample-button" and sample_clicks:
+            if button_id == "microarray-load-sample-button" and sample_clicks:
                 # Load sample data
                 self.analyzer = create_sample_analyzer()
                 self.current_data = self.analyzer.data
@@ -516,7 +538,7 @@ class MicroarrayDashboard:
         @self.app.callback(
             [
                 Output("visualization-content", "children"),
-                Output("analysis-status", "children"),
+                Output("microarray-analysis-status", "children"),
             ],
             [
                 Input("normalize-button", "n_clicks"),
@@ -591,7 +613,7 @@ class MicroarrayDashboard:
                 return f"Error in analysis: {str(e)}", ""
 
         @self.app.callback(
-            Output("results-table-container", "children"),
+            Output("microarray-results-table-container", "children"),
             [Input("results-type-dropdown", "value")],
         )
         def update_results_table(results_type):
@@ -611,9 +633,9 @@ class MicroarrayDashboard:
                 return "No data available for selected type"
 
         @self.app.callback(
-            Output("export-output", "children"),
-            [Input("export-button", "n_clicks")],
-            [State("export-format-dropdown", "value")],
+            Output("microarray-export-output", "children"),
+            [Input("microarray-export-button", "n_clicks")],
+            [State("microarray-export-format-dropdown", "value")],
         )
         def export_results(export_clicks, format_type):
             """Export analysis results."""
@@ -646,10 +668,10 @@ class MicroarrayDashboard:
                 )
 
         @self.app.callback(
-            Output("statistics-display", "children"),
+            Output("microarray-statistics-display", "children"),
             [
                 Input("load-data-button", "n_clicks"),
-                Input("load-sample-button", "n_clicks"),
+                Input("microarray-load-sample-button", "n_clicks"),
                 Input("normalize-button", "n_clicks"),
                 Input("diff-expr-button", "n_clicks"),
             ],
@@ -1195,6 +1217,15 @@ def create_microarray_dashboard() -> MicroarrayDashboard:
         MicroarrayDashboard instance
     """
     return MicroarrayDashboard()
+
+
+# Plugin interface read by plugin_registry: the static layout, and a
+# function creating the dashboard on the main app.
+layout = MicroarrayDashboard.build_layout()
+
+
+def register_callbacks(app: dash.Dash) -> MicroarrayDashboard:
+    return MicroarrayDashboard(app=app)
 
 
 if __name__ == "__main__":

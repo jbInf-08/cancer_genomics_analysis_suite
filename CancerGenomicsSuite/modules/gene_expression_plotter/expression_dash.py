@@ -9,7 +9,7 @@ visualize results through a web-based interface.
 import base64
 import io
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import dash
 import numpy as np
@@ -28,7 +28,7 @@ class ExpressionDashboard:
     web-based dashboard for gene expression analysis.
     """
 
-    def __init__(self, app: dash.Dash):
+    def __init__(self, app: Optional[dash.Dash] = None):
         """
         Initialize the expression dashboard.
 
@@ -37,6 +37,10 @@ class ExpressionDashboard:
         """
         self.app = app
         self.logger = logging.getLogger(__name__)
+        if app is None:
+            # Layout only: plugin_registry's module-level `layout` is built
+            # this way, with no services and no callbacks.
+            return
         self.plotter = GeneExpressionPlotter()
 
         # Register callbacks
@@ -775,30 +779,8 @@ def register_callbacks(app):
     return dashboard
 
 
-# Legacy layout for backward compatibility
-layout = html.Div(
-    [
-        html.H1("Gene Expression Plotter"),
-        html.P("This module provides gene expression visualization tools."),
-        html.Div(
-            [
-                html.Label("Upload Expression Data:"),
-                dcc.Upload(
-                    id="upload-data",
-                    children=html.Div(["Drag and Drop or ", html.A("Select Files")]),
-                    style={
-                        "width": "100%",
-                        "height": "60px",
-                        "lineHeight": "60px",
-                        "borderWidth": "1px",
-                        "borderStyle": "dashed",
-                        "borderRadius": "5px",
-                        "textAlign": "center",
-                    },
-                    multiple=False,
-                ),
-                html.Div(id="expression-output"),
-            ]
-        ),
-    ]
-)
+# The layout plugin_registry serves: the dashboard's real one, which its
+# callbacks are written against. It used to be a placeholder form that lacked
+# the inputs and outputs those callbacks use, so in the app the dashboard did
+# nothing.
+layout = ExpressionDashboard().get_layout()
