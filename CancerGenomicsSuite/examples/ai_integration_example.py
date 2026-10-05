@@ -49,7 +49,7 @@ from modules.ai_integration import (
 
 # Import existing modules
 from modules.omics_definitions import OmicsFieldRegistry
-from modules.reporting_engine import HTMLReporter, PDFBuilder
+from reporting_engine import HTMLReporter, PDFBuilder
 
 # Configure logging
 logging.basicConfig(

@@ -544,10 +544,12 @@ run_local.sh
 *.bmp
 *.tiff
 *.svg
-!static/icons/*.png
-!static/icons/*.svg
-!static/images/logo.png
-!static/images/favicon.ico
+# A pattern containing a slash is anchored to this file's directory, so these
+# exceptions need `**/` to reach CancerGenomicsSuite/static.
+!**/static/icons/*.png
+!**/static/icons/*.svg
+!**/static/images/logo.png
+!**/static/images/favicon.ico
 
 # Documentation images
 docs/images/
